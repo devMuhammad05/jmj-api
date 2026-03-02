@@ -22,11 +22,8 @@ final class AuthController extends ApiController
     public function register(RegisterUserRequest $request): JsonResponse
     {
         $user = User::create([
-            'title' => $request->title,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
+            'full_name' => $request->full_name,
             'email' => $request->email,
-            'dob' => $request->dob,
             'password' => $this->hasher->make($request->password),
         ]);
 
