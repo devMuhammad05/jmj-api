@@ -69,6 +69,19 @@ Retrieve current authenticated user details.
 - **Method**: `GET`
 - **Authentication**: Required (Sanctum)
 
+#### **Update Profile**
+
+Update current authenticated user details.
+
+- **URL**: `/auth/profile`
+- **Method**: `PUT`
+- **Authentication**: Required (Sanctum)
+- **Body Parameters (All Optional)**:
+    - `full_name` (string)
+    - `email` (string, unique)
+    - `phone_number` (string)
+    - `country` (string)
+
 ---
 
 ### 2. Client Management

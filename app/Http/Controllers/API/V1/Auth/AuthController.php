@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\Auth\LoginUserRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterUserRequest;
+use App\Http\Requests\Api\V1\Auth\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Hashing\Hasher;
@@ -79,5 +80,18 @@ final class AuthController extends ApiController
     public function me(): JsonResponse
     {
         return $this->successResponse('User profile retrieved successfully', $this->authManager->user());
+    }
+
+    /**
+     * Update the authenticated user's profile.
+     */
+    public function update(UpdateProfileRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->authManager->user();
+
+        $user->update($request->validated());
+
+        return $this->successResponse('User profile updated successfully', $user);
     }
 }

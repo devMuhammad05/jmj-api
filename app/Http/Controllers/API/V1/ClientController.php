@@ -9,17 +9,17 @@ use App\DTOs\ClientData;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreClientRequest;
 use App\Http\Resources\V1\ClientResource;
-use App\Models\Client;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ClientController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $clients = Client::query()
+        $clients = $request->user()->clients()
             ->latest()
             ->paginate(10);
 

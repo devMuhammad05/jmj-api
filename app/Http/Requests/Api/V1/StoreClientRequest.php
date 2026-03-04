@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Enums\RiskLevel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class StoreClientRequest extends FormRequest
 {
@@ -30,16 +32,16 @@ class StoreClientRequest extends FormRequest
             // Verification
             'id_type' => ['required', 'string', 'in:national_id,passport,driving_license,voters_card'],
             'id_number' => ['required', 'string', 'max:50'],
-            'id_card_front_img_url' => ['required', 'string'],
-            'id_card_back_img_url' => ['nullable', 'string'],
-            'selfie_img_url' => ['required', 'string'],
+            'id_card_front_img_url' => ['required', 'url'],
+            'id_card_back_img_url' => ['nullable', 'url'],
+            'selfie_img_url' => ['required', 'url'],
 
             // MetaTrader
             'mt_account_number' => ['required', 'string', 'max:50'],
             'mt_password' => ['required', 'string', 'max:50'],
             'mt_server' => ['required', 'string', 'max:100'],
             'initial_deposit' => ['required', 'numeric', 'min:0'],
-            'risk_level' => ['required', new \Illuminate\Validation\Rules\Enum(\App\Enums\RiskLevel::class)],
+            'risk_level' => ['required', new Enum(RiskLevel::class)],
         ];
     }
 }
