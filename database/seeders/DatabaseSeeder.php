@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Enums\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,10 +22,10 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-                // Admin
+        // Admin
         DB::table('users')->insert([
             'full_name' => 'Administrator',
-            'email' => 'admin@voteunited.com',
+            'email' => 'admin@jmj.com',
             'email_verified_at' => now(),
             'role' => Role::Admin->value,
             'password' => Hash::make('jmjapp1234@'),

@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Role;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasName
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -27,6 +29,7 @@ class User extends Authenticatable implements FilamentUser
         'phone_number',
         'country',
         'password',
+        'role',
     ];
 
     /**
@@ -39,6 +42,13 @@ class User extends Authenticatable implements FilamentUser
         'remember_token',
     ];
 
+
+    public function getFilamentName(): string
+    {
+        return $this->full_name ?? $this->email ?? 'Administrator';
+    }
+
+
     public function canAccessPanel(Panel $panel): bool
     {
 
@@ -47,13 +57,14 @@ class User extends Authenticatable implements FilamentUser
         // }
 
         // if ($this->role === Role::Admin) {
-        //     return str_ends_with($this->email, '@voteunited.com') && $this->hasVerifiedEmail();
+        //     return str_ends_with($this->email, '@jmj.com') && $this->hasVerifiedEmail();
         // }
 
         // return false;
 
         return true;
     }
+
 
 
     /**
@@ -66,6 +77,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => Role::class,
         ];
     }
 
