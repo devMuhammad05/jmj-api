@@ -18,7 +18,7 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            'owner_id' => User::factory(),
+            'user_id' => User::factory(),
             'client_id' => $this->faker->uuid(),
             'full_name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),

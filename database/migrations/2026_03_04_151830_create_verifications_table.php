@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignId('client_id')->unique()->constrained()->cascadeOnDelete();
             $table->string('id_type');
             $table->string('id_number');
-            $table->string('id_card_front_img');
-            $table->string('id_card_back_img')->nullable();
-            $table->string('selfie_img');
+            $table->string('id_card_front_img_url');
+            $table->string('id_card_back_img_url')->nullable();
+            $table->string('selfie_img_url');
             $table->string('status')->default(VerificationStatus::PENDING->value);
             $table->timestamps();
         });

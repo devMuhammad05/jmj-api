@@ -24,6 +24,7 @@ final class AuthController extends ApiController
         $user = User::create([
             'full_name' => $request->full_name,
             'email' => $request->email,
+            'country' => $request->country,
             'password' => $this->hasher->make($request->password),
         ]);
 
@@ -64,7 +65,10 @@ final class AuthController extends ApiController
         /** @var User $user */
         $user = $this->authManager->user();
 
-        $user->currentAccessToken()->delete();
+        /** @var \Laravel\Sanctum\PersonalAccessToken $token */
+        $token = $user->currentAccessToken();
+
+        $token->delete();
 
         return $this->successResponse('User logged out successfully');
     }

@@ -20,7 +20,7 @@ class CreateClientAction
     {
         return DB::transaction(function () use ($owner, $data) {
             $client = Client::create([
-                'owner_id' => $owner->id,
+                'user_id' => $owner->id,
                 'full_name' => $data->full_name,
                 'email' => $data->email,
                 'phone' => $data->phone,

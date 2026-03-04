@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('mt_password');
             $table->string('mt_server');
             $table->decimal('initial_deposit', 15, 2);
-            $table->string('risk_level')->nullable();
+            $table->string('risk_level');
             $table->timestamps();
         });
     }

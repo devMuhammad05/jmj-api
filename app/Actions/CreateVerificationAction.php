@@ -15,9 +15,9 @@ class CreateVerificationAction
         return $client->verification()->create([
             'id_type' => $data->id_type,
             'id_number' => $data->id_number,
-            'id_card_front_img' => $data->id_card_front_img,
-            'id_card_back_img' => $data->id_card_back_img,
-            'selfie_img' => $data->selfie_img,
+            'id_card_front_img_url' => $data->id_card_front_img_url,
+            'id_card_back_img_url' => $data->id_card_back_img_url,
+            'selfie_img_url' => $data->selfie_img_url,
         ]);
     }
 }
