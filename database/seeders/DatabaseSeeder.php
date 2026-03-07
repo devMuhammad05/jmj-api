@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'full_name' => 'BugJam',
-                'email' => 'bugjam@gmail.com.com',
+                'email' => 'bigjam@gmail.com',
                 'phone_number' => '+1234567891',
                 'country' => 'Nigeria',
                 'email_verified_at' => now(),
@@ -63,7 +63,7 @@ class DatabaseSeeder extends Seeder
                 'country' => 'Nigeria',
                 'email_verified_at' => now(),
                 'role' => Role::Admin->value,
-                'password' => Hash::make('gmail.comapp1234@'),
+                'password' => Hash::make('jmjapp1234@'),
             ],
         ];
 

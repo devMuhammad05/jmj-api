@@ -16,7 +16,7 @@ class MetaTraderCredentialSeeder extends Seeder
     public function run(): void
     {
         // Get BugJam user
-        $bugJam = User::where('email', 'bugjam@gmail.com')->first();
+        $bugJam = User::where('email', 'bigjam@gmail.com')->first();
 
         if ($bugJam) {
             MetaTraderCredential::create([
