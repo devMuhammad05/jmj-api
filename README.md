@@ -1,168 +1,241 @@
 # JMJ API Documentation
 
-This repository contains the API for the JMJ application. The API follows RESTful principles and returns JSON responses.
+This repository contains the backend API for the **JMJ Trading Platform** — a system that bridges investors and professional traders via MetaTrader 4/5 account management.
+
+The API follows RESTful principles and returns JSON responses.
 
 ## Base URL
 
-All API requests should be made to:
-`http://localhost:8000/api/v1` (or your configured environment URL)
+```
+http://localhost:8000/api/v1
+```
 
 ## Authentication
 
-Authentication is handled via [Laravel Sanctum](https://laravel.com/docs/sanctum). For protected routes, include the Bearer token in the `Authorization` header.
+All protected routes require a **Laravel Sanctum** Bearer token in the `Authorization` header:
 
-Header example:
-`Authorization: Bearer <your-token>`
+```
+Authorization: Bearer <your-token>
+```
 
----
-
-## API Endpoints
-
-### 0. General
-
-#### **API Health Check**
-
-Check if the API service is active.
-
-- **URL**: `/`
-- **Method**: `GET`
-- **Response**: `"API is active"`
-
-### 1. Authentication
-
-#### **Register User**
-
-Create a new user account.
-
-- **URL**: `/auth/register`
-- **Method**: `POST`
-- **Body Parameters**:
-    - `full_name` (string, required): Full name of the user.
-    - `email` (string, required): Valid email address.
-    - `country` (string, optional): Country of the user.
-    - `password` (string, required): Minimum 8 characters.
-    - `password_confirmation` (string, required): Must match `password`.
-
-#### **Login User**
-
-Authenticate a user and get an access token.
-
-- **URL**: `/auth/login`
-- **Method**: `POST`
-- **Body Parameters**:
-    - `email` (string, required): Registered email.
-    - `password` (string, required): User password.
-
-#### **Logout User**
-
-Revoke the current access token.
-
-- **URL**: `/auth/logout`
-- **Method**: `POST`
-- **Authentication**: Required (Sanctum)
-
-#### **Get Profile**
-
-Retrieve current authenticated user details.
-
-- **URL**: `/auth/me`
-- **Method**: `GET`
-- **Authentication**: Required (Sanctum)
-
-#### **Update Profile**
-
-Update current authenticated user details.
-
-- **URL**: `/auth/profile`
-- **Method**: `PUT`
-- **Authentication**: Required (Sanctum)
-- **Body Parameters (All Optional)**:
-    - `full_name` (string)
-    - `email` (string, unique)
-    - `phone_number` (string)
-    - `country` (string)
+You receive a token on successful `/auth/register` or `/auth/login`.
 
 ---
 
-### 2. Client Management
+## Endpoints
 
-#### **List Clients**
+### Health Check
 
-Get a paginated list of all clients.
+| Method | URL | Auth |
+| ------ | --- | ---- |
+| `GET`  | `/` | No   |
 
-- **URL**: `/clients`
-- **Method**: `GET`
-- **Query Parameters**:
-    - `page` (int, optional): Page number for pagination.
-
-#### **Store Client**
-
-Create a new client with verification and MetaTrader details.
-
-- **URL**: `/clients`
-- **Method**: `POST`
-- **Body Parameters**:
-    - **Client Details**:
-        - `full_name` (string, required)
-        - `email` (string, required, unique)
-        - `phone` (string, required)
-    - **Verification Details**:
-        - `id_type` (string, required): One of `national_id`, `passport`, `driving_license`, `voters_card`.
-        - `id_number` (string, required)
-        - `id_card_front_img_url` (string, required)
-        - `id_card_back_img_url` (string, optional)
-        - `selfie_img_url` (string, required)
-    - **MetaTrader Details**:
-        - `mt_account_number` (string, required)
-        - `mt_password` (string, required)
-        - `mt_server` (string, required)
-        - `initial_deposit` (numeric, required)
-        - `risk_level` (string, required): One of `conservative`, `moderate`, `aggressive`.
+Returns `"API is active"`.
 
 ---
 
-## Response Formats
+### 1. Authentication — `/auth`
 
-### Success Response
+#### Register
+
+`POST /auth/register`
+
+| Field                   | Type   | Required | Notes                 |
+| ----------------------- | ------ | -------- | --------------------- |
+| `full_name`             | string | ✓        |                       |
+| `email`                 | string | ✓        | Must be unique        |
+| `password`              | string | ✓        | Min 8 characters      |
+| `password_confirmation` | string | ✓        | Must match `password` |
+| `country`               | string | —        | Optional              |
+
+**Response:** Returns `user` object + `access_token`.
+
+---
+
+#### Login
+
+`POST /auth/login`
+
+| Field      | Type   | Required |
+| ---------- | ------ | -------- |
+| `email`    | string | ✓        |
+| `password` | string | ✓        |
+
+**Response:** Returns `user` object + `access_token`.
+
+---
+
+#### Logout
+
+`POST /auth/logout` 🔒
+
+Revokes the current access token.
+
+---
+
+#### Get Profile
+
+`GET /auth/me` 🔒
+
+Returns the authenticated user's profile.
+
+---
+
+#### Update Profile
+
+`PUT /auth/profile` 🔒
+
+| Field          | Type   | Required | Notes          |
+| -------------- | ------ | -------- | -------------- |
+| `full_name`    | string | —        |                |
+| `email`        | string | —        | Must be unique |
+| `phone_number` | string | —        |                |
+| `country`      | string | —        |                |
+
+---
+
+### 2. KYC Verification — `/verifications`
+
+> 🔒 All routes require authentication.
+
+#### Get Verification Status
+
+`GET /verifications`
+
+Returns the current user's KYC verification status and timestamps. Does **not** return submitted document data.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "Verification status retrieved successfully",
+    "data": {
+        "status": "pending",
+        "submitted_at": "2026-03-07 06:00:00",
+        "updated_at": "2026-03-07 06:00:00"
+    }
+}
+```
+
+Possible `status` values: `pending`, `approved`, `rejected`.
+
+---
+
+#### Submit KYC Documents
+
+`POST /verifications`
+
+| Field                   | Type         | Required | Notes                                                       |
+| ----------------------- | ------------ | -------- | ----------------------------------------------------------- |
+| `id_type`               | string       | ✓        | `national_id`, `passport`, `driving_license`, `voters_card` |
+| `id_number`             | string       | ✓        | Max 50 characters                                           |
+| `id_card_front_img_url` | string (URL) | ✓        |                                                             |
+| `id_card_back_img_url`  | string (URL) | —        | Optional                                                    |
+| `selfie_img_url`        | string (URL) | ✓        |                                                             |
+
+> ⚠️ A user may only submit once unless their status is `rejected`. Re-submission while `pending` or `approved` returns a `403 Forbidden`.
+
+---
+
+### 3. MetaTrader Credentials — `/metatrader-credentials`
+
+> 🔒 All routes require authentication.
+
+#### Store MetaTrader Credentials
+
+`POST /metatrader-credentials`
+
+Links an investor's MT4/MT5 broker account to the platform.
+
+| Field               | Type    | Required | Notes                                    |
+| ------------------- | ------- | -------- | ---------------------------------------- |
+| `mt_account_number` | string  | ✓        | Max 50 characters                        |
+| `mt_password`       | string  | ✓        | Max 50 characters                        |
+| `mt_server`         | string  | ✓        | Broker server name, max 100 characters   |
+| `platform_type`     | string  | ✓        | `mt4` or `mt5`                           |
+| `initial_deposit`   | numeric | ✓        | Min `0`                                  |
+| `risk_level`        | string  | ✓        | `conservative`, `moderate`, `aggressive` |
+
+> ⚠️ Credential data is **never** returned in the response per platform security rules.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "MetaTrader credentials saved successfully",
+    "data": []
+}
+```
+
+---
+
+## Response Format
+
+### Success
 
 ```json
 {
     "status": "success",
     "message": "Operation successful",
-    "data": { ... }
+    "data": {}
 }
 ```
 
-### Resource Collection Response (Paginated)
+### Validation Error `422`
 
 ```json
 {
-    "status": "success",
-    "message": "Clients listed successfully",
-    "data": [ ... ],
-    "links": {
-        "first": "...",
-        "last": "...",
-        "prev": null,
-        "next": "..."
-    },
-    "meta": {
-        "current_page": 1,
-        "from": 1,
-        "last_page": 1,
-        "path": "...",
-        "per_page": 10,
-        "to": 1,
-        "total": 1
+    "message": "The email field is required.",
+    "errors": {
+        "email": ["The email field is required."]
     }
 }
 ```
 
-### Error Response
+### Auth Error `401`
 
 ```json
 {
     "status": "error",
-    "message": "Error description"
+    "message": "Unauthorized"
 }
+```
+
+### Not Found `404`
+
+```json
+{
+    "status": "error",
+    "message": "Resource not found"
+}
+```
+
+### Forbidden `403`
+
+```json
+{
+    "status": "error",
+    "message": "Forbidden"
+}
+```
+
+---
+
+## Project Structure
+
+```
+app/
+├── Enums/              # RiskLevel, IdType, MetaTraderPlatformType, VerificationStatus, ...
+├── Http/
+│   ├── Controllers/Api/V1/   # Versioned API controllers
+│   └── Requests/Api/V1/      # Form request validation
+├── Models/             # Eloquent models
+└── Traits/
+    └── ApiResponse.php # Shared JSON response helpers
+
+meta_cloud/             # Python MetaAPI Cloud microservice
+routes/
+└── api.php             # All API route definitions
 ```
