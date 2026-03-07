@@ -29,13 +29,6 @@ class StoreClientRequest extends FormRequest
             'email' => ['required', 'email', 'unique:clients,email'],
             'phone' => ['required', 'string', 'max:20'],
 
-            // Verification
-            'id_type' => ['required', 'string', 'in:national_id,passport,driving_license,voters_card'],
-            'id_number' => ['required', 'string', 'max:50'],
-            'id_card_front_img_url' => ['required', 'url'],
-            'id_card_back_img_url' => ['nullable', 'url'],
-            'selfie_img_url' => ['required', 'url'],
-
             // MetaTrader
             'mt_account_number' => ['required', 'string', 'max:50'],
             'mt_password' => ['required', 'string', 'max:50'],

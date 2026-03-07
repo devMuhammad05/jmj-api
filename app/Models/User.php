@@ -42,12 +42,10 @@ class User extends Authenticatable implements FilamentUser, HasName
         'remember_token',
     ];
 
-
     public function getFilamentName(): string
     {
         return $this->full_name ?? $this->email ?? 'Administrator';
     }
-
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -64,8 +62,6 @@ class User extends Authenticatable implements FilamentUser, HasName
 
         return true;
     }
-
-
 
     /**
      * Get the attributes that should be cast.
@@ -89,5 +85,13 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function clients(): HasMany
     {
         return $this->hasMany(Client::class);
+    }
+
+    /**
+     * Get the verification associated with the user.
+     */
+    public function verification(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Verification::class);
     }
 }

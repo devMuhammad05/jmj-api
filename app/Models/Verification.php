@@ -27,10 +27,10 @@ class Verification extends Model
     }
 
     /**
-     * Get the client that owns the verification.
+     * Get the user that owns the verification.
      */
-    public function client(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(User::class);
     }
 }

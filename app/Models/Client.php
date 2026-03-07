@@ -21,14 +21,6 @@ class Client extends Model
     }
 
     /**
-     * Get the verification associated with the client.
-     */
-    public function verification(): HasOne
-    {
-        return $this->hasOne(Verification::class);
-    }
-
-    /**
      * Get the MetaTrader credential associated with the client.
      */
     public function metaTraderCredential(): HasOne

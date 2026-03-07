@@ -23,7 +23,7 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'full_name' => ['sometimes', 'required', 'string', 'max:255'],
-            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,' . $this->user()->id],
+            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', 'unique:users,email,'.$this->user()->id],
             'phone_number' => ['sometimes', 'nullable', 'string', 'max:20'],
             'country' => ['sometimes', 'nullable', 'string', 'max:255'],
         ];

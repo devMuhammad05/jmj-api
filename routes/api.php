@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\ClientController;
+use App\Http\Controllers\Api\V1\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -10,7 +11,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::prefix('v1')->group(function (): void {
-    Route::get('/', fn() => 'API is active');
+    Route::get('/', fn () => 'API is active');
 
     // Auth Routes
     Route::prefix('auth')->group(function (): void {
@@ -27,5 +28,8 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/clients', [ClientController::class, 'index']);
         Route::post('/clients', [ClientController::class, 'store']);
+
+        Route::get('/verifications', [VerificationController::class, 'index']);
+        Route::post('/verifications', [VerificationController::class, 'store']);
     });
 });

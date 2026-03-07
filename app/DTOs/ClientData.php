@@ -12,7 +12,6 @@ readonly class ClientData
         public string $full_name,
         public string $email,
         public string $phone,
-        public VerificationData $verification,
         public MetaTraderData $metaTrader,
     ) {}
 
@@ -22,7 +21,6 @@ readonly class ClientData
             full_name: $request->string('full_name')->value(),
             email: $request->string('email')->value(),
             phone: $request->string('phone')->value(),
-            verification: VerificationData::fromRequest($request),
             metaTrader: MetaTraderData::fromRequest($request),
         );
     }

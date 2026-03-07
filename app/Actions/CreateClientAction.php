@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 class CreateClientAction
 {
     public function __construct(
-        private CreateVerificationAction $createVerification,
         private CreateMetaTraderCredentialAction $createMetaTrader,
     ) {}
 
@@ -24,10 +23,9 @@ class CreateClientAction
                 'full_name' => $data->full_name,
                 'email' => $data->email,
                 'phone' => $data->phone,
-                'client_id' => 'CL-' . mt_rand(10000000, 99999999),
+                'client_id' => 'CL-'.mt_rand(10000000, 99999999),
             ]);
 
-            $this->createVerification->execute($client, $data->verification);
             $this->createMetaTrader->execute($client, $data->metaTrader);
 
             return $client;
