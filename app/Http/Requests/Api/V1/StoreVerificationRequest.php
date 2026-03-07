@@ -4,6 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use App\Enums\IdType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rules\Enum;
 
 class StoreVerificationRequest extends FormRequest
@@ -13,7 +14,9 @@ class StoreVerificationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('submit', \App\Models\Verification::class);
+        Gate::authorize('submit', \App\Models\Verification::class);
+
+        return true;
     }
 
     /**

@@ -26,7 +26,7 @@ class VerificationController extends ApiController
         }
 
         return $this->successResponse(
-            'Verification retrieved successfully',
+            'Verification status retrieved successfully',
             new VerificationResource($verification)
         );
     }
