@@ -16,27 +16,41 @@ class UserForm
             ->components([
                 TextInput::make('full_name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label('Email Address')
                     ->email()
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                DateTimePicker::make('email_verified_at'),
                 TextInput::make('phone_number')
+                    ->label('Phone Number')
                     ->tel()
                     ->maxLength(255),
                 TextInput::make('country')
                     ->maxLength(255),
+                DateTimePicker::make('email_verified_at')
+                    ->label('Email Verified At')
+                    ->helperText('Leave empty if email is not verified'),
+                Select::make('role')
+                    ->options(Role::class)
+                    ->required()
+                    ->default(Role::User)
+                    ->helperText('Admin users can access the admin panel'),
                 TextInput::make('password')
                     ->password()
                     ->required(fn (string $operation): bool => $operation === 'create')
                     ->dehydrated(fn (?string $state) => filled($state))
-                    ->maxLength(255),
-                Select::make('role')
-                    ->options(Role::class)
-                    ->required()
-                    ->default(Role::User),
-            ]);
+                    ->revealable()
+                    ->maxLength(255)
+                    ->helperText(fn (string $operation): string => 
+                        $operation === 'edit' 
+                            ? 'Leave empty to keep current password' 
+                            : 'Minimum 8 characters recommended'
+                    )
+                    ->columnSpanFull(),
+            ])
+            ->columns(2);
     }
 }

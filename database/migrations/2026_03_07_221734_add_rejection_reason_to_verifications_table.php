@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('account_snapshots', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('verifications', function (Blueprint $table) {
+            $table->text('rejection_reason')->nullable()->after('status');
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('account_snapshots');
+        Schema::table('verifications', function (Blueprint $table) {
+            $table->dropColumn('rejection_reason');
+        });
     }
 };

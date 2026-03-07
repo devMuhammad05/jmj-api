@@ -14,6 +14,22 @@ class Verification extends Model
     use HasFactory;
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'user_id',
+        'id_type',
+        'id_number',
+        'id_card_front_img_url',
+        'id_card_back_img_url',
+        'selfie_img_url',
+        'status',
+        'rejection_reason',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

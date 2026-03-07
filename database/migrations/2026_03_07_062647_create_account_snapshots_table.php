@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('account_snapshots', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('mt_account_id');
-            $table->foreign('mt_account_id')->references('id')->on('meta_trader_credentials')->cascadeOnDelete();
+            $table->id();
+            $table->foreignId('mt_account_id')->constrained('meta_trader_credentials')->cascadeOnDelete();
             $table->decimal('balance', 15, 2);
             $table->decimal('equity', 15, 2);
             $table->decimal('margin', 15, 2);
@@ -23,6 +22,7 @@ return new class extends Migration
             $table->unsignedInteger('leverage');
             $table->string('currency', 10);
             $table->timestamp('fetched_at');
+            $table->timestamps();
         });
     }
 

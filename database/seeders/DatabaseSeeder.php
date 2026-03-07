@@ -22,13 +22,53 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        // Admin
-        DB::table('users')->insert([
-            'full_name' => 'Administrator',
-            'email' => 'admin@jmj.com',
-            'email_verified_at' => now(),
-            'role' => Role::Admin->value,
-            'password' => Hash::make('jmjapp1234@'),
-        ]);
+        // Create users
+        $users = [
+            [
+                'full_name' => 'Muhammad',
+                'email' => 'muhammad@gmail.com.com',
+                'phone_number' => '+1234567890',
+                'country' => 'Nigeria',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'full_name' => 'BugJam',
+                'email' => 'bugjam@gmail.com.com',
+                'phone_number' => '+1234567891',
+                'country' => 'Nigeria',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'full_name' => 'Hameed',
+                'email' => 'hameed@gmail.com.com',
+                'phone_number' => '+1234567892',
+                'country' => 'Nigeria',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'full_name' => 'Raji codes',
+                'email' => 'rajicodes@gmail.com.com',
+                'phone_number' => '+1234567893',
+                'country' => 'Nigeria',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'full_name' => 'gmail.com',
+                'email' => 'admin@jmj.com.com',
+                'phone_number' => '+1234567894',
+                'country' => 'Nigeria',
+                'email_verified_at' => now(),
+                'role' => Role::Admin->value,
+                'password' => Hash::make('gmail.comapp1234@'),
+            ],
+        ];
+
+        foreach ($users as $userData) {
+            User::create($userData);
+        }
     }
 }

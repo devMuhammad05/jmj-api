@@ -12,6 +12,21 @@ class MetaTraderCredential extends Model
     use HasFactory;
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'user_id',
+        'mt_account_number',
+        'mt_password',
+        'mt_server',
+        'platform_type',
+        'initial_deposit',
+        'risk_level',
+    ];
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
