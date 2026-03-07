@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'full_name' => 'gmail.com',
-                'email' => 'admin@jmj.com.com',
+                'email' => 'admin@jmj.com',
                 'phone_number' => '+1234567894',
                 'country' => 'Nigeria',
                 'email_verified_at' => now(),
@@ -70,5 +70,12 @@ class DatabaseSeeder extends Seeder
         foreach ($users as $userData) {
             User::create($userData);
         }
+
+        // Seed verifications
+        $this->call([
+            VerificationSeeder::class,
+            MetaTraderCredentialSeeder::class,
+            SignalSeeder::class,
+        ]);
     }
 }

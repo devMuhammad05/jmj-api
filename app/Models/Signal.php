@@ -14,6 +14,26 @@ class Signal extends Model
     use HasFactory;
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'symbol',
+        'action',
+        'type',
+        'entry_price',
+        'stop_loss',
+        'take_profit_1',
+        'take_profit_2',
+        'take_profit_3',
+        'status',
+        'pips_result',
+        'notes',
+        'is_published',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -25,6 +45,12 @@ class Signal extends Model
             'status' => SignalStatus::class,
             'action' => SignalAction::class,
             'is_published' => 'boolean',
+            'entry_price' => 'decimal:5',
+            'stop_loss' => 'decimal:5',
+            'take_profit_1' => 'decimal:5',
+            'take_profit_2' => 'decimal:5',
+            'take_profit_3' => 'decimal:5',
+            'pips_result' => 'decimal:2',
         ];
     }
 }
