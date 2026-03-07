@@ -78,13 +78,13 @@ class User extends Authenticatable implements FilamentUser, HasName
     }
 
     /**
-     * Get the clients associated with the user.
+     * Get the meta trader credentials associated with the user.
      *
-     * @return HasMany<Client, $this>
+     * @return HasMany<MetaTraderCredential, $this>
      */
-    public function clients(): HasMany
+    public function metaTraderCredentials(): HasMany
     {
-        return $this->hasMany(Client::class);
+        return $this->hasMany(MetaTraderCredential::class);
     }
 
     /**

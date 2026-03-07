@@ -52,7 +52,7 @@ trait ApiResponse
     /**
      * Return a 201 Created response.
      */
-    public function createdResponse($message, $data): JsonResponse
+    public function createdResponse(string $message, mixed $data = []): JsonResponse
     {
         return $this->successResponse($message, $data, Response::HTTP_CREATED);
     }

@@ -12,20 +12,6 @@ class MetaTraderCredential extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'client_id',
-        'mt_account_number',
-        'mt_password',
-        'mt_server',
-        'initial_deposit',
-        'risk_level',
-    ];
-
-    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
@@ -43,15 +29,16 @@ class MetaTraderCredential extends Model
     {
         return [
             'risk_level' => \App\Enums\RiskLevel::class,
+            'platform_type' => \App\Enums\MetaTraderPlatformType::class,
             'initial_deposit' => 'decimal:2',
         ];
     }
 
     /**
-     * Get the client that owns the credential.
+     * Get the user that owns the credential.
      */
-    public function client(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(User::class);
     }
 }
