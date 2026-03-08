@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
+use App\Http\Controllers\Api\V1\PoolController;
+use App\Http\Controllers\Api\V1\PoolInvestmentController;
+use App\Http\Controllers\Api\V1\ProfitDistributionController;
 use App\Http\Controllers\Api\V1\SignalController;
 use App\Http\Controllers\Api\V1\VerificationController;
 use Illuminate\Http\Request;
@@ -39,5 +42,18 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/verifications', [VerificationController::class, 'index']);
         Route::post('/verifications', [VerificationController::class, 'store']);
+
+        // Pool Routes
+        Route::get('/pools', [PoolController::class, 'index']);
+        Route::get('/pools/{pool}', [PoolController::class, 'show']);
+
+        // Pool Investment Routes
+        Route::get('/pool-investments', [PoolInvestmentController::class, 'index']);
+        Route::post('/pool-investments', [PoolInvestmentController::class, 'store']);
+        Route::get('/pool-investments/{poolInvestment}', [PoolInvestmentController::class, 'show']);
+
+        // Profit Distribution Routes
+        Route::get('/profit-distributions', [ProfitDistributionController::class, 'index']);
+        Route::get('/profit-distributions/{profitDistribution}', [ProfitDistributionController::class, 'show']);
     });
 });

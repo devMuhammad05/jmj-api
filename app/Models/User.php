@@ -110,6 +110,16 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     }
 
     /**
+     * Get the pool investments associated with the user.
+     *
+     * @return HasMany<PoolInvestment, $this>
+     */
+    public function poolInvestments(): HasMany
+    {
+        return $this->hasMany(PoolInvestment::class);
+    }
+
+    /**
      * Get the options for logging activity.
      */
     public function getActivitylogOptions(): LogOptions

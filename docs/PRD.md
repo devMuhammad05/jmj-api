@@ -27,6 +27,7 @@ Investors retain full visibility of their account performance, profit/loss (P&L)
 - [8. Security & Compliance](#8-security--compliance)
 - [9. Technical Stack](#9-technical-stack)
 - [10. External Integrations](#10-external-integrations)
+- [11. Pool Funding Feature](#11-pool-funding-feature)
 
 ---
 
@@ -193,3 +194,152 @@ The platform interacts with MT servers via one of the following:
 
 - **Email:** SendGrid or AWS SES for transaction alerts.
 - **In-App:** Real-time updates for trade execution and closed positions.
+
+---
+
+## 11. Pool Funding Feature
+
+### 11.1 Overview
+
+The **Pool Funding** feature enables collective investment where multiple investors can contribute to a shared trading pool. This allows investors with smaller capital to participate in professional trading while benefiting from proportional profit distribution based on their contribution.
+
+### 11.2 Key Concepts
+
+- **Collective Investment:** Multiple investors pool their funds together into a single trading account.
+- **Minimum Investment:** $1,000 minimum contribution per investor.
+- **Proportional Profits:** Returns are distributed based on each investor's percentage contribution to the total pool.
+- **Transparent Performance:** Real-time visibility of pool status, total capital, investor count, and historical returns.
+
+### 11.3 Pool Funding Workflow
+
+```mermaid
+graph TD
+    A[View Pool Status] --> B[Submit Application]
+    B --> C[Enter Personal Details]
+    C --> D[Provide Bank Details]
+    D --> E[Upload Payment Proof]
+    E --> F{Admin Verification}
+    F -- Rejected --> G[Notify Investor]
+    F -- Approved --> H[Add to Pool]
+    H --> I[Start Trading]
+    I --> J[Distribute Profits]
+    J --> K[Send to Bank Account]
+```
+
+### 11.4 User Interface Components
+
+#### Pool Status Display
+
+| Component       | Description                                                |
+| :-------------- | :--------------------------------------------------------- |
+| **Total Pool**  | Aggregate amount currently in the pool (e.g., $45,000)    |
+| **Investors**   | Number of active participants (e.g., 23)                   |
+| **Last Return** | Most recent performance percentage (e.g., +15.2%)          |
+| **Min. Amount** | Minimum investment requirement ($1,000)                    |
+| **Profit Info** | Clarification that profits are distributed proportionally  |
+
+#### How It Works Section
+
+1. **Submit Application:** Investor submits application with minimum $1,000 contribution
+2. **Payment Verification:** Admin verifies payment within 24-48 hours
+3. **Join Pool:** Approved funds are added to the pool and trading begins
+4. **Profit Distribution:** Profits sent to investor's bank account based on their share
+
+#### Application Form Fields
+
+| Field                  | Type     | Required | Description                                    |
+| :--------------------- | :------- | :------- | :--------------------------------------------- |
+| `user_id`          | String   | Yes      | Auto-generated unique ID (e.g., INV-810823009) |
+| `full_name`            | String   | Yes      | Investor's full legal name                     |
+| `phone_number`         | String   | Yes      | Contact number (e.g., +234 XXX XXX XXXX)       |
+| `bank_name`            | String   | Yes      | Bank for profit disbursement                   |
+| `account_number`       | String   | Yes      | 10-digit bank account number                   |
+| `account_name`         | String   | Yes      | Name on bank account                           |
+| `contribution_amount`  | Decimal  | Yes      | Investment amount (minimum $1,000)             |
+| `payment_proof_url`        | File     | Yes      | Screenshot of bank transfer or payment         |
+| `terms_accepted`       | Boolean  | Yes      | Agreement to terms and profit distribution     |
+
+### 11.5 Data Models
+
+#### Pool Investment
+
+| Field                | Type      | Description                                |
+| :------------------- | :-------- | :----------------------------------------- |
+| `id`                 | UUID      | Primary Key                                |
+| `user_id`        | String    | Auto-generated investor identifier         |
+| `user_id`            | UUID      | Foreign key to User table                  |
+| `pool_id`            | UUID      | Foreign key to Pool table                  |
+| `full_name`          | String    | Investor's full name                       |
+| `phone_number`       | String    | Contact number                             |
+| `bank_name`          | String    | Bank for profit disbursement               |
+| `account_number`     | String    | Bank account number                        |
+| `account_name`       | String    | Name on bank account                       |
+| `contribution`       | Decimal   | Investment amount                          |
+| `share_percentage`   | Decimal   | Calculated share of total pool             |
+| `payment_proof_url | String    | Storage path for payment screenshot        |
+| `status`             | Enum      | pending, verified, active, rejected        |
+| `terms_accepted`     | Boolean   | Terms and conditions acceptance            |
+| `created_at`         | Timestamp | Application submission date                |
+| `verified_at`        | Timestamp | Admin verification date                    |
+
+#### Pool
+
+| Field              | Type      | Description                          |
+| :----------------- | :-------- | :----------------------------------- |
+| `id`               | UUID      | Primary Key                          |
+| `name`             | String    | Pool identifier                      |
+| `total_amount`     | Decimal   | Current total pool capital           |
+| `investor_count`   | Integer   | Number of active investors           |
+| `last_return`      | Decimal   | Most recent return percentage        |
+| `minimum_investment` | Decimal | Minimum contribution ($1,000)        |
+| `status`           | Enum      | active, closed, paused               |
+| `created_at`       | Timestamp | Pool creation date                   |
+
+#### Profit Distribution
+
+| Field              | Type      | Description                          |
+| :----------------- | :-------- | :----------------------------------- |
+| `id`               | UUID      | Primary Key                          |
+| `pool_investment_id` | UUID    | Foreign key to Pool Investment       |
+| `distribution_date` | Date     | When profit was distributed          |
+| `profit_amount`    | Decimal   | Amount sent to investor              |
+| `pool_return`      | Decimal   | Overall pool return percentage       |
+| `status`           | Enum      | pending, processed, failed           |
+
+### 11.6 Business Rules
+
+1. **Minimum Investment:** All contributions must be at least $1,000
+2. **Verification Period:** Payment verification takes 24-48 hours
+3. **Proportional Distribution:** Profits calculated as: `(investor_contribution / total_pool) * total_profit`
+4. **Share Calculation:** Updated dynamically when new investors join or existing investors add funds
+5. **Payment Proof:** Required for all contributions; must be a valid screenshot or document
+6. **Bank Details:** Used exclusively for profit disbursement, not for initial contribution
+7. **No KYC Required:** Users do NOT need to complete KYC verification to invest in pools (unlike MetaTrader account linking which requires verification)
+
+### 11.7 API Endpoints
+
+| Method | Endpoint                      | Description                        |
+| :----- | :---------------------------- | :--------------------------------- |
+| GET    | `/api/v1/pools`               | List all active pools              |
+| GET    | `/api/v1/pools/{id}`          | Get pool details and status        |
+| POST   | `/api/v1/pool-investments`    | Submit pool investment application |
+| GET    | `/api/v1/pool-investments`    | Get user's pool investments        |
+| GET    | `/api/v1/pool-investments/{id}` | Get specific investment details  |
+| PATCH  | `/api/v1/pool-investments/{id}/verify` | Admin: Verify payment      |
+| GET    | `/api/v1/profit-distributions` | Get profit distribution history   |
+
+### 11.8 Security Considerations
+
+- **Payment Proof Storage:** Securely store uploaded payment screenshots with access restricted to admins
+- **Bank Details Protection:** Encrypt bank account information at rest
+- **Verification Workflow:** Only admins can approve/reject pool investment applications
+- **Audit Trail:** Log all pool investment submissions, verifications, and profit distributions
+- **Share Recalculation:** Automatically recalculate all investor shares when pool composition changes
+
+### 11.9 Admin Features
+
+- **Review Applications:** View pending pool investment applications with payment proofs
+- **Verify Payments:** Approve or reject applications within 24-48 hours
+- **Manage Pools:** Create, pause, or close investment pools
+- **Distribute Profits:** Process profit distributions based on calculated shares
+- **Performance Tracking:** Monitor pool performance and investor returns
