@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Role;
 use App\Enums\VerificationStatus;
 use App\Models\User;
 use App\Models\Verification;
@@ -9,6 +10,23 @@ use Illuminate\Auth\Access\Response;
 
 class VerificationPolicy
 {
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->role === Role::Admin) {
+            return true;
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine whether the user can view any verifications.
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->role === Role::Admin;
+    }
+
     /**
      * Determine whether the user can submit (create or update) a verification.
      */
