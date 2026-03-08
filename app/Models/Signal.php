@@ -7,11 +7,13 @@ use App\Enums\SignalStatus;
 use App\Enums\SignalType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Signal extends Model
 {
     /** @use HasFactory<\Database\Factories\SignalFactory> */
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -52,5 +54,18 @@ class Signal extends Model
             'take_profit_3' => 'decimal:5',
             'pips_result' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Get the options for logging activity.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['symbol', 'action', 'status', 'entry_price', 'stop_loss', 'take_profit_1', 'pips_result'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Signal {$eventName}")
+            ->useLogName('signal');
     }
 }

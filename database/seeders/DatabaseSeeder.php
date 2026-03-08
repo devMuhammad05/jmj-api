@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         $users = [
             [
                 'full_name' => 'Muhammad',
-                'email' => 'muhammad@gmail.com.com',
+                'email' => 'muhammad@gmail.com',
                 'phone_number' => '+1234567890',
                 'country' => 'Nigeria',
                 'email_verified_at' => now(),
@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'full_name' => 'Hameed',
-                'email' => 'hameed@gmail.com.com',
+                'email' => 'hameed@gmail.com',
                 'phone_number' => '+1234567892',
                 'country' => 'Nigeria',
                 'email_verified_at' => now(),
@@ -50,14 +50,14 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'full_name' => 'Raji codes',
-                'email' => 'rajicodes@gmail.com.com',
+                'email' => 'rajicodes@gmail.com',
                 'phone_number' => '+1234567893',
                 'country' => 'Nigeria',
                 'email_verified_at' => now(),
                 'password' => Hash::make('password123'),
             ],
             [
-                'full_name' => 'gmail.com',
+                'full_name' => 'Administrator',
                 'email' => 'admin@jmj.com',
                 'phone_number' => '+1234567894',
                 'country' => 'Nigeria',

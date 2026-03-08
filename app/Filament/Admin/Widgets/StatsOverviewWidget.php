@@ -37,7 +37,8 @@ class StatsOverviewWidget extends BaseWidget
                 ->description($usersThisMonth . ' new this month')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
-                ->chart([7, 12, 15, 18, 22, 25, $totalUsers]),
+                ->chart([7, 12, 15, 18, 22, 25, $totalUsers])
+                ->url(route('filament.admin.resources.users.index')),
 
             Stat::make('Pending KYC', $pendingKyc)
                 ->description($approvedKyc . ' approved total')
@@ -51,7 +52,8 @@ class StatsOverviewWidget extends BaseWidget
                 ->description($mtAccountsThisMonth . ' added this month')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('info')
-                ->chart([5, 8, 12, 15, 18, 20, $activeMtAccounts]),
+                ->chart([5, 8, 12, 15, 18, 20, $activeMtAccounts])
+                ->url(route('filament.admin.resources.meta-trader-credentials.index')),
 
             Stat::make('Active Signals', $activeSignals)
                 ->description($signalsThisMonth . ' created this month')
