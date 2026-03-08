@@ -26,7 +26,7 @@ class MetaTraderCredentialSeeder extends Seeder
                 'mt_server' => 'Exness-MT5Real',
                 'platform_type' => MetaTraderPlatformType::MT5,
                 'initial_deposit' => 5000.00,
-                'risk_level' => RiskLevel::Medium,
+                'risk_level' => RiskLevel::MODERATE->value,
             ]);
         }
     }

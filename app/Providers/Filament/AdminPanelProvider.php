@@ -18,6 +18,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Stephenjude\FilamentTwoFactorAuthentication\TwoFactorAuthenticationPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -28,6 +29,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->plugins([
+                TwoFactorAuthenticationPlugin::make()
+                    ->enableTwoFactorAuthentication() // Enable Google 2FA
+                    ->enablePasskeyAuthentication() // Enable Passkey
+                    ->addTwoFactorMenuItem() // Add 2FA menu item
+                    // ->forceTwoFactorSetup(), // Force 2FA setup
+            ])
             ->colors([
                 'primary' => Color::Amber,
             ])

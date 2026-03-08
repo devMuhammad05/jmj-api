@@ -14,11 +14,15 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
+use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
+use Stephenjude\FilamentTwoFactorAuthentication\TwoFactorAuthenticatable;
 
-class User extends Authenticatable implements FilamentUser, HasName
+
+class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, LogsActivity;
+    use HasApiTokens, HasFactory, Notifiable, LogsActivity, TwoFactorAuthenticatable, InteractsWithPasskeys;
 
     /**
      * The attributes that are mass assignable.
@@ -47,6 +51,14 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function getFilamentName(): string
     {
         return $this->full_name ?? $this->email ?? 'Administrator';
+    }
+
+    /**
+     * Get the user's name attribute (alias for full_name).
+     */
+    public function getNameAttribute(): ?string
+    {
+        return $this->full_name;
     }
 
     public function canAccessPanel(Panel $panel): bool
