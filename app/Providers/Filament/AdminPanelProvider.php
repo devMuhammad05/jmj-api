@@ -25,17 +25,25 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->favicon(asset('img/logo.png'))
+
+            ->sidebarCollapsibleOnDesktop()
+
+            ->brandLogo(fn () => asset('img/logo.png'))
+            ->brandLogoHeight('3rem')
+
             ->default()
             ->id('admin')
             ->path('admin')
             ->login()
-            ->plugins([
-                TwoFactorAuthenticationPlugin::make()
-                    ->enableTwoFactorAuthentication() // Enable Google 2FA
-                    ->enablePasskeyAuthentication() // Enable Passkey
-                    ->addTwoFactorMenuItem() // Add 2FA menu item
-                    // ->forceTwoFactorSetup(), // Force 2FA setup
-            ])
+            ->plugins(array_filter([
+                app()->isProduction()
+                    ? TwoFactorAuthenticationPlugin::make()
+                        ->enableTwoFactorAuthentication()
+                        ->enablePasskeyAuthentication()
+                        ->addTwoFactorMenuItem()
+                    : null,
+            ]))
             ->colors([
                 'primary' => Color::Amber,
             ])

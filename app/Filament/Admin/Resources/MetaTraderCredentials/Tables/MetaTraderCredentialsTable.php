@@ -48,9 +48,9 @@ class MetaTraderCredentialsTable
                     ->label('Risk Level')
                     ->badge()
                     ->color(fn (RiskLevel $state): string => match ($state) {
-                        RiskLevel::Low => 'success',
-                        RiskLevel::Medium => 'warning',
-                        RiskLevel::High => 'danger',
+                        RiskLevel::CONSERVATIVE => 'success',
+                        RiskLevel::MODERATE => 'warning',
+                        RiskLevel::AGGRESSIVE => 'danger',
                     })
                     ->sortable(),
                 TextColumn::make('initial_deposit')
@@ -90,15 +90,27 @@ class MetaTraderCredentialsTable
                     ->modalContent(fn (MetaTraderCredential $record) => view('filament.admin.mt-credentials', ['record' => $record]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close')
-                    ->action(function () {
-                        // Log credential access for audit
+                    ->action(function (MetaTraderCredential $record) {
+                        // Log credential access for audit trail
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(auth()->user())
+                            ->withProperties([
+                                'log_type' => \App\Enums\LogType::MT->value,
+                                'action' => 'view_credentials',
+                                'mt_account_number' => $record->mt_account_number,
+                                'user_email' => $record->user->email,
+                                'accessed_at' => now()->toDateTimeString(),
+                            ])
+                            ->log('MetaTrader credentials accessed');
+
                         Notification::make()
                             ->title('Credentials Accessed')
                             ->body('This action has been logged for security purposes.')
                             ->info()
                             ->send();
                     }),
-                EditAction::make(),
+                // EditAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
