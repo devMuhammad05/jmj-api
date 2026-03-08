@@ -39,6 +39,13 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/verifications`              | 🔒   | Get KYC verification status        |
 | POST   | `/verifications`              | 🔒   | Submit KYC documents               |
 | POST   | `/metatrader-credentials`     | 🔒   | Store MetaTrader credentials       |
+| GET    | `/pools`                      | 🔒   | Get all active investment pools    |
+| GET    | `/pools/{id}`                 | 🔒   | Get specific pool details          |
+| GET    | `/pool-investments`           | 🔒   | Get user's pool investments        |
+| POST   | `/pool-investments`           | 🔒   | Submit pool investment application |
+| GET    | `/pool-investments/{id}`      | 🔒   | Get specific investment details    |
+| GET    | `/profit-distributions`       | 🔒   | Get user's profit distributions    |
+| GET    | `/profit-distributions/{id}`  | 🔒   | Get specific distribution details  |
 
 ---
 
@@ -513,6 +520,262 @@ Retrieve details of a specific signal by ID.
 
 ---
 
+### 5. Pool Funding — `/pools`, `/pool-investments`, `/profit-distributions`
+
+> 🔒 All routes require authentication.
+> ℹ️ **No KYC Required**: Users do NOT need to complete KYC verification to invest in pools.
+
+Pool Funding allows multiple investors to contribute to a collective investment pool where professional traders manage the funds. Profits are distributed proportionally based on each investor's contribution.
+
+#### 5.1 Get Active Pools
+
+`GET /pools` 🔒
+
+Retrieve all active investment pools available for investment.
+
+**Response:**
+
+```json
+{
+    "success": true,
+    "message": "Active pools retrieved successfully",
+    "data": [
+        {
+            "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
+            "name": "Main Trading Pool",
+            "total_amount": "45000.00",
+            "investor_count": 23,
+            "last_return": "15.20",
+            "minimum_investment": "1000.00",
+            "status": "active",
+            "created_at": "2026-03-01 10:00:00"
+        }
+    ],
+    "links": {...},
+    "meta": {...}
+}
+```
+
+---
+
+#### 5.2 Get Pool Details
+
+`GET /pools/{id}` 🔒
+
+Retrieve detailed information about a specific pool.
+
+**Response:**
+
+```json
+{
+    "success": true,
+    "message": "Pool details retrieved successfully",
+    "data": {
+        "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
+        "name": "Main Trading Pool",
+        "total_amount": "45000.00",
+        "investor_count": 23,
+        "last_return": "15.20",
+        "minimum_investment": "1000.00",
+        "status": "active",
+        "created_at": "2026-03-01 10:00:00"
+    }
+}
+```
+
+---
+
+#### 5.3 Submit Pool Investment Application
+
+`POST /pool-investments` 🔒
+
+Submit an application to join an investment pool. Payment verification takes 24-48 hours.
+
+**Request Body:**
+
+| Field                  | Type    | Required | Notes                                    |
+| ---------------------- | ------- | -------- | ---------------------------------------- |
+| `pool_id`              | UUID    | ✓        | Must be a valid active pool              |
+| `full_name`            | string  | ✓        | Investor's full legal name               |
+| `phone_number`         | string  | ✓        | Contact number                           |
+| `bank_name`            | string  | ✓        | Bank for profit disbursement             |
+| `account_number`       | string  | ✓        | 10-digit bank account number             |
+| `account_name`         | string  | ✓        | Name on bank account                     |
+| `contribution`         | numeric | ✓        | Investment amount (minimum $1,000)       |
+| `payment_proof_path`   | URL     | ✓        | URL to payment screenshot                |
+| `terms_accepted`       | boolean | ✓        | Must be `true`                           |
+
+**Response:**
+
+```json
+{
+    "success": true,
+    "message": "Pool investment application submitted successfully. Payment verification will take 24-48 hours.",
+    "data": {
+        "id": "8c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
+        "pool": {
+            "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
+            "name": "Main Trading Pool",
+            "total_amount": "45000.00",
+            "investor_count": 23,
+            "last_return": "15.20",
+            "minimum_investment": "1000.00",
+            "status": "active",
+            "created_at": "2026-03-01 10:00:00"
+        },
+        "full_name": "John Doe",
+        "phone_number": "+234 XXX XXX XXXX",
+        "contribution": "1000.00",
+        "share_percentage": "0.0000",
+        "status": "pending",
+        "terms_accepted": true,
+        "verified_at": null,
+        "submitted_at": "2026-03-08 20:30:00",
+        "updated_at": "2026-03-08 20:30:00"
+    }
+}
+```
+
+**Investment Status Values:**
+- `pending` — Application submitted, awaiting admin verification
+- `verified` — Payment verified by admin
+- `active` — Investment is active and participating in pool trading
+- `rejected` — Application rejected (includes rejection_reason)
+
+---
+
+#### 5.4 Get User's Pool Investments
+
+`GET /pool-investments` 🔒
+
+Retrieve all pool investments for the authenticated user.
+
+**Response:**
+
+```json
+{
+    "success": true,
+    "message": "Pool investments retrieved successfully",
+    "data": [
+        {
+            "id": "8c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
+            "pool": {
+                "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
+                "name": "Main Trading Pool",
+                "total_amount": "45000.00",
+                "investor_count": 23,
+                "last_return": "15.20",
+                "minimum_investment": "1000.00",
+                "status": "active",
+                "created_at": "2026-03-01 10:00:00"
+            },
+            "full_name": "John Doe",
+            "phone_number": "+234 XXX XXX XXXX",
+            "contribution": "1000.00",
+            "share_percentage": "2.2222",
+            "status": "active",
+            "terms_accepted": true,
+            "verified_at": "2026-03-09 10:00:00",
+            "submitted_at": "2026-03-08 20:30:00",
+            "updated_at": "2026-03-09 10:00:00"
+        }
+    ],
+    "links": {...},
+    "meta": {...}
+}
+```
+
+---
+
+#### 5.5 Get Pool Investment Details
+
+`GET /pool-investments/{id}` 🔒
+
+Retrieve detailed information about a specific pool investment. Users can only view their own investments.
+
+**Response:**
+
+```json
+{
+    "success": true,
+    "message": "Pool investment details retrieved successfully",
+    "data": {
+        "id": "8c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
+        "pool": {...},
+        "full_name": "John Doe",
+        "phone_number": "+234 XXX XXX XXXX",
+        "contribution": "1000.00",
+        "share_percentage": "2.2222",
+        "status": "active",
+        "terms_accepted": true,
+        "verified_at": "2026-03-09 10:00:00",
+        "submitted_at": "2026-03-08 20:30:00",
+        "updated_at": "2026-03-09 10:00:00"
+    }
+}
+```
+
+---
+
+#### 5.6 Get User's Profit Distributions
+
+`GET /profit-distributions` 🔒
+
+Retrieve all profit distributions for the authenticated user.
+
+**Response:**
+
+```json
+{
+    "success": true,
+    "message": "Profit distributions retrieved successfully",
+    "data": [
+        {
+            "id": "7b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e",
+            "distribution_date": "2026-03-15",
+            "profit_amount": "152.00",
+            "pool_return": "15.20",
+            "status": "processed",
+            "processed_at": "2026-03-15 14:30:00"
+        }
+    ],
+    "links": {...},
+    "meta": {...}
+}
+```
+
+**Distribution Status Values:**
+- `pending` — Profit calculated, awaiting transfer
+- `processed` — Profit successfully transferred to bank account
+- `failed` — Transfer failed (includes failure_reason)
+
+---
+
+#### 5.7 Get Profit Distribution Details
+
+`GET /profit-distributions/{id}` 🔒
+
+Retrieve detailed information about a specific profit distribution. Users can only view their own distributions.
+
+**Response:**
+
+```json
+{
+    "success": true,
+    "message": "Profit distribution details retrieved successfully",
+    "data": {
+        "id": "7b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e",
+        "distribution_date": "2026-03-15",
+        "profit_amount": "152.00",
+        "pool_return": "15.20",
+        "status": "processed",
+        "processed_at": "2026-03-15 14:30:00"
+    }
+}
+```
+
+---
+
 ## Response Format
 
 All API responses follow a consistent JSON structure.
@@ -671,6 +934,46 @@ curl -X GET http://localhost:8000/api/v1/signals/statistics
 
 ```bash
 curl -X GET http://localhost:8000/api/v1/signals/1
+```
+
+**Get active pools:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/pools \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Submit pool investment:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/pool-investments \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "pool_id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
+    "full_name": "John Doe",
+    "phone_number": "+234 123 456 7890",
+    "bank_name": "GTBank",
+    "account_number": "0123456789",
+    "account_name": "John Doe",
+    "contribution": 1000,
+    "payment_proof_path": "https://example.com/proof.jpg",
+    "terms_accepted": true
+  }'
+```
+
+**Get my pool investments:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/pool-investments \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Get my profit distributions:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/profit-distributions \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ---

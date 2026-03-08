@@ -232,3 +232,103 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - To filter on a particular test name: `php artisan test --compact --filter=testName` (recommended after making a change to a related file).
 
 </laravel-boost-guidelines>
+
+
+=== api documentation rules ===
+
+# API Documentation Maintenance
+
+## README.md Updates
+
+- **CRITICAL**: Whenever you create, modify, or delete API endpoints, you MUST update the `README.md` file to reflect these changes.
+- The README.md serves as the primary API documentation for frontend developers and external consumers.
+
+### When to Update README.md
+
+1. **New Endpoints**: Add complete documentation including:
+   - HTTP method and endpoint path
+   - Authentication requirements (🔒 if protected)
+   - Request parameters/body with types and validation rules
+   - Response format with example JSON
+   - Possible error responses
+
+2. **Modified Endpoints**: Update existing documentation when:
+   - Changing request/response structure
+   - Adding/removing parameters
+   - Modifying validation rules
+   - Changing authentication requirements
+   - Updating response codes or error messages
+
+3. **Deleted Endpoints**: Remove the endpoint documentation and update the endpoints overview table
+
+### Documentation Structure to Follow
+
+```markdown
+#### Endpoint Title
+
+`METHOD /api/v1/endpoint-path` 🔒 (if authenticated)
+
+Brief description of what the endpoint does.
+
+**Request Body/Parameters:**
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| field_name | string | ✓ | Description |
+
+**Response:**
+
+\`\`\`json
+{
+  "success": true,
+  "message": "Success message",
+  "data": {}
+}
+\`\`\`
+
+**Error Responses:**
+
+- 401: Unauthorized
+- 422: Validation error
+- 403: Forbidden
+```
+
+### Update Process
+
+1. After creating/modifying routes in `routes/api.php`
+2. After creating/modifying controllers
+3. After creating/modifying request validation classes
+4. Update the "Endpoints Overview" table at the top
+5. Add/update detailed endpoint documentation in the appropriate section
+6. Include cURL examples in the "Testing the API" section if needed
+
+### Sections to Maintain
+
+- **Endpoints Overview Table**: Quick reference of all endpoints
+- **Detailed Endpoints**: Full documentation for each endpoint group
+- **Response Format**: Standard response structures
+- **Testing the API**: cURL examples for common operations
+
+### Example Update Workflow
+
+When you add pool funding endpoints:
+1. Add rows to the Endpoints Overview table
+2. Create a new section "### 5. Pool Funding — `/pools`, `/pool-investments`"
+3. Document each endpoint with full details
+4. Add cURL examples for testing
+5. Update any affected response format documentation
+
+## Additional Documentation Files
+
+- Keep `docs/POOL_FUNDING_API.md` and similar detailed API docs in sync with README.md
+- Update OpenAPI/Swagger specs if they exist
+- Maintain Postman collections if present in the project
+
+## Verification
+
+- After updating README.md, verify:
+  - All new endpoints are documented
+  - Request/response examples are accurate
+  - Authentication requirements are clearly marked
+  - Validation rules match the actual Form Request classes
+  - cURL examples work correctly
