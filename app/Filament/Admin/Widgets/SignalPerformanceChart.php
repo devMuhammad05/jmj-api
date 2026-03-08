@@ -34,8 +34,8 @@ class SignalPerformanceChart extends ChartWidget
 
             $daySignals = $signals->get($dateKey, collect());
 
-            $hitTpData[] = $daySignals->where('status', SignalStatus::HIT_TP)->count();
-            $hitSlData[] = $daySignals->where('status', SignalStatus::HIT_SL)->count();
+            $hitTpData[] = $daySignals->where('status', SignalStatus::TP)->count();
+            $hitSlData[] = $daySignals->where('status', SignalStatus::SL)->count();
             $activeData[] = $daySignals->where('status', SignalStatus::ACTIVE)->count();
         }
 

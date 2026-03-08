@@ -42,8 +42,8 @@ class RecentSignalsWidget extends BaseWidget
                     ->badge()
                     ->color(fn (SignalStatus $state): string => match ($state) {
                         SignalStatus::ACTIVE => 'info',
-                        SignalStatus::HIT_TP => 'success',
-                        SignalStatus::HIT_SL => 'danger',
+                        SignalStatus::TP => 'success',
+                        SignalStatus::SL => 'danger',
                         SignalStatus::CLOSED => 'gray',
                         SignalStatus::CANCELLED => 'warning',
                     }),

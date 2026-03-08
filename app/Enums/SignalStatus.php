@@ -5,8 +5,8 @@ namespace App\Enums;
 enum SignalStatus: string
 {
     case ACTIVE = 'active';
-    case HIT_TP = 'hit_tp';
-    case HIT_SL = 'hit_sl';
+    case TP = 'tp';
+    case SL = 'sl';
     case CLOSED = 'closed';
     case CANCELLED = 'cancelled';
 }
