@@ -32,6 +32,10 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | POST   | `/auth/logout`                | 🔒   | Logout user                        |
 | GET    | `/auth/me`                    | 🔒   | Get authenticated user profile     |
 | PUT    | `/auth/profile`               | 🔒   | Update user profile                |
+| GET    | `/signals`                    | No   | Get all published signals          |
+| GET    | `/signals/active`             | No   | Get active signals only            |
+| GET    | `/signals/statistics`         | No   | Get signal performance statistics  |
+| GET    | `/signals/{id}`               | No   | Get specific signal details        |
 | GET    | `/verifications`              | 🔒   | Get KYC verification status        |
 | POST   | `/verifications`              | 🔒   | Submit KYC documents               |
 | POST   | `/metatrader-credentials`     | 🔒   | Store MetaTrader credentials       |
@@ -296,8 +300,6 @@ Link an investor's MT4/MT5 broker account to the platform. This allows traders t
 | `initial_deposit`   | numeric | ✓        | Initial deposit amount, min `0`          |
 | `risk_level`        | string  | ✓        | `conservative`, `moderate`, `aggressive` |
 
-> ⚠️ **Security:** Credential data is **never** returned in the response per platform security rules. Credentials are encrypted and stored securely.
-
 **Response:**
 
 ```json
@@ -307,6 +309,207 @@ Link an investor's MT4/MT5 broker account to the platform. This allows traders t
     "data": []
 }
 ```
+
+---
+
+### 4. Trading Signals — `/signals`
+
+> ℹ️ All signal routes are **public** and do not require authentication.
+
+#### 4.1 Get All Signals
+
+`GET /signals`
+
+Retrieve a paginated list of published trading signals.
+
+**Query Parameters:**
+
+| Parameter    | Type   | Required | Description                                      |
+| ------------ | ------ | -------- | ------------------------------------------------ |
+| `status`     | string | —        | Filter by status: `active`, `tp`, `sl`, `closed` |
+| `symbol`     | string | —        | Filter by symbol (e.g., `EURUSD`, `XAUUSD`)      |
+| `action`     | string | —        | Filter by action: `buy`, `sell`, etc.            |
+| `type`       | string | —        | Filter by type: `forex`, `crypto`, `commodities` |
+| `per_page`   | number | —        | Results per page (default: 15)                   |
+| `include_all`| bool   | —        | Include all statuses (default: active only)      |
+
+**Response:**
+
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "symbol": "EURUSD",
+            "action": "buy",
+            "type": "forex",
+            "entry_price": "1.09500",
+            "stop_loss": "1.09200",
+            "take_profit_1": "1.10000",
+            "take_profit_2": "1.10500",
+            "take_profit_3": null,
+            "status": "active",
+            "pips_result": null,
+            "notes": "Strong bullish momentum on H4 timeframe",
+            "is_published": true,
+            "published_at": "2026-03-08T10:00:00+00:00",
+            "created_at": "2026-03-08T10:00:00+00:00",
+            "updated_at": "2026-03-08T10:00:00+00:00"
+        }
+    ],
+    "links": {
+        "first": "http://localhost:8000/api/v1/signals?page=1",
+        "last": "http://localhost:8000/api/v1/signals?page=3",
+        "prev": null,
+        "next": "http://localhost:8000/api/v1/signals?page=2"
+    },
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 3,
+        "per_page": 15,
+        "to": 15,
+        "total": 42
+    }
+}
+```
+
+---
+
+#### 4.2 Get Active Signals Only
+
+`GET /signals/active`
+
+Retrieve only signals with `active` status.
+
+**Query Parameters:**
+
+| Parameter  | Type   | Required | Description                                 |
+| ---------- | ------ | -------- | ------------------------------------------- |
+| `symbol`   | string | —        | Filter by symbol (e.g., `EURUSD`, `XAUUSD`) |
+| `type`     | string | —        | Filter by type: `forex`, `crypto`, etc.     |
+| `per_page` | number | —        | Results per page (default: 15)              |
+
+**Response:**
+
+```json
+{
+    "data": [
+        {
+            "id": 5,
+            "symbol": "XAUUSD",
+            "action": "sell",
+            "type": "commodities",
+            "entry_price": "2050.00",
+            "stop_loss": "2060.00",
+            "take_profit_1": "2030.00",
+            "take_profit_2": "2020.00",
+            "take_profit_3": "2010.00",
+            "status": "active",
+            "pips_result": null,
+            "notes": "Gold showing bearish divergence",
+            "is_published": true,
+            "published_at": "2026-03-08T12:00:00+00:00",
+            "created_at": "2026-03-08T12:00:00+00:00",
+            "updated_at": "2026-03-08T12:00:00+00:00"
+        }
+    ],
+    "links": {...},
+    "meta": {...}
+}
+```
+
+---
+
+#### 4.3 Get Signal Statistics
+
+`GET /signals/statistics`
+
+Retrieve performance statistics for all published signals.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "Signal statistics retrieved successfully",
+    "data": {
+        "total_signals": 42,
+        "active_signals": 5,
+        "tp_signals": 28,
+        "sl_signals": 7,
+        "total_pips": 1250.50,
+        "average_pips": 35.73,
+        "win_rate": 80.00
+    }
+}
+```
+
+**Statistics Explained:**
+- `total_signals`: Total number of published signals
+- `active_signals`: Currently active signals
+- `tp_signals`: Signals that hit take profit
+- `sl_signals`: Signals that hit stop loss
+- `total_pips`: Sum of all pips results (positive and negative)
+- `average_pips`: Average pips per closed signal
+- `win_rate`: Percentage of signals that hit TP (TP / (TP + SL + Closed) × 100)
+
+---
+
+#### 4.4 Get Specific Signal
+
+`GET /signals/{id}`
+
+Retrieve details of a specific signal by ID.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "Signal retrieved successfully",
+    "data": {
+        "id": 1,
+        "symbol": "EURUSD",
+        "action": "buy",
+        "type": "forex",
+        "entry_price": "1.09500",
+        "stop_loss": "1.09200",
+        "take_profit_1": "1.10000",
+        "take_profit_2": "1.10500",
+        "take_profit_3": null,
+        "status": "tp",
+        "pips_result": 50.00,
+        "notes": "Perfect execution. Hit TP1 within 4 hours.",
+        "is_published": true,
+        "published_at": "2026-03-07T10:00:00+00:00",
+        "created_at": "2026-03-07T10:00:00+00:00",
+        "updated_at": "2026-03-07T14:00:00+00:00"
+    }
+}
+```
+
+**Signal Status Values:**
+- `active`: Signal is currently active
+- `tp`: Signal hit take profit
+- `sl`: Signal hit stop loss
+- `closed`: Signal manually closed
+- `cancelled`: Signal cancelled
+
+**Signal Action Values:**
+- `buy`: Market buy order
+- `sell`: Market sell order
+- `buy_limit`: Buy limit order
+- `sell_limit`: Sell limit order
+- `buy_stop`: Buy stop order
+- `sell_stop`: Sell stop order
+
+**Signal Type Values:**
+- `forex`: Foreign exchange pairs
+- `crypto`: Cryptocurrency pairs
+- `commodities`: Gold, Silver, Oil, etc.
+- `indices`: Stock market indices
+- `stocks`: Individual stocks
 
 ---
 
@@ -440,57 +643,34 @@ curl -X POST http://localhost:8000/api/v1/metatrader-credentials \
   }'
 ```
 
----
+**Get all signals:**
 
-## Project Structure
-
+```bash
+curl -X GET http://localhost:8000/api/v1/signals
 ```
-app/
-├── Actions/            # Business logic actions
-│   ├── CreateClientAction.php
-│   ├── CreateMetaTraderCredentialAction.php
-│   └── CreateVerificationAction.php
-├── DTOs/               # Data Transfer Objects
-│   ├── ClientData.php
-│   ├── MetaTraderData.php
-│   └── VerificationData.php
-├── Enums/              # Enumerations
-│   ├── IdType.php
-│   ├── MetaTraderPlatformType.php
-│   ├── RiskLevel.php
-│   ├── Role.php
-│   ├── SignalAction.php
-│   ├── SignalStatus.php
-│   ├── SignalType.php
-│   └── VerificationStatus.php
-├── Http/
-│   ├── Controllers/Api/V1/   # Versioned API controllers
-│   │   ├── Auth/
-│   │   │   └── AuthController.php
-│   │   ├── MetaTraderCredentialController.php
-│   │   └── VerificationController.php
-│   ├── Requests/Api/V1/      # Form request validation
-│   │   ├── Auth/
-│   │   │   ├── LoginUserRequest.php
-│   │   │   ├── RegisterUserRequest.php
-│   │   │   └── UpdateProfileRequest.php
-│   │   ├── StoreMetaTraderCredentialRequest.php
-│   │   └── StoreVerificationRequest.php
-│   └── Resources/V1/         # API resources
-│       ├── ClientResource.php
-│       └── VerificationResource.php
-├── Models/             # Eloquent models
-│   ├── AccountSnapshot.php
-│   ├── Client.php
-│   ├── MetaTraderCredential.php
-│   ├── Signal.php
-│   ├── User.php
-│   └── Verification.php
-└── Traits/
-    └── ApiResponse.php # Shared JSON response helpers
 
-routes/
-└── api.php             # All API route definitions
+**Get active signals only:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/signals/active
+```
+
+**Get signals with filters:**
+
+```bash
+curl -X GET "http://localhost:8000/api/v1/signals?symbol=EURUSD&status=active&per_page=10"
+```
+
+**Get signal statistics:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/signals/statistics
+```
+
+**Get specific signal:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/signals/1
 ```
 
 ---
@@ -507,6 +687,3 @@ routes/
 
 ---
 
-## License
-
-This project is proprietary software for JMJ Trading Platform.

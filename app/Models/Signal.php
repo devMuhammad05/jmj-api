@@ -47,6 +47,7 @@ class Signal extends Model
             'status' => SignalStatus::class,
             'action' => SignalAction::class,
             'is_published' => 'boolean',
+            'published_at' => 'datetime',
             'entry_price' => 'decimal:5',
             'stop_loss' => 'decimal:5',
             'take_profit_1' => 'decimal:5',

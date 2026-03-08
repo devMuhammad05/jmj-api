@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password123'),
             ],
             [
-                'full_name' => 'BugJam',
+                'full_name' => 'BigJam',
                 'email' => 'bigjam@gmail.com',
                 'phone_number' => '+1234567891',
                 'country' => 'Nigeria',
