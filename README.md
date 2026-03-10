@@ -50,6 +50,8 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/pool-investments/{id}`      | 🔒   | Get specific investment details    |
 | GET    | `/profit-distributions`       | 🔒   | Get user's profit distributions    |
 | GET    | `/profit-distributions/{id}`  | 🔒   | Get specific distribution details  |
+| GET    | `/trading-classes`            | 🔒   | Get all published trading classes  |
+| GET    | `/trading-classes/{id}`       | 🔒   | Get specific trading class details |
 
 ---
 
@@ -883,6 +885,72 @@ Retrieve detailed information about a specific profit distribution. Users can on
 ```
 
 ---
+
+### 6. Trading Classes (Learning Hub) — `/trading-classes`
+
+> 🔒 All routes require authentication.
+
+Trading Classes (Learning Hub) allows administrators to post educational sessions, webinars, and workshops. Each class includes a schedule, a description, and a meeting link for platforms like Zoom or Telegram.
+
+#### 6.1 Get All Published Classes
+
+`GET /api/v1/trading-classes` 🔒
+
+Retrieve a list of all trading classes that are marked as published, ordered by their scheduled date (newest first).
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Trading classes retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "title": "Advanced Trading Strategies",
+      "description": "Learn advanced techniques for swing trading and position sizing.",
+      "scheduled_at": "2024-01-15 19:00:00",
+      "formatted_date": "Jan 15, 2024",
+      "formatted_time": "7:00 PM",
+      "platform": "zoom",
+      "platform_label": "Zoom",
+      "meeting_link": "https://zoom.us/j/example-session-1",
+      "created_at": "2024-03-10 23:30:00"
+    }
+  ]
+}
+```
+
+#### 6.2 Get Specific Class Details
+
+`GET /api/v1/trading-classes/{id}` 🔒
+
+Retrieve detailed information about a specific trading class.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Trading class details retrieved successfully",
+  "data": {
+    "id": 1,
+    "title": "Advanced Trading Strategies",
+    "description": "Learn advanced techniques for swing trading and position sizing.",
+    "scheduled_at": "2024-01-15 19:00:00",
+    "formatted_date": "Jan 15, 2024",
+    "formatted_time": "7:00 PM",
+    "platform": "zoom",
+    "platform_label": "Zoom",
+    "meeting_link": "https://zoom.us/j/example-session-1",
+    "created_at": "2024-03-10 23:30:00"
+  }
+}
+```
+
+**Error Responses:**
+
+- 404: Class not found or is not published.
 
 ## Response Format
 
