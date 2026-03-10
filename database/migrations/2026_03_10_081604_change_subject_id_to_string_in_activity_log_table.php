@@ -1,43 +1,40 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        $table = config("activitylog.table_name", "activity_log");
-        $connection = config("activitylog.database_connection");
+        $tableName = config('activitylog.table_name', 'activity_log');
+        $connection = config('activitylog.database_connection');
 
-        Schema::connection($connection)
-            ->getConnection()
-            ->statement(
-                "ALTER TABLE `{$table}` MODIFY `subject_id` VARCHAR(36) NULL",
-            );
-
-        Schema::connection($connection)
-            ->getConnection()
-            ->statement(
-                "ALTER TABLE `{$table}` MODIFY `causer_id` VARCHAR(36) NULL",
-            );
+        Schema::connection($connection)->table($tableName, function (
+            Blueprint $table,
+        ) {
+            $table->string('subject_id', 36)->nullable()->change();
+            $table->string('causer_id', 36)->nullable()->change();
+        });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        $table = config("activitylog.table_name", "activity_log");
-        $connection = config("activitylog.database_connection");
+        $tableName = config('activitylog.table_name', 'activity_log');
+        $connection = config('activitylog.database_connection');
 
-        Schema::connection($connection)
-            ->getConnection()
-            ->statement(
-                "ALTER TABLE `{$table}` MODIFY `subject_id` BIGINT UNSIGNED NULL",
-            );
-
-        Schema::connection($connection)
-            ->getConnection()
-            ->statement(
-                "ALTER TABLE `{$table}` MODIFY `causer_id` BIGINT UNSIGNED NULL",
-            );
+        Schema::connection($connection)->table($tableName, function (
+            Blueprint $table,
+        ) {
+            $table->unsignedBigInteger('subject_id')->nullable()->change();
+            $table->unsignedBigInteger('causer_id')->nullable()->change();
+        });
     }
 };
