@@ -13,8 +13,17 @@ trait ApiResponse
     /**
      * Return a success JSON response.
      */
-    public function successResponse(string $message, mixed $data = [], int $code = Response::HTTP_OK): JsonResponse
-    {
+    public function successResponse(
+        string|array|JsonResource $message,
+        mixed $data = [],
+        int $code = Response::HTTP_OK,
+    ): JsonResponse {
+        // Handle cases where the first argument is the data/resource
+        if (is_array($message) || $message instanceof JsonResource) {
+            $data = $message;
+            $message = 'Operation successful';
+        }
+
         $response = [
             'status' => 'success',
             'message' => $message,
@@ -23,6 +32,9 @@ trait ApiResponse
         if ($data instanceof JsonResource) {
             $resourceResponse = $data->toResponse(request())->getData(true);
             $response = array_merge($response, $resourceResponse);
+        } elseif (is_array($data) && isset($data['data'])) {
+            // Handle array data that already contains metadata (like paginated results)
+            $response = array_merge($response, $data);
         } else {
             $response['data'] = $data;
         }
@@ -35,10 +47,13 @@ trait ApiResponse
      */
     public function errorResponse(string $message, int $code): JsonResponse
     {
-        return response()->json([
-            'status' => 'error',
-            'message' => $message,
-        ], $code);
+        return response()->json(
+            [
+                'status' => 'error',
+                'message' => $message,
+            ],
+            $code,
+        );
     }
 
     /**
@@ -46,14 +61,18 @@ trait ApiResponse
      */
     public function errorMessage(string $message, int $code): JsonResponse
     {
-        return response()->json($message, $code)->header('Content-Type', 'application/json');
+        return response()
+            ->json($message, $code)
+            ->header('Content-Type', 'application/json');
     }
 
     /**
      * Return a 201 Created response.
      */
-    public function createdResponse(string $message, mixed $data = []): JsonResponse
-    {
+    public function createdResponse(
+        string $message,
+        mixed $data = [],
+    ): JsonResponse {
         return $this->successResponse($message, $data, Response::HTTP_CREATED);
     }
 
@@ -68,8 +87,9 @@ trait ApiResponse
     /**
      * Return a 404 Not Found response.
      */
-    public function notFoundResponse($message = 'Resource not found'): JsonResponse
-    {
+    public function notFoundResponse(
+        $message = 'Resource not found',
+    ): JsonResponse {
         return $this->errorResponse($message, Response::HTTP_NOT_FOUND);
     }
 
@@ -84,16 +104,21 @@ trait ApiResponse
     /**
      * Return a 401 Unauthorized response.
      */
-    public function unauthorizedResponse(string $message = 'Unauthorized'): JsonResponse
-    {
+    public function unauthorizedResponse(
+        string $message = 'Unauthorized',
+    ): JsonResponse {
         return $this->errorResponse($message, Response::HTTP_UNAUTHORIZED);
     }
 
     /**
      * Return a 422 Validation Error response.
      */
-    public function validationErrorResponse(string $message = 'Validation failed'): JsonResponse
-    {
-        return $this->errorResponse($message, Response::HTTP_UNPROCESSABLE_ENTITY);
+    public function validationErrorResponse(
+        string $message = 'Validation failed',
+    ): JsonResponse {
+        return $this->errorResponse(
+            $message,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
     }
 }

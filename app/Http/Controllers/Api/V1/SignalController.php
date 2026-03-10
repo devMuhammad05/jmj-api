@@ -9,7 +9,6 @@ use App\Http\Resources\V1\SignalResource;
 use App\Models\Signal;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SignalController extends ApiController
 {
@@ -19,10 +18,13 @@ class SignalController extends ApiController
     public function index(
         Request $request,
         GetSignalsAction $action,
-    ): AnonymousResourceCollection {
+    ): JsonResponse {
         $signals = $action->execute($request);
 
-        return SignalResource::collection($signals);
+        return $this->successResponse(
+            'Signals retrieved successfully',
+            SignalResource::collection($signals),
+        );
     }
 
     /**
@@ -47,10 +49,13 @@ class SignalController extends ApiController
     public function active(
         Request $request,
         GetSignalsAction $action,
-    ): AnonymousResourceCollection {
+    ): JsonResponse {
         $signals = $action->execute($request, activeOnly: true);
 
-        return SignalResource::collection($signals);
+        return $this->successResponse(
+            'Active signals retrieved successfully',
+            SignalResource::collection($signals),
+        );
     }
 
     /**
