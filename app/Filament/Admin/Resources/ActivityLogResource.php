@@ -25,29 +25,15 @@ class ActivityLogResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('properties.log_type')
+                TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->formatStateUsing(function (?string $state): string {
-                        if (!$state) return 'System';
-                        
-                        $logType = LogType::tryFrom($state);
-                        return $logType ? $logType->label() : ucfirst($state);
-                    })
-                    ->color(function (?string $state): string {
-                        if (!$state) return 'gray';
-                        
-                        $logType = LogType::tryFrom($state);
-                        return $logType ? $logType->color() : 'gray';
-                    })
-                    ->icon(function (?string $state): ?string {
-                        if (!$state) return 'heroicon-o-cog';
-                        
-                        $logType = LogType::tryFrom($state);
-                        return $logType ? $logType->icon() : null;
-                    })
-                    ->sortable()
-                    ->searchable(),
+                    ->getStateUsing(fn($record) => self::resolveLogType($record))
+                    ->formatStateUsing(fn(?string $state): string => LogType::tryFrom($state)?->getLabel() ?? ucfirst($state ?? 'System'))
+                    ->color(fn(?string $state): string => LogType::tryFrom($state)?->getColor() ?? 'gray')
+                    ->icon(fn(?string $state): ?string => LogType::tryFrom($state)?->getIcon() ?? 'heroicon-o-cog')
+                    ->sortable(query: fn($query, $direction) => $query->orderBy('properties->log_type', $direction))
+                    ->searchable(query: fn($query, $search) => $query->where('properties->log_type', 'like', "%{$search}%")),
                 TextColumn::make('description')
                     ->label('Event')
                     ->searchable()
@@ -55,7 +41,7 @@ class ActivityLogResource extends Resource
                     ->wrap(),
                 TextColumn::make('subject_type')
                     ->label('Model')
-                    ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : 'N/A')
+                    ->formatStateUsing(fn(?string $state): string => $state ? class_basename($state) : 'N/A')
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('subject_id')
@@ -69,32 +55,13 @@ class ActivityLogResource extends Resource
                     ->sortable(),
                 TextColumn::make('properties')
                     ->label('Details')
-                    ->formatStateUsing(function ($state) {
-                        if (!$state) return 'N/A';
-                        
-                        // For MT logs, show specific details
-                        if (isset($state['log_type']) && $state['log_type'] === 'mt') {
-                            $details = [];
-                            if (isset($state['action'])) $details[] = "Action: {$state['action']}";
-                            if (isset($state['mt_account_number'])) $details[] = "Account: {$state['mt_account_number']}";
-                            if (isset($state['user_email'])) $details[] = "User: {$state['user_email']}";
-                            return implode(' | ', $details) ?: 'N/A';
-                        }
-                        
-                        // For other logs, show changes
-                        $changes = [];
-                        if (isset($state['attributes'])) {
-                            foreach ($state['attributes'] as $key => $value) {
-                                $old = $state['old'][$key] ?? 'null';
-                                $changes[] = "{$key}: {$old} → {$value}";
-                            }
-                        }
-                        return implode(', ', $changes) ?: 'N/A';
-                    })
+                    ->formatStateUsing(fn($state) => self::formatActivityDetails($state))
                     ->limit(50)
                     ->tooltip(function ($state) {
-                        if (!$state) return null;
-                        
+                        if (! $state) {
+                            return null;
+                        }
+
                         return json_encode($state, JSON_PRETTY_PRINT);
                     })
                     ->wrap(),
@@ -107,26 +74,21 @@ class ActivityLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_type')
                     ->label('Log Type')
-                    ->options(collect(LogType::cases())->mapWithKeys(fn ($type) => [$type->value => $type->label()]))
+                    ->options(LogType::class)
                     ->query(function ($query, array $data) {
                         if (isset($data['value']) && $data['value']) {
                             return $query->whereJsonContains('properties->log_type', $data['value']);
                         }
+
                         return $query;
                     }),
                 SelectFilter::make('subject_type')
                     ->label('Model')
-                    ->options([
-                        'App\Models\User' => 'User',
-                        'App\Models\Verification' => 'Verification',
-                        'App\Models\Signal' => 'Signal',
-                        'App\Models\MetaTraderCredential' => 'MetaTrader Credential',
-                    ]),
+                    ->options(\App\Enums\ActivitySubjectType::class),
                 SelectFilter::make('causer_id')
                     ->label('User')
-                    ->relationship('causer', 'full_name')
-                    ->searchable()
-                    ->preload(),
+                    ->options(fn() => \App\Models\User::query()->orderBy('full_name')->pluck('full_name', 'id')->toArray())
+                    ->searchable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->paginated([10, 25, 50, 100]);
@@ -142,5 +104,76 @@ class ActivityLogResource extends Resource
     public static function canCreate(): bool
     {
         return false;
+    }
+
+    protected static function formatActivityDetails($state): string
+    {
+        if (! $state) {
+            return 'N/A';
+        }
+
+        // Convert to array if it's a Collection or object
+        $data = is_array($state) ? $state : (method_exists($state, 'toArray') ? $state->toArray() : (array) $state);
+
+        // If it has log_type OR specific MT keys, format as MT log
+        if ((isset($data['log_type']) && $data['log_type'] === 'mt') || isset($data['mt_account_number']) || isset($data['action'])) {
+            $details = [];
+            foreach (['action', 'mt_account_number', 'user_email', 'accessed_at'] as $key) {
+                if (isset($data[$key])) {
+                    $label = str_replace('_', ' ', ucfirst($key));
+                    $details[] = "{$label}: {$data[$key]}";
+                }
+            }
+
+            if ($details) {
+                return implode(' | ', $details);
+            }
+        }
+
+        // For logs with attributes/old (Spatie standard)
+        $changes = [];
+        if (isset($data['attributes'])) {
+            foreach ($data['attributes'] as $key => $value) {
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
+                $old = isset($data['old'][$key]) ? (is_array($data['old'][$key]) ? json_encode($data['old'][$key]) : $data['old'][$key]) : 'null';
+                $changes[] = "{$key}: {$old} → {$value}";
+            }
+        }
+
+        if ($changes) {
+            return implode(', ', $changes);
+        }
+
+        // Fallback: just show keys and values that aren't metadata
+        $fallback = [];
+        foreach ($data as $key => $value) {
+            if (in_array($key, ['log_type', 'attributes', 'old'])) {
+                continue;
+            }
+            if (is_array($value)) {
+                $value = json_encode($value);
+            }
+            $fallback[] = "{$key}: {$value}";
+        }
+
+        return implode(', ', $fallback) ?: 'N/A';
+    }
+
+    protected static function resolveLogType($record): string
+    {
+        $props = $record->properties;
+        $data = is_array($props) ? $props : (method_exists($props, 'toArray') ? $props->toArray() : (array) $props);
+
+        if (isset($data['log_type'])) {
+            return $data['log_type'];
+        }
+
+        if (isset($data['mt_account_number']) || isset($data['action'])) {
+            return 'mt';
+        }
+
+        return 'system';
     }
 }

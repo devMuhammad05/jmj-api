@@ -15,40 +15,37 @@ class PoolsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->weight('bold')
+                TextColumn::make("name")
+                    ->weight("bold")
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('total_amount')
-                    ->label('Total Capital')
-                    ->money('USD')
+                TextColumn::make("total_amount")
+                    ->label("Total Capital")
+                    ->money("USD")
                     ->sortable(),
-                TextColumn::make('investor_count')
-                    ->label('Investors')
+                TextColumn::make("investor_count")
+                    ->label("Investors")
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('last_return')
-                    ->label('Last Return')
-                    ->numeric(decimalPlaces: 2)
-                    ->suffix('%')
+                TextColumn::make("minimum_investment")
+                    ->label("Min. Investment")
+                    ->money("USD")
                     ->sortable(),
-                TextColumn::make('minimum_investment')
-                    ->label('Min. Investment')
-                    ->money('USD')
-                    ->sortable(),
-                TextColumn::make('status')
+                TextColumn::make("status")
                     ->badge()
-                    ->color(fn (PoolStatus $state): string => match ($state) {
-                        PoolStatus::ACTIVE => 'success',
-                        PoolStatus::CLOSED => 'danger',
-                        PoolStatus::PAUSED => 'warning',
-                    })
+                    ->color(
+                        fn(PoolStatus $state): string => match ($state) {
+                            PoolStatus::ACTIVE => "success",
+                            PoolStatus::CLOSED => "danger",
+                            PoolStatus::PAUSED => "warning",
+                        },
+                    )
                     ->searchable(),
-                TextColumn::make('created_at')
+                TextColumn::make("created_at")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                TextColumn::make("updated_at")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -56,13 +53,9 @@ class PoolsTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
-            ])
+            ->recordActions([EditAction::make()])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                BulkActionGroup::make([DeleteBulkAction::make()]),
             ]);
     }
 }

@@ -40,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
                 app()->isProduction()
                     ? TwoFactorAuthenticationPlugin::make()
                         ->enableTwoFactorAuthentication()
-                        ->enablePasskeyAuthentication()
+                        // ->enablePasskeyAuthentication()
                         ->addTwoFactorMenuItem()
                     : null,
             ]))

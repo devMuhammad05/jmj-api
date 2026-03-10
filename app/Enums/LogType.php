@@ -2,7 +2,11 @@
 
 namespace App\Enums;
 
-enum LogType: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+
+enum LogType: string implements HasColor, HasIcon, HasLabel
 {
     case MT = 'mt';
     case AUTH = 'auth';
@@ -12,7 +16,7 @@ enum LogType: string
     case SYSTEM = 'system';
     case SECURITY = 'security';
 
-    public function label(): string
+    public function getLabel(): ?string
     {
         return match ($this) {
             self::MT => 'MetaTrader',
@@ -25,7 +29,7 @@ enum LogType: string
         };
     }
 
-    public function color(): string
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::MT => 'warning',
@@ -38,7 +42,7 @@ enum LogType: string
         };
     }
 
-    public function icon(): string
+    public function getIcon(): ?string
     {
         return match ($this) {
             self::MT => 'heroicon-o-key',

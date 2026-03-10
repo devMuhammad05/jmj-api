@@ -12,46 +12,40 @@ class PoolForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Pool Information')
-                    ->description('Basic details about the investment pool.')
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        Select::make('status')
-                            ->options(PoolStatus::class)
-                            ->default(PoolStatus::ACTIVE)
-                            ->required(),
-                        TextInput::make('minimum_investment')
-                            ->label('Minimum Investment ($)')
-                            ->required()
-                            ->numeric()
-                            ->prefix('$')
-                            ->default(1000.0),
-                    ])->columns(2),
+        return $schema->components([
+            Section::make("Pool Information")
+                ->description("Basic details about the investment pool.")
+                ->schema([
+                    TextInput::make("name")->required()->maxLength(255),
+                    Select::make("status")
+                        ->options(PoolStatus::class)
+                        ->default(PoolStatus::ACTIVE)
+                        ->required(),
+                    TextInput::make("minimum_investment")
+                        ->label('Minimum Investment ($)')
+                        ->required()
+                        ->numeric()
+                        ->prefix('$')
+                        ->default(1000.0),
+                ])
+                ->columns(2),
 
-                Section::make('Financial Performance')
-                    ->description('Real-time tracking of pool performance.')
-                    ->schema([
-                        TextInput::make('total_amount')
-                            ->label('Total Capital ($)')
-                            ->required()
-                            ->numeric()
-                            ->prefix('$')
-                            ->default(0.0),
-                        TextInput::make('investor_count')
-                            ->label('Active Investors')
-                            ->required()
-                            ->numeric()
-                            ->default(0),
-                        TextInput::make('last_return')
-                            ->label('Last Return (%)')
-                            ->numeric()
-                            ->prefix('%')
-                            ->placeholder('e.g. 15.2'),
-                    ])->columns(3),
-            ]);
+            Section::make("Financial Performance")
+                ->description("Real-time tracking of pool performance.")
+                ->schema([
+                    TextInput::make("total_amount")
+                        ->label('Total Capital ($)')
+                        ->required()
+                        ->numeric()
+                        ->prefix('$')
+                        ->default(0.0),
+                    TextInput::make("investor_count")
+                        ->label("Active Investors")
+                        ->required()
+                        ->numeric()
+                        ->default(0),
+                ])
+                ->columns(3),
+        ]);
     }
 }

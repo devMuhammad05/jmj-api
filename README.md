@@ -545,7 +545,6 @@ Retrieve all active investment pools available for investment.
             "name": "Main Trading Pool",
             "total_amount": "45000.00",
             "investor_count": 23,
-            "last_return": "15.20",
             "minimum_investment": "1000.00",
             "status": "active",
             "created_at": "2026-03-01 10:00:00"
@@ -575,7 +574,6 @@ Retrieve detailed information about a specific pool.
         "name": "Main Trading Pool",
         "total_amount": "45000.00",
         "investor_count": 23,
-        "last_return": "15.20",
         "minimum_investment": "1000.00",
         "status": "active",
         "created_at": "2026-03-01 10:00:00"
@@ -618,7 +616,6 @@ Submit an application to join an investment pool. Payment verification takes 24-
             "name": "Main Trading Pool",
             "total_amount": "45000.00",
             "investor_count": 23,
-            "last_return": "15.20",
             "minimum_investment": "1000.00",
             "status": "active",
             "created_at": "2026-03-01 10:00:00"
@@ -664,7 +661,6 @@ Retrieve all pool investments for the authenticated user.
                 "name": "Main Trading Pool",
                 "total_amount": "45000.00",
                 "investor_count": 23,
-                "last_return": "15.20",
                 "minimum_investment": "1000.00",
                 "status": "active",
                 "created_at": "2026-03-01 10:00:00"

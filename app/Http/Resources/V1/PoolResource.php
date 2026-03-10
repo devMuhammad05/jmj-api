@@ -15,14 +15,13 @@ class PoolResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'total_amount' => $this->total_amount,
-            'investor_count' => $this->investor_count,
-            'last_return' => $this->last_return,
-            'minimum_investment' => $this->minimum_investment,
-            'status' => $this->status,
-            'created_at' => $this->created_at->toDateTimeString(),
+            "id" => $this->id,
+            "name" => $this->name,
+            "total_amount" => $this->total_amount,
+            "investor_count" => $this->investor_count,
+            "minimum_investment" => $this->minimum_investment,
+            "status" => $this->status,
+            "created_at" => $this->created_at->toDateTimeString(),
         ];
     }
 }
