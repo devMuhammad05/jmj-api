@@ -19,10 +19,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->prependToGroup('api', \App\Http\Middleware\ForceJsonResponse::class);
+        $middleware->prependToGroup(
+            'api',
+            \App\Http\Middleware\ForceJsonResponse::class,
+        );
+        $middleware->alias([
+            'pin' => \App\Http\Middleware\RequirePin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
+        $exceptions->shouldRenderJsonWhen(function (
+            Request $request,
+            Throwable $e,
+        ) {
             if ($request->is('api/*')) {
                 return true;
             }
@@ -30,47 +39,78 @@ return Application::configure(basePath: dirname(__DIR__))
             return $request->expectsJson();
         });
 
-        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+        $exceptions->render(function (
+            AccessDeniedHttpException $e,
+            Request $request,
+        ) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $e->getMessage() ?: 'This action is unauthorized.',
-                ], 403);
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => $e->getMessage() ?: 'This action is unauthorized.',
+                    ],
+                    403,
+                );
             }
         });
 
-        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, Request $request) {
+        $exceptions->render(function (
+            \Illuminate\Auth\Access\AuthorizationException $e,
+            Request $request,
+        ) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $e->getMessage(),
-                ], 403);
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => $e->getMessage(),
+                    ],
+                    403,
+                );
             }
         });
 
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+        $exceptions->render(function (
+            NotFoundHttpException $e,
+            Request $request,
+        ) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Route not found.',
-                ], 404);
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Route not found.',
+                    ],
+                    404,
+                );
             }
         });
-        $exceptions->render(function (ModelNotFoundException $e, Request $request) {
+        $exceptions->render(function (
+            ModelNotFoundException $e,
+            Request $request,
+        ) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Record not found.',
-                ], 404);
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Record not found.',
+                    ],
+                    404,
+                );
             }
         });
 
-        $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+        $exceptions->render(function (
+            MethodNotAllowedHttpException $e,
+            Request $request,
+        ) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => "The {$request->method()} method is not allowed for this endpoint.",
-                ], 405);
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => "The {$request->method()} method is not allowed for this endpoint.",
+                    ],
+                    405,
+                );
             }
         });
-    })->create();
+    })
+    ->create();

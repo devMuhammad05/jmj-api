@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -76,6 +75,7 @@ class DatabaseSeeder extends Seeder
             VerificationSeeder::class,
             MetaTraderCredentialSeeder::class,
             SignalSeeder::class,
+            PoolInvestmentSeeder::class,
         ]);
     }
 }

@@ -15,7 +15,10 @@ use Illuminate\Http\JsonResponse;
 
 final class AuthController extends ApiController
 {
-    public function __construct(private readonly Hasher $hasher, private readonly AuthManager $authManager) {}
+    public function __construct(
+        private readonly Hasher $hasher,
+        private readonly AuthManager $authManager,
+    ) {}
 
     /**
      * Handle a registration request for the application.
@@ -31,11 +34,16 @@ final class AuthController extends ApiController
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return $this->successResponse('User registered successfully', [
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ], 201);
+        return $this->successResponse(
+            'User registered successfully',
+            [
+                'user' => $user,
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'pin_configured' => false,
+            ],
+            201,
+        );
     }
 
     /**
@@ -55,6 +63,7 @@ final class AuthController extends ApiController
             'user' => $user,
             'access_token' => $token,
             'token_type' => 'Bearer',
+            'pin_configured' => $user->isPinSet(),
         ]);
     }
 
@@ -79,7 +88,10 @@ final class AuthController extends ApiController
      */
     public function me(): JsonResponse
     {
-        return $this->successResponse('User profile retrieved successfully', $this->authManager->user());
+        return $this->successResponse(
+            'User profile retrieved successfully',
+            $this->authManager->user(),
+        );
     }
 
     /**
@@ -92,6 +104,9 @@ final class AuthController extends ApiController
 
         $user->update($request->validated());
 
-        return $this->successResponse('User profile updated successfully', $user);
+        return $this->successResponse(
+            'User profile updated successfully',
+            $user,
+        );
     }
 }

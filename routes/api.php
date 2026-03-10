@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\Pin\ChangePinController;
+use App\Http\Controllers\Api\V1\Auth\Pin\ResetPinController;
+use App\Http\Controllers\Api\V1\Auth\Pin\SetupPinController;
+use App\Http\Controllers\Api\V1\Auth\Pin\VerifyPinController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
 use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\PoolInvestmentController;
@@ -15,7 +19,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::prefix('v1')->group(function (): void {
-    Route::get('/', fn() => 'API is active');
+    Route::get('/', fn () => 'API is active');
 
     // Auth Routes
     Route::prefix('auth')->group(function (): void {
@@ -27,6 +31,16 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/me', [AuthController::class, 'me']);
             Route::put('/profile', [AuthController::class, 'update']);
         });
+
+        // PIN Routes
+        Route::middleware(['auth:sanctum', 'throttle:10,1'])
+            ->prefix('pin')
+            ->group(function (): void {
+                Route::post('/setup', SetupPinController::class);
+                Route::post('/verify', VerifyPinController::class);
+                Route::post('/change', ChangePinController::class);
+                Route::post('/reset', ResetPinController::class);
+            });
     });
 
     // Public Signal Routes (no authentication required)
@@ -38,7 +52,10 @@ Route::prefix('v1')->group(function (): void {
     });
 
     Route::middleware('auth:sanctum')->group(function (): void {
-        Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
+        Route::post('/metatrader-credentials', [
+            MetaTraderCredentialController::class,
+            'store',
+        ]);
 
         Route::get('/verifications', [VerificationController::class, 'index']);
         Route::post('/verifications', [VerificationController::class, 'store']);
@@ -48,12 +65,27 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/pools/{pool}', [PoolController::class, 'show']);
 
         // Pool Investment Routes
-        Route::get('/pool-investments', [PoolInvestmentController::class, 'index']);
-        Route::post('/pool-investments', [PoolInvestmentController::class, 'store']);
-        Route::get('/pool-investments/{poolInvestment}', [PoolInvestmentController::class, 'show']);
+        Route::get('/pool-investments', [
+            PoolInvestmentController::class,
+            'index',
+        ]);
+        Route::post('/pool-investments', [
+            PoolInvestmentController::class,
+            'store',
+        ]);
+        Route::get('/pool-investments/{poolInvestment}', [
+            PoolInvestmentController::class,
+            'show',
+        ]);
 
         // Profit Distribution Routes
-        Route::get('/profit-distributions', [ProfitDistributionController::class, 'index']);
-        Route::get('/profit-distributions/{profitDistribution}', [ProfitDistributionController::class, 'show']);
+        Route::get('/profit-distributions', [
+            ProfitDistributionController::class,
+            'index',
+        ]);
+        Route::get('/profit-distributions/{profitDistribution}', [
+            ProfitDistributionController::class,
+            'show',
+        ]);
     });
 });

@@ -15,7 +15,7 @@ Represents a collective investment pool where multiple investors can contribute 
 - `name` (string) - Pool identifier
 - `total_amount` (decimal) - Current total pool capital
 - `investor_count` (integer) - Number of active investors
-- `last_return` (decimal) - Most recent return percentage
+
 - `minimum_investment` (decimal) - Minimum contribution (default: $1,000)
 - `status` (enum) - Pool status: active, closed, paused
 - `timestamps` - created_at, updated_at

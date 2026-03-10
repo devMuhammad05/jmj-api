@@ -18,11 +18,15 @@ use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
 use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
 use Stephenjude\FilamentTwoFactorAuthentication\TwoFactorAuthenticatable;
 
-
 class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, LogsActivity, TwoFactorAuthenticatable, InteractsWithPasskeys;
+    use HasApiTokens,
+        HasFactory,
+        InteractsWithPasskeys,
+        LogsActivity,
+        Notifiable,
+        TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -36,6 +40,10 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
         'country',
         'password',
         'role',
+        'pin',
+        'pin_set_at',
+        'pin_attempts',
+        'pin_locked_until',
     ];
 
     /**
@@ -43,14 +51,11 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
      *
      * @var list<string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token', 'pin'];
 
     public function getFilamentName(): string
     {
-        return $this->full_name ?? $this->email ?? 'Administrator';
+        return $this->full_name ?? ($this->email ?? 'Administrator');
     }
 
     /**
@@ -63,7 +68,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
 
     public function canAccessPanel(Panel $panel): bool
     {
-
         // if (! app()->isProduction()) {
         //     return true; // Allow access in non-production environments
         // }
@@ -88,7 +92,38 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'pin_set_at' => 'datetime',
+            'pin_locked_until' => 'datetime',
+            'pin_attempts' => 'integer',
         ];
+    }
+
+    /**
+     * Determine whether the user has configured a PIN.
+     */
+    public function isPinSet(): bool
+    {
+        return $this->pin !== null;
+    }
+
+    /**
+     * Determine whether the user's PIN is currently locked out.
+     */
+    public function isPinLocked(): bool
+    {
+        return $this->pin_locked_until !== null &&
+            $this->pin_locked_until->isFuture();
+    }
+
+    /**
+     * Verify a raw 4-digit PIN against the stored hash.
+     */
+    public function verifyPin(int $raw): bool
+    {
+        return \Illuminate\Support\Facades\Hash::check(
+            (string) $raw,
+            $this->pin,
+        );
     }
 
     /**
@@ -128,7 +163,9 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
             ->logOnly(['full_name', 'email', 'role', 'country'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}")
+            ->setDescriptionForEvent(
+                fn (string $eventName) => "User {$eventName}",
+            )
             ->useLogName('user');
     }
 }

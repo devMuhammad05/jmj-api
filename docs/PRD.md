@@ -290,7 +290,7 @@ graph TD
 | `name`             | String    | Pool identifier                      |
 | `total_amount`     | Decimal   | Current total pool capital           |
 | `investor_count`   | Integer   | Number of active investors           |
-| `last_return`      | Decimal   | Most recent return percentage        |
+
 | `minimum_investment` | Decimal | Minimum contribution ($1,000)        |
 | `status`           | Enum      | active, closed, paused               |
 | `created_at`       | Timestamp | Pool creation date                   |
