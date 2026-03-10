@@ -15,13 +15,11 @@ class SignalController extends ApiController
 {
     /**
      * Display a listing of published signals.
-     *
-     * @param Request $request
-     * @param GetSignalsAction $action
-     * @return AnonymousResourceCollection
      */
-    public function index(Request $request, GetSignalsAction $action): AnonymousResourceCollection
-    {
+    public function index(
+        Request $request,
+        GetSignalsAction $action,
+    ): AnonymousResourceCollection {
         $signals = $action->execute($request);
 
         return SignalResource::collection($signals);
@@ -29,32 +27,27 @@ class SignalController extends ApiController
 
     /**
      * Display the specified signal.
-     *
-     * @param Signal $signal
-     * @return JsonResponse
      */
     public function show(Signal $signal): JsonResponse
     {
         // Only show published signals
-        if (!$signal->is_published) {
+        if (! $signal->is_published) {
             return $this->errorResponse('Signal not found', 404);
         }
 
         return $this->successResponse(
+            'Signal retrieved successfully',
             new SignalResource($signal),
-            'Signal retrieved successfully'
         );
     }
 
     /**
      * Get active signals only.
-     *
-     * @param Request $request
-     * @param GetSignalsAction $action
-     * @return AnonymousResourceCollection
      */
-    public function active(Request $request, GetSignalsAction $action): AnonymousResourceCollection
-    {
+    public function active(
+        Request $request,
+        GetSignalsAction $action,
+    ): AnonymousResourceCollection {
         $signals = $action->execute($request, activeOnly: true);
 
         return SignalResource::collection($signals);
@@ -62,8 +55,6 @@ class SignalController extends ApiController
 
     /**
      * Get signal statistics.
-     *
-     * @return JsonResponse
      */
     public function statistics(): JsonResponse
     {
@@ -87,18 +78,23 @@ class SignalController extends ApiController
             'win_rate' => $this->calculateWinRate(),
         ];
 
-        return $this->successResponse($stats, 'Signal statistics retrieved successfully');
+        return $this->successResponse(
+            'Signal statistics retrieved successfully',
+            $stats,
+        );
     }
 
     /**
      * Calculate win rate percentage.
-     *
-     * @return float
      */
     private function calculateWinRate(): float
     {
         $totalClosed = Signal::where('is_published', true)
-            ->whereIn('status', [SignalStatus::TP, SignalStatus::SL, SignalStatus::CLOSED])
+            ->whereIn('status', [
+                SignalStatus::TP,
+                SignalStatus::SL,
+                SignalStatus::CLOSED,
+            ])
             ->count();
 
         if ($totalClosed === 0) {

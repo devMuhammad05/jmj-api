@@ -29,17 +29,25 @@ class SignalsTable
                     ->weight('bold'),
                 TextColumn::make('action')
                     ->badge()
-                    ->color(fn (SignalAction $state): string => match ($state) {
-                        SignalAction::BUY, SignalAction::BUY_LIMIT, SignalAction::BUY_STOP => 'success',
-                        SignalAction::SELL, SignalAction::SELL_LIMIT, SignalAction::SELL_STOP => 'danger',
-                    })
+                    ->color(
+                        fn (SignalAction $state): string => match ($state) {
+                            SignalAction::BUY,
+                            SignalAction::BUY_LIMIT,
+                            SignalAction::BUY_STOP => 'success',
+                            SignalAction::SELL,
+                            SignalAction::SELL_LIMIT,
+                            SignalAction::SELL_STOP => 'danger',
+                        },
+                    )
                     ->sortable(),
                 TextColumn::make('type')
                     ->badge()
-                    ->color(fn (SignalType $state): string => match ($state) {
-                        SignalType::FREE => 'info',
-                        SignalType::PREMIUM => 'warning',
-                    })
+                    ->color(
+                        fn (SignalType $state): string => match ($state) {
+                            SignalType::FREE => 'info',
+                            SignalType::PREMIUM => 'warning',
+                        },
+                    )
                     ->sortable(),
                 TextColumn::make('entry_price')
                     ->label('Entry')
@@ -63,18 +71,26 @@ class SignalsTable
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
                     ->badge()
-                    ->color(fn (SignalStatus $state): string => match ($state) {
-                        SignalStatus::ACTIVE => 'info',
-                        SignalStatus::TP => 'success',
-                        SignalStatus::SL => 'danger',
-                        SignalStatus::CLOSED => 'gray',
-                        SignalStatus::CANCELLED => 'warning',
-                    })
+                    ->color(
+                        fn (SignalStatus $state): string => match ($state) {
+                            SignalStatus::ACTIVE => 'info',
+                            SignalStatus::TP => 'success',
+                            SignalStatus::SL => 'danger',
+                            SignalStatus::CLOSED => 'gray',
+                            SignalStatus::CANCELLED => 'warning',
+                        },
+                    )
                     ->sortable(),
                 TextColumn::make('pips_result')
                     ->label('Pips')
                     ->numeric(decimalPlaces: 2)
-                    ->color(fn ($state): string => $state > 0 ? 'success' : ($state < 0 ? 'danger' : 'gray'))
+                    ->color(
+                        fn ($state): string => $state > 0
+                            ? 'success'
+                            : ($state < 0
+                                ? 'danger'
+                                : 'gray'),
+                    )
                     ->sortable(),
                 IconColumn::make('is_published')
                     ->label('Published')
@@ -90,42 +106,36 @@ class SignalsTable
                 SelectFilter::make('status')
                     ->options(SignalStatus::class)
                     ->default(SignalStatus::ACTIVE->value),
-                SelectFilter::make('action')
-                    ->options(SignalAction::class),
-                SelectFilter::make('type')
-                    ->options(SignalType::class),
-                SelectFilter::make('symbol')
-                    ->options([
-                        'EURUSD' => 'EURUSD',
-                        'GBPUSD' => 'GBPUSD',
-                        'USDJPY' => 'USDJPY',
-                        'AUDUSD' => 'AUDUSD',
-                        'USDCAD' => 'USDCAD',
-                        'XAUUSD' => 'XAUUSD (Gold)',
-                        'BTCUSD' => 'BTCUSD (Bitcoin)',
-                    ])
-                    ->searchable(),
+                SelectFilter::make('action')->options(SignalAction::class),
+                SelectFilter::make('type')->options(SignalType::class),
             ])
             ->recordActions([
                 Action::make('hit_tp')
                     ->label('TP')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Signal $record) => $record->status === SignalStatus::ACTIVE)
+                    ->visible(
+                        fn (Signal $record) => $record->status ===
+                            SignalStatus::ACTIVE,
+                    )
                     ->requiresConfirmation()
                     ->action(function (Signal $record) {
-                        $pips = abs($record->take_profit_1 - $record->entry_price) * 10000;
-                        if ($record->action === SignalAction::SELL || 
-                            $record->action === SignalAction::SELL_LIMIT || 
-                            $record->action === SignalAction::SELL_STOP) {
+                        $pips =
+                            abs($record->take_profit_1 - $record->entry_price) *
+                            10000;
+                        if (
+                            $record->action === SignalAction::SELL ||
+                            $record->action === SignalAction::SELL_LIMIT ||
+                            $record->action === SignalAction::SELL_STOP
+                        ) {
                             $pips = -$pips;
                         }
-                        
+
                         $record->update([
                             'status' => SignalStatus::TP,
                             'pips_result' => $pips,
                         ]);
-                        
+
                         Notification::make()
                             ->title('Signal Hit TP')
                             ->success()
@@ -135,21 +145,28 @@ class SignalsTable
                     ->label('SL')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Signal $record) => $record->status === SignalStatus::ACTIVE)
+                    ->visible(
+                        fn (Signal $record) => $record->status ===
+                            SignalStatus::ACTIVE,
+                    )
                     ->requiresConfirmation()
                     ->action(function (Signal $record) {
-                        $pips = abs($record->stop_loss - $record->entry_price) * 10000;
-                        if ($record->action === SignalAction::BUY || 
-                            $record->action === SignalAction::BUY_LIMIT || 
-                            $record->action === SignalAction::BUY_STOP) {
+                        $pips =
+                            abs($record->stop_loss - $record->entry_price) *
+                            10000;
+                        if (
+                            $record->action === SignalAction::BUY ||
+                            $record->action === SignalAction::BUY_LIMIT ||
+                            $record->action === SignalAction::BUY_STOP
+                        ) {
                             $pips = -$pips;
                         }
-                        
+
                         $record->update([
                             'status' => SignalStatus::SL,
                             'pips_result' => $pips,
                         ]);
-                        
+
                         Notification::make()
                             ->title('Signal Hit SL')
                             ->danger()
@@ -159,7 +176,10 @@ class SignalsTable
                     ->label('Cancel')
                     ->icon('heroicon-o-x-mark')
                     ->color('warning')
-                    ->visible(fn (Signal $record) => $record->status === SignalStatus::ACTIVE)
+                    ->visible(
+                        fn (Signal $record) => $record->status ===
+                            SignalStatus::ACTIVE,
+                    )
                     ->requiresConfirmation()
                     ->action(function (Signal $record) {
                         $record->update(['status' => SignalStatus::CANCELLED]);
@@ -170,11 +190,7 @@ class SignalsTable
                     }),
                 EditAction::make(),
             ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])
             ->defaultSort('created_at', 'desc');
     }
 }

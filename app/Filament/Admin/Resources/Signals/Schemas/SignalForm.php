@@ -18,39 +18,16 @@ class SignalForm
     {
         return $schema
             ->components([
-
                 // ── 1. Signal Identity ─────────────────────────────────────
                 Section::make('Signal Identity')
-                    ->description('Define the trading instrument and direction of this signal.')
+                    ->description(
+                        'Define the trading instrument and direction of this signal.',
+                    )
                     ->icon('heroicon-o-identification')
                     ->schema([
-                        Select::make('symbol')
+                        TextInput::make('symbol')
                             ->label('Symbol')
-                            ->options([
-                                'Forex Majors' => [
-                                    'EURUSD' => 'EUR/USD',
-                                    'GBPUSD' => 'GBP/USD',
-                                    'USDJPY' => 'USD/JPY',
-                                    'AUDUSD' => 'AUD/USD',
-                                    'USDCAD' => 'USD/CAD',
-                                    'USDCHF' => 'USD/CHF',
-                                    'NZDUSD' => 'NZD/USD',
-                                ],
-                                'Forex Crosses' => [
-                                    'EURGBP' => 'EUR/GBP',
-                                    'EURJPY' => 'EUR/JPY',
-                                    'GBPJPY' => 'GBP/JPY',
-                                ],
-                                'Commodities' => [
-                                    'XAUUSD' => 'XAU/USD — Gold',
-                                    'XAGUSD' => 'XAG/USD — Silver',
-                                ],
-                                'Crypto' => [
-                                    'BTCUSD' => 'BTC/USD — Bitcoin',
-                                    'ETHUSD' => 'ETH/USD — Ethereum',
-                                ],
-                            ])
-                            ->searchable()
+                            ->placeholder('e.g., EURUSD, XAUUSD')
                             ->required()
                             ->columnSpan(1),
 
@@ -79,7 +56,9 @@ class SignalForm
 
                 // ── 2. Price Levels ────────────────────────────────────────
                 Section::make('Price Levels')
-                    ->description('Set the entry, stop loss, and take profit targets for this trade.')
+                    ->description(
+                        'Set the entry, stop loss, and take profit targets for this trade.',
+                    )
                     ->icon('heroicon-o-chart-bar')
                     ->schema([
                         TextInput::make('entry_price')
@@ -88,7 +67,9 @@ class SignalForm
                             ->step(0.00001)
                             ->required()
                             ->prefix('$')
-                            ->helperText('The price at which to enter the trade')
+                            ->helperText(
+                                'The price at which to enter the trade',
+                            )
                             ->columnSpan(1),
 
                         TextInput::make('stop_loss')
@@ -97,7 +78,9 @@ class SignalForm
                             ->step(0.00001)
                             ->required()
                             ->prefix('$')
-                            ->helperText('Exit price if the trade moves against you')
+                            ->helperText(
+                                'Exit price if the trade moves against you',
+                            )
                             ->columnSpan(1),
 
                         TextInput::make('take_profit_1')
@@ -130,7 +113,9 @@ class SignalForm
 
                 // ── 3. Outcome & Visibility ────────────────────────────────
                 Section::make('Outcome & Visibility')
-                    ->description('Track the signal result and control whether it is visible to subscribers.')
+                    ->description(
+                        'Track the signal result and control whether it is visible to subscribers.',
+                    )
                     ->icon('heroicon-o-eye')
                     ->schema([
                         TextInput::make('pips_result')
@@ -139,13 +124,17 @@ class SignalForm
                             ->step(0.01)
                             ->default(0)
                             ->suffix('pips')
-                            ->helperText('Calculated automatically when the signal is closed')
+                            ->helperText(
+                                'Calculated automatically when the signal is closed',
+                            )
                             ->columnSpan(1),
 
                         Toggle::make('is_published')
                             ->label('Published')
                             ->default(true)
-                            ->helperText('Make this signal visible to subscribers')
+                            ->helperText(
+                                'Make this signal visible to subscribers',
+                            )
                             ->inline(false)
                             ->columnSpan(1),
                     ])
@@ -154,19 +143,24 @@ class SignalForm
 
                 // ── 4. Analyst Notes ───────────────────────────────────────
                 Section::make('Analyst Notes')
-                    ->description('Optional commentary or analysis to accompany this signal.')
+                    ->description(
+                        'Optional commentary or analysis to accompany this signal.',
+                    )
                     ->icon('heroicon-o-document-text')
                     ->schema([
                         Textarea::make('notes')
                             ->label('Notes')
                             ->rows(4)
-                            ->placeholder('Add your trade rationale, key levels to watch, or any relevant market context…')
-                            ->helperText('Visible to users alongside the signal')
+                            ->placeholder(
+                                'Add your trade rationale, key levels to watch, or any relevant market context…',
+                            )
+                            ->helperText(
+                                'Visible to users alongside the signal',
+                            )
                             ->columnSpanFull(),
                     ])
                     ->collapsible()
                     ->collapsed(),
-
             ])
             ->columns(1);
     }

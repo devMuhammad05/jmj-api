@@ -39,19 +39,24 @@ class MetaTraderCredentialsTable
                 TextColumn::make('platform_type')
                     ->label('Platform')
                     ->badge()
-                    ->color(fn (MetaTraderPlatformType $state): string => match ($state) {
-                        MetaTraderPlatformType::MT4 => 'info',
-                        MetaTraderPlatformType::MT5 => 'success',
-                    })
+                    ->color(
+                        fn (MetaTraderPlatformType $state): string => match (
+                            $state
+                        ) {
+                            MetaTraderPlatformType::MT4 => 'info',
+                            MetaTraderPlatformType::MT5 => 'success',
+                        },
+                    )
                     ->sortable(),
                 TextColumn::make('risk_level')
                     ->label('Risk Level')
                     ->badge()
-                    ->color(fn (RiskLevel $state): string => match ($state) {
-                        RiskLevel::CONSERVATIVE => 'success',
-                        RiskLevel::MODERATE => 'warning',
-                        RiskLevel::AGGRESSIVE => 'danger',
-                    })
+                    ->color(
+                        fn (RiskLevel $state): string => match ($state) {
+                            RiskLevel::CONSERVATIVE => 'success',
+                            RiskLevel::MODERATE => 'warning',
+                        },
+                    )
                     ->sortable(),
                 TextColumn::make('initial_deposit')
                     ->label('Initial Deposit')
@@ -86,8 +91,15 @@ class MetaTraderCredentialsTable
                     ->color('warning')
                     ->requiresConfirmation()
                     ->modalHeading('MetaTrader Credentials')
-                    ->modalDescription('These credentials are sensitive. Only access them when necessary for trade execution.')
-                    ->modalContent(fn (MetaTraderCredential $record) => view('filament.admin.mt-credentials', ['record' => $record]))
+                    ->modalDescription(
+                        'These credentials are sensitive. Only access them when necessary for trade execution.',
+                    )
+                    ->modalContent(
+                        fn (MetaTraderCredential $record) => view(
+                            'filament.admin.mt-credentials',
+                            ['record' => $record],
+                        ),
+                    )
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close')
                     ->action(function (MetaTraderCredential $record) {
@@ -106,17 +118,15 @@ class MetaTraderCredentialsTable
 
                         Notification::make()
                             ->title('Credentials Accessed')
-                            ->body('This action has been logged for security purposes.')
+                            ->body(
+                                'This action has been logged for security purposes.',
+                            )
                             ->info()
                             ->send();
                     }),
                 // EditAction::make(),
             ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])
             ->defaultSort('created_at', 'desc');
     }
 }

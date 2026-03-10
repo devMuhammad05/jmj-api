@@ -116,7 +116,6 @@
                 $riskStyles = [
                     'conservative' => 'background: #dcfce7; color: #166534;',
                     'moderate'     => 'background: #fef9c3; color: #854d0e;',
-                    'aggressive'   => 'background: #fee2e2; color: #991b1b;',
                 ];
                 $style = $riskStyles[$record->risk_level->value] ?? 'background: #f3f4f6; color: #374151;';
             @endphp
@@ -152,7 +151,7 @@
 function copyToClipboard(text, label) {
     // Log for debugging
     console.log('Attempting to copy:', label, 'Value:', text);
-    
+
     // Try modern clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
@@ -177,15 +176,15 @@ function fallbackCopy(text, label) {
     textarea.style.top = '-999999px';
     textarea.setAttribute('readonly', '');
     document.body.appendChild(textarea);
-    
+
     try {
         textarea.focus();
         textarea.select();
         textarea.setSelectionRange(0, 99999); // For mobile devices
-        
+
         const successful = document.execCommand('copy');
         console.log('Fallback copy result:', successful);
-        
+
         if (successful) {
             showSuccessToast(label + ' copied!');
         } else {
@@ -210,7 +209,7 @@ function showSuccessToast(message) {
         ${message}
     `;
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.3s';
@@ -233,7 +232,7 @@ function showErrorToast(message) {
         ${message}
     `;
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.3s';

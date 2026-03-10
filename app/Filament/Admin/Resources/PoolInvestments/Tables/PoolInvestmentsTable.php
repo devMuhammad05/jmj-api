@@ -62,11 +62,11 @@ class PoolInvestmentsTable
 
                 IconColumn::make('terms_accepted')->label('Terms')->boolean(),
 
-                TextColumn::make('verified_at')
-                    ->label('Verified At')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
+                // TextColumn::make('verified_at')
+                //     ->label('Verified At')
+                //     ->dateTime()
+                //     ->sortable()
+                //     ->toggleable(),
 
                 TextColumn::make('created_at')
                     ->label('Applied At')

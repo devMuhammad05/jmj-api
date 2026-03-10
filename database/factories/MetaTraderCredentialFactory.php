@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\RiskLevel;
 use App\Models\Client;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,7 +24,7 @@ class MetaTraderCredentialFactory extends Factory
             'mt_password' => fake()->password(8, 12),
             'mt_server' => 'Broker-Real'.fake()->numberBetween(1, 10),
             'initial_deposit' => fake()->randomFloat(2, 500, 50000),
-            'risk_level' => fake()->randomElement(['Low', 'Medium', 'High']),
+            'risk_level' => fake()->randomElement(RiskLevel::cases()),
         ];
     }
 }

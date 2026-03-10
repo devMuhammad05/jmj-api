@@ -32,6 +32,10 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | POST   | `/auth/logout`                | 🔒   | Logout user                        |
 | GET    | `/auth/me`                    | 🔒   | Get authenticated user profile     |
 | PUT    | `/auth/profile`               | 🔒   | Update user profile                |
+| POST   | `/auth/pin/setup`             | 🔒   | Setup 4-digit security PIN         |
+| POST   | `/auth/pin/verify`            | 🔒   | Verify security PIN                |
+| POST   | `/auth/pin/change`            | 🔒   | Change existing security PIN       |
+| POST   | `/auth/pin/reset`             | 🔒   | Reset PIN using account password   |
 | GET    | `/signals`                    | No   | Get all published signals          |
 | GET    | `/signals/active`             | No   | Get active signals only            |
 | GET    | `/signals/statistics`         | No   | Get signal performance statistics  |
@@ -100,7 +104,9 @@ Create a new user account.
             "created_at": "2026-03-08T10:00:00.000000Z",
             "updated_at": "2026-03-08T10:00:00.000000Z"
         },
-        "access_token": "1|abc123..."
+        "access_token": "1|abc123...",
+        "token_type": "Bearer",
+        "pin_configured": false
     }
 }
 ```
@@ -125,7 +131,7 @@ Authenticate an existing user.
 ```json
 {
     "status": "success",
-    "message": "Login successful",
+    "message": "User logged in successfully",
     "data": {
         "user": {
             "id": 1,
@@ -135,7 +141,9 @@ Authenticate an existing user.
             "created_at": "2026-03-08T10:00:00.000000Z",
             "updated_at": "2026-03-08T10:00:00.000000Z"
         },
-        "access_token": "2|xyz789..."
+        "access_token": "2|xyz789...",
+        "token_type": "Bearer",
+        "pin_configured": true
     }
 }
 ```
@@ -216,6 +224,110 @@ Update the authenticated user's profile information.
         "created_at": "2026-03-08T10:00:00.000000Z",
         "updated_at": "2026-03-08T11:00:00.000000Z"
     }
+}
+
+---
+
+#### 1.6 PIN Management
+
+All PIN endpoints are throttled to prevent brute-force attacks.
+
+##### 1.6.1 Setup PIN
+
+`POST /auth/pin/setup` 🔒
+
+Configure a new 4-digit security PIN. This can only be done if a PIN is not already set.
+
+**Request Body:**
+
+| Field              | Type    | Required | Notes            |
+| ------------------ | ------- | -------- | ---------------- |
+| `pin`              | integer | ✓        | 4 digits         |
+| `pin_confirmation` | integer | ✓        | Must match `pin` |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "PIN set up successfully.",
+    "data": []
+}
+```
+
+---
+
+##### 1.6.2 Verify PIN
+
+`POST /auth/pin/verify` 🔒
+
+Verify the user's security PIN. 5 failed attempts will lock the PIN for 30 minutes.
+
+**Request Body:**
+
+| Field | Type    | Required | Notes    |
+| ----- | ------- | -------- | -------- |
+| `pin` | integer | ✓        | 4 digits |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "PIN verified successfully.",
+    "data": []
+}
+```
+
+---
+
+##### 1.6.3 Change PIN
+
+`POST /auth/pin/change` 🔒
+
+Change an existing security PIN. Requires the current PIN.
+
+**Request Body:**
+
+| Field              | Type    | Required | Notes                             |
+| ------------------ | ------- | -------- | --------------------------------- |
+| `current_pin`      | integer | ✓        | 4 digits                          |
+| `pin`              | integer | ✓        | 4 digits, different from current |
+| `pin_confirmation` | integer | ✓        | Must match `pin`                  |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "PIN changed successfully.",
+    "data": []
+}
+```
+
+---
+
+##### 1.6.4 Reset PIN
+
+`POST /auth/pin/reset` 🔒
+
+Reset the security PIN using the account password. Useful if the user has forgotten their PIN or it is locked.
+
+**Request Body:**
+
+| Field              | Type    | Required | Notes            |
+| ------------------ | ------- | -------- | ---------------- |
+| `password`         | string  | ✓        | Account password |
+| `pin`              | integer | ✓        | 4 digits         |
+| `pin_confirmation` | integer | ✓        | Must match `pin` |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "PIN reset successfully.",
+    "data": []
 }
 ```
 
@@ -305,7 +417,7 @@ Link an investor's MT4/MT5 broker account to the platform. This allows traders t
 | `mt_server`         | string  | ✓        | Broker server name, max 100 characters   |
 | `platform_type`     | string  | ✓        | `mt4` or `mt5`                           |
 | `initial_deposit`   | numeric | ✓        | Initial deposit amount, min `0`          |
-| `risk_level`        | string  | ✓        | `conservative`, `moderate`, `aggressive` |
+| `risk_level`        | string  | ✓        | `conservative`, `moderate`               |
 
 **Response:**
 
@@ -537,17 +649,17 @@ Retrieve all active investment pools available for investment.
 
 ```json
 {
-    "success": true,
+    "status": "success",
     "message": "Active pools retrieved successfully",
     "data": [
         {
-            "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-            "name": "Main Trading Pool",
-            "total_amount": "45000.00",
-            "investor_count": 23,
-            "minimum_investment": "1000.00",
+            "id": 1,
+            "name": "Conservative Growth Pool",
+            "total_amount": "50000.00",
+            "investor_count": 12,
+            "minimum_investment": "100.00",
             "status": "active",
-            "created_at": "2026-03-01 10:00:00"
+            "created_at": "2026-01-15 08:30:00"
         }
     ],
     "links": {...},
@@ -567,16 +679,16 @@ Retrieve detailed information about a specific pool.
 
 ```json
 {
-    "success": true,
+    "status": "success",
     "message": "Pool details retrieved successfully",
     "data": {
-        "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-        "name": "Main Trading Pool",
-        "total_amount": "45000.00",
-        "investor_count": 23,
-        "minimum_investment": "1000.00",
+        "id": 1,
+        "name": "Conservative Growth Pool",
+        "total_amount": "50000.00",
+        "investor_count": 12,
+        "minimum_investment": "100.00",
         "status": "active",
-        "created_at": "2026-03-01 10:00:00"
+        "created_at": "2026-01-15 08:30:00"
     }
 }
 ```
@@ -607,28 +719,28 @@ Submit an application to join an investment pool. Payment verification takes 24-
 
 ```json
 {
-    "success": true,
-    "message": "Pool investment application submitted successfully. Payment verification will take 24-48 hours.",
+    "status": "success",
+    "message": "Investment application submitted successfully",
     "data": {
-        "id": "8c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
+        "id": 15,
         "pool": {
-            "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-            "name": "Main Trading Pool",
-            "total_amount": "45000.00",
-            "investor_count": 23,
-            "minimum_investment": "1000.00",
+            "id": 1,
+            "name": "Conservative Growth Pool",
+            "total_amount": "50000.00",
+            "investor_count": 12,
+            "minimum_investment": "100.00",
             "status": "active",
-            "created_at": "2026-03-01 10:00:00"
+            "created_at": "2026-01-15 08:30:00"
         },
         "full_name": "John Doe",
-        "phone_number": "+234 XXX XXX XXXX",
-        "contribution": "1000.00",
-        "share_percentage": "0.0000",
+        "phone_number": "+2348012345678",
+        "contribution": "500.00",
+        "share_percentage": "1.00",
         "status": "pending",
         "terms_accepted": true,
         "verified_at": null,
-        "submitted_at": "2026-03-08 20:30:00",
-        "updated_at": "2026-03-08 20:30:00"
+        "submitted_at": "2026-03-08 14:20:00",
+        "updated_at": "2026-03-08 14:20:00"
     }
 }
 ```
@@ -651,29 +763,29 @@ Retrieve all pool investments for the authenticated user.
 
 ```json
 {
-    "success": true,
+    "status": "success",
     "message": "Pool investments retrieved successfully",
     "data": [
         {
-            "id": "8c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
+            "id": 15,
             "pool": {
-                "id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-                "name": "Main Trading Pool",
-                "total_amount": "45000.00",
-                "investor_count": 23,
-                "minimum_investment": "1000.00",
+                "id": 1,
+                "name": "Conservative Growth Pool",
+                "total_amount": "50000.00",
+                "investor_count": 12,
+                "minimum_investment": "100.00",
                 "status": "active",
-                "created_at": "2026-03-01 10:00:00"
+                "created_at": "2026-01-15 08:30:00"
             },
             "full_name": "John Doe",
-            "phone_number": "+234 XXX XXX XXXX",
-            "contribution": "1000.00",
-            "share_percentage": "2.2222",
+            "phone_number": "+2348012345678",
+            "contribution": "500.00",
+            "share_percentage": "1.00",
             "status": "active",
             "terms_accepted": true,
-            "verified_at": "2026-03-09 10:00:00",
-            "submitted_at": "2026-03-08 20:30:00",
-            "updated_at": "2026-03-09 10:00:00"
+            "verified_at": "2026-03-10 10:00:00",
+            "submitted_at": "2026-03-08 14:20:00",
+            "updated_at": "2026-03-10 10:00:00"
         }
     ],
     "links": {...},
@@ -693,20 +805,20 @@ Retrieve detailed information about a specific pool investment. Users can only v
 
 ```json
 {
-    "success": true,
+    "status": "success",
     "message": "Pool investment details retrieved successfully",
     "data": {
-        "id": "8c2d3e4f-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
+        "id": 15,
         "pool": {...},
         "full_name": "John Doe",
-        "phone_number": "+234 XXX XXX XXXX",
-        "contribution": "1000.00",
-        "share_percentage": "2.2222",
+        "phone_number": "+2348012345678",
+        "contribution": "500.00",
+        "share_percentage": "1.00",
         "status": "active",
         "terms_accepted": true,
-        "verified_at": "2026-03-09 10:00:00",
-        "submitted_at": "2026-03-08 20:30:00",
-        "updated_at": "2026-03-09 10:00:00"
+        "verified_at": "2026-03-10 10:00:00",
+        "submitted_at": "2026-03-08 14:20:00",
+        "updated_at": "2026-03-10 10:00:00"
     }
 }
 ```
@@ -723,16 +835,16 @@ Retrieve all profit distributions for the authenticated user.
 
 ```json
 {
-    "success": true,
+    "status": "success",
     "message": "Profit distributions retrieved successfully",
     "data": [
         {
-            "id": "7b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e",
-            "distribution_date": "2026-03-15",
-            "profit_amount": "152.00",
-            "pool_return": "15.20",
+            "id": 1,
+            "distribution_date": "2026-02-28",
+            "profit_amount": "1250.00",
+            "pool_return": "50.00",
             "status": "processed",
-            "processed_at": "2026-03-15 14:30:00"
+            "processed_at": "2026-03-01 09:00:00"
         }
     ],
     "links": {...},
@@ -757,15 +869,15 @@ Retrieve detailed information about a specific profit distribution. Users can on
 
 ```json
 {
-    "success": true,
+    "status": "success",
     "message": "Profit distribution details retrieved successfully",
     "data": {
-        "id": "7b1c2d3e-4f5a-6b7c-8d9e-0f1a2b3c4d5e",
-        "distribution_date": "2026-03-15",
-        "profit_amount": "152.00",
-        "pool_return": "15.20",
+        "id": 1,
+        "distribution_date": "2026-02-28",
+        "profit_amount": "1250.00",
+        "pool_return": "50.00",
         "status": "processed",
-        "processed_at": "2026-03-15 14:30:00"
+        "processed_at": "2026-03-01 09:00:00"
     }
 }
 ```
