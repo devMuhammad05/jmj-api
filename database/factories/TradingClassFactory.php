@@ -26,12 +26,12 @@ class TradingClassFactory extends Factory
     public function definition(): array
     {
         return [
-            "title" => $this->faker->sentence(4),
-            "description" => $this->faker->paragraph(),
-            "scheduled_at" => $this->faker->dateTimeBetween("now", "+1 month"),
-            "platform" => $this->faker->randomElement(ClassPlatform::cases()),
-            "meeting_link" => $this->faker->url(),
-            "is_published" => $this->faker->boolean(80),
+            'title' => fake()->sentence(4),
+            'description' => fake()->paragraph(),
+            'scheduled_at' => fake()->dateTimeBetween('now', '+1 month'),
+            'platform' => fake()->randomElement(ClassPlatform::cases()),
+            'meeting_link' => fake()->url(),
+            'is_published' => fake()->boolean(80),
         ];
     }
 }
