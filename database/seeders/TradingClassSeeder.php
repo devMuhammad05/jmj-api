@@ -49,6 +49,6 @@ class TradingClassSeeder extends Seeder
         }
 
         // Add additional varied classes using factory
-        TradingClass::factory()->count(7)->create();
+        // TradingClass::factory()->count(7)->create();
     }
 }
