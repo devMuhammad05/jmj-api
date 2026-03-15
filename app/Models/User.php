@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
 use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
 use Stephenjude\FilamentTwoFactorAuthentication\TwoFactorAuthenticatable;
@@ -24,7 +22,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     use HasApiTokens,
         HasFactory,
         InteractsWithPasskeys,
-        LogsActivity,
         Notifiable,
         TwoFactorAuthenticatable;
 
@@ -164,7 +161,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(
-                fn (string $eventName) => "User {$eventName}",
+                fn(string $eventName) => "User {$eventName}",
             )
             ->useLogName('user');
     }

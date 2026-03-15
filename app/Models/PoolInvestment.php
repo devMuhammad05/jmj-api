@@ -8,13 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class PoolInvestment extends Model
 {
     /** @use HasFactory<\Database\Factories\PoolInvestmentFactory> */
-    use HasFactory, HasUuids, LogsActivity;
+    use HasFactory, HasUuids;
 
     /**
      * The attributes that are mass assignable.

@@ -7,13 +7,12 @@ use App\Enums\VerificationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+
 
 class Verification extends Model
 {
     /** @use HasFactory<\Database\Factories\VerificationFactory> */
-    use HasFactory, LogsActivity;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

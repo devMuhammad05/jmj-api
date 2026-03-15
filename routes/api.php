@@ -52,15 +52,23 @@ Route::prefix("v1")->group(function (): void {
         Route::get("/{signal}", [SignalController::class, "show"]);
     });
 
+
+    Route::prefix("trading-classes")->group(function (): void {
+        Route::get("/", [TradingClassController::class, "index"]);
+        Route::get("/{tradingClass}", [
+            TradingClassController::class,
+            "show",
+        ]);
+    });
     Route::middleware("auth:sanctum")->group(function (): void {
         // Trading Class Routes (Learning Hub)
-        Route::prefix("trading-classes")->group(function (): void {
-            Route::get("/", [TradingClassController::class, "index"]);
-            Route::get("/{tradingClass}", [
-                TradingClassController::class,
-                "show",
-            ]);
-        });
+        // Route::prefix("trading-classes")->group(function (): void {
+        //     Route::get("/", [TradingClassController::class, "index"]);
+        //     Route::get("/{tradingClass}", [
+        //         TradingClassController::class,
+        //         "show",
+        //     ]);
+        // });
 
         Route::post("/metatrader-credentials", [
             MetaTraderCredentialController::class,

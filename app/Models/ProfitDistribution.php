@@ -7,13 +7,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class ProfitDistribution extends Model
 {
     /** @use HasFactory<\Database\Factories\ProfitDistributionFactory> */
-    use HasFactory, HasUuids, LogsActivity;
+    use HasFactory, HasUuids;
 
     /**
      * The attributes that are mass assignable.

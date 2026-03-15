@@ -7,13 +7,11 @@ use App\Enums\SignalStatus;
 use App\Enums\SignalType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class Signal extends Model
 {
     /** @use HasFactory<\Database\Factories\SignalFactory> */
-    use HasFactory, LogsActivity;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
