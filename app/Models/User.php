@@ -151,18 +151,4 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
         return $this->hasMany(PoolInvestment::class);
     }
 
-    /**
-     * Get the options for logging activity.
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['full_name', 'email', 'role', 'country'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(
-                fn(string $eventName) => "User {$eventName}",
-            )
-            ->useLogName('user');
-    }
 }

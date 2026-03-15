@@ -21,18 +21,18 @@ class PoolInvestmentController extends ApiController
      */
     public function index(Request $request): JsonResponse
     {
-        $investments = $request->user()
-            ->poolInvestments()
+        $user = $request->user();
+
+        $investments = $user->poolInvestments()
             ->with('pool')
             ->latest()
-            ->paginate(10);
+            ->paginate(10); 
 
         return $this->successResponse(
             'Pool investments retrieved successfully',
             PoolInvestmentResource::collection($investments)
         );
     }
-
     /**
      * Store a newly created pool investment.
      */
