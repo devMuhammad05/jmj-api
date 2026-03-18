@@ -150,5 +150,4 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     {
         return $this->hasMany(PoolInvestment::class);
     }
-
 }

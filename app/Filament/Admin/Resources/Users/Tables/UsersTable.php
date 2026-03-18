@@ -9,12 +9,10 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Hash;
 
 class UsersTable
 {
@@ -96,7 +94,7 @@ class UsersTable
                     ->label('View KYC')
                     ->icon('heroicon-o-document-text')
                     ->color('info')
-                    ->url(fn (User $record): ?string => $record->verification 
+                    ->url(fn (User $record): ?string => $record->verification
                         ? route('filament.admin.resources.verifications.edit', ['record' => $record->verification->id])
                         : null)
                     ->visible(fn (User $record): bool => $record->verification !== null),
@@ -105,9 +103,9 @@ class UsersTable
                     ->icon('heroicon-o-chart-bar')
                     ->color('success')
                     ->url(fn (User $record): string => route('filament.admin.resources.meta-trader-credentials.index', [
-                        'tableFilters' => ['user_id' => ['value' => $record->id]]
-                    ]))
-                    // ->visible(fn (User $record): bool => $record->metaTraderCredentials_count > 0),
+                        'tableFilters' => ['user_id' => ['value' => $record->id]],
+                    ])),
+                // ->visible(fn (User $record): bool => $record->metaTraderCredentials_count > 0),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

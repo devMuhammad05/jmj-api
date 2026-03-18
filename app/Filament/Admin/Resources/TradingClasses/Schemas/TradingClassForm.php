@@ -18,23 +18,23 @@ class TradingClassForm
         return $schema
             ->components([
                 // ── 1. Class Details ───────────────────────────────────────
-                Section::make("Class Details")
+                Section::make('Class Details')
                     ->description(
-                        "Define the title and description for the trading session.",
+                        'Define the title and description for the trading session.',
                     )
-                    ->icon("heroicon-o-academic-cap")
+                    ->icon('heroicon-o-academic-cap')
                     ->schema([
-                        TextInput::make("title")
-                            ->label("Class Title")
-                            ->placeholder("e.g., Advanced Trading Strategies")
+                        TextInput::make('title')
+                            ->label('Class Title')
+                            ->placeholder('e.g., Advanced Trading Strategies')
                             ->required()
                             ->maxLength(255)
                             ->columnSpanFull(),
 
-                        Textarea::make("description")
-                            ->label("Description")
+                        Textarea::make('description')
+                            ->label('Description')
                             ->placeholder(
-                                "Outline what students will learn in this session...",
+                                'Outline what students will learn in this session...',
                             )
                             ->rows(4)
                             ->columnSpanFull(),
@@ -42,32 +42,32 @@ class TradingClassForm
                     ->collapsible(),
 
                 // ── 2. Scheduling & Access ──────────────────────────────────
-                Section::make("Scheduling & Access")
+                Section::make('Scheduling & Access')
                     ->description(
-                        "Set the date, time, and meeting platform for this class.",
+                        'Set the date, time, and meeting platform for this class.',
                     )
-                    ->icon("heroicon-o-calendar-days")
+                    ->icon('heroicon-o-calendar-days')
                     ->schema([
-                        DateTimePicker::make("scheduled_at")
-                            ->label("Scheduled Date & Time")
+                        DateTimePicker::make('scheduled_at')
+                            ->label('Scheduled Date & Time')
                             ->required()
                             ->native(false)
-                            ->displayFormat("M j, Y h:i A")
+                            ->displayFormat('M j, Y h:i A')
                             ->columnSpan(1),
 
-                        Select::make("platform")
-                            ->label("Platform")
+                        Select::make('platform')
+                            ->label('Platform')
                             ->options(ClassPlatform::class)
                             ->default(ClassPlatform::ZOOM)
                             ->required()
                             ->columnSpan(1),
 
-                        TextInput::make("meeting_link")
-                            ->label("Meeting Link")
-                            ->placeholder("https://zoom.us/j/...")
+                        TextInput::make('meeting_link')
+                            ->label('Meeting Link')
+                            ->placeholder('https://zoom.us/j/...')
                             ->url()
                             ->helperText(
-                                "The link users will use to join or learn more about the class.",
+                                'The link users will use to join or learn more about the class.',
                             )
                             ->columnSpanFull(),
                     ])
@@ -75,17 +75,17 @@ class TradingClassForm
                     ->collapsible(),
 
                 // ── 3. Publishing ──────────────────────────────────────────
-                Section::make("Publishing")
+                Section::make('Publishing')
                     ->description(
-                        "Control the visibility of this class in the Learning Hub.",
+                        'Control the visibility of this class in the Learning Hub.',
                     )
-                    ->icon("heroicon-o-eye")
+                    ->icon('heroicon-o-eye')
                     ->schema([
-                        Toggle::make("is_published")
-                            ->label("Published")
+                        Toggle::make('is_published')
+                            ->label('Published')
                             ->default(true)
                             ->helperText(
-                                "If turned off, users will not see this class.",
+                                'If turned off, users will not see this class.',
                             )
                             ->inline(false),
                     ])

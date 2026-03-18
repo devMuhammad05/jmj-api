@@ -64,7 +64,7 @@ class Signal extends Model
             ->logOnly(['symbol', 'action', 'status', 'entry_price', 'stop_loss', 'take_profit_1', 'pips_result'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Signal {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Signal {$eventName}")
             ->useLogName('signal');
     }
 }

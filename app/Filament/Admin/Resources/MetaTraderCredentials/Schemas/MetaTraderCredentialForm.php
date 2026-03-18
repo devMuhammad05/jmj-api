@@ -42,9 +42,8 @@ class MetaTraderCredentialForm
                     ->revealable()
                     ->required(fn (string $operation): bool => $operation === 'create')
                     ->dehydrated(fn (?string $state) => filled($state))
-                    ->helperText(fn (string $operation): string => 
-                        $operation === 'edit' 
-                            ? 'Leave empty to keep current password' 
+                    ->helperText(fn (string $operation): string => $operation === 'edit'
+                            ? 'Leave empty to keep current password'
                             : 'This will be encrypted and stored securely'
                     ),
                 TextInput::make('initial_deposit')

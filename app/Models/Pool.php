@@ -19,11 +19,11 @@ class Pool extends Model
      * @var list<string>
      */
     protected $fillable = [
-        "name",
-        "total_amount",
-        "investor_count",
-        "minimum_investment",
-        "status",
+        'name',
+        'total_amount',
+        'investor_count',
+        'minimum_investment',
+        'status',
     ];
 
     /**
@@ -34,10 +34,10 @@ class Pool extends Model
     protected function casts(): array
     {
         return [
-            "total_amount" => "decimal:2",
-            "minimum_investment" => "decimal:2",
-            "investor_count" => "integer",
-            "status" => PoolStatus::class,
+            'total_amount' => 'decimal:2',
+            'minimum_investment' => 'decimal:2',
+            'investor_count' => 'integer',
+            'status' => PoolStatus::class,
         ];
     }
 
@@ -54,7 +54,7 @@ class Pool extends Model
      */
     public function activeInvestments(): HasMany
     {
-        return $this->hasMany(PoolInvestment::class)->where("status", "active");
+        return $this->hasMany(PoolInvestment::class)->where('status', 'active');
     }
 
     /**
@@ -63,12 +63,12 @@ class Pool extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(["name", "total_amount", "investor_count", "status"])
+            ->logOnly(['name', 'total_amount', 'investor_count', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(
-                fn(string $eventName) => "Pool {$eventName}",
+                fn (string $eventName) => "Pool {$eventName}",
             )
-            ->useLogName("pool");
+            ->useLogName('pool');
     }
 }

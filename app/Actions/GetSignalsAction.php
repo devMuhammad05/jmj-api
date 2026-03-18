@@ -12,10 +12,6 @@ class GetSignalsAction
 {
     /**
      * Execute the action to get filtered and paginated signals.
-     *
-     * @param Request $request
-     * @param bool $activeOnly
-     * @return LengthAwarePaginator
      */
     public function execute(Request $request, bool $activeOnly = false): LengthAwarePaginator
     {
@@ -35,11 +31,6 @@ class GetSignalsAction
 
     /**
      * Apply filters to the query.
-     *
-     * @param Builder $query
-     * @param Request $request
-     * @param bool $activeOnly
-     * @return void
      */
     private function applyFilters(Builder $query, Request $request, bool $activeOnly): void
     {
@@ -50,7 +41,7 @@ class GetSignalsAction
 
         // Filter by symbol
         if ($request->has('symbol')) {
-            $query->where('symbol', 'like', '%' . $request->symbol . '%');
+            $query->where('symbol', 'like', '%'.$request->symbol.'%');
         }
 
         // Filter by action (buy/sell)
@@ -64,7 +55,7 @@ class GetSignalsAction
         }
 
         // Get only active signals by default (unless status is specified or include_all is set)
-        if ($activeOnly || (!$request->has('status') && !$request->has('include_all'))) {
+        if ($activeOnly || (! $request->has('status') && ! $request->has('include_all'))) {
             $query->where('status', SignalStatus::ACTIVE);
         }
     }

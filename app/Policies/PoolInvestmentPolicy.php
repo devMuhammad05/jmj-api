@@ -33,7 +33,6 @@ class PoolInvestmentPolicy
         return $user->id === $poolInvestment->user_id;
     }
 
-
     public function create(User $user): bool
     {
         return true;

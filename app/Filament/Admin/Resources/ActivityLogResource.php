@@ -28,12 +28,12 @@ class ActivityLogResource extends Resource
                 TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->getStateUsing(fn($record) => self::resolveLogType($record))
-                    ->formatStateUsing(fn(?string $state): string => LogType::tryFrom($state)?->getLabel() ?? ucfirst($state ?? 'System'))
-                    ->color(fn(?string $state): string => LogType::tryFrom($state)?->getColor() ?? 'gray')
-                    ->icon(fn(?string $state): ?string => LogType::tryFrom($state)?->getIcon() ?? 'heroicon-o-cog')
-                    ->sortable(query: fn($query, $direction) => $query->orderBy('properties->log_type', $direction))
-                    ->searchable(query: fn($query, $search) => $query->where('properties->log_type', 'like', "%{$search}%")),
+                    ->getStateUsing(fn ($record) => self::resolveLogType($record))
+                    ->formatStateUsing(fn (?string $state): string => LogType::tryFrom($state)?->getLabel() ?? ucfirst($state ?? 'System'))
+                    ->color(fn (?string $state): string => LogType::tryFrom($state)?->getColor() ?? 'gray')
+                    ->icon(fn (?string $state): ?string => LogType::tryFrom($state)?->getIcon() ?? 'heroicon-o-cog')
+                    ->sortable(query: fn ($query, $direction) => $query->orderBy('properties->log_type', $direction))
+                    ->searchable(query: fn ($query, $search) => $query->where('properties->log_type', 'like', "%{$search}%")),
                 TextColumn::make('description')
                     ->label('Event')
                     ->searchable()
@@ -41,7 +41,7 @@ class ActivityLogResource extends Resource
                     ->wrap(),
                 TextColumn::make('subject_type')
                     ->label('Model')
-                    ->formatStateUsing(fn(?string $state): string => $state ? class_basename($state) : 'N/A')
+                    ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : 'N/A')
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('subject_id')
@@ -55,7 +55,7 @@ class ActivityLogResource extends Resource
                     ->sortable(),
                 TextColumn::make('properties')
                     ->label('Details')
-                    ->formatStateUsing(fn($state) => self::formatActivityDetails($state))
+                    ->formatStateUsing(fn ($state) => self::formatActivityDetails($state))
                     ->limit(50)
                     ->tooltip(function ($state) {
                         if (! $state) {
@@ -87,7 +87,7 @@ class ActivityLogResource extends Resource
                     ->options(\App\Enums\ActivitySubjectType::class),
                 SelectFilter::make('causer_id')
                     ->label('User')
-                    ->options(fn() => \App\Models\User::query()->orderBy('full_name')->pluck('full_name', 'id')->toArray())
+                    ->options(fn () => \App\Models\User::query()->orderBy('full_name')->pluck('full_name', 'id')->toArray())
                     ->searchable(),
             ])
             ->defaultSort('created_at', 'desc')

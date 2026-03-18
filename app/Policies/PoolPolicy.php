@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Enums\Role;
 use App\Models\Pool;
 use App\Models\User;
-use App\Enums\Role;
 
 class PoolPolicy
 {

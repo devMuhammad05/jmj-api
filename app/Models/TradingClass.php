@@ -17,12 +17,12 @@ class TradingClass extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "title",
-        "description",
-        "scheduled_at",
-        "platform",
-        "meeting_link",
-        "is_published",
+        'title',
+        'description',
+        'scheduled_at',
+        'platform',
+        'meeting_link',
+        'is_published',
     ];
 
     /**
@@ -33,9 +33,9 @@ class TradingClass extends Model
     protected function casts(): array
     {
         return [
-            "scheduled_at" => "datetime",
-            "platform" => ClassPlatform::class,
-            "is_published" => "boolean",
+            'scheduled_at' => 'datetime',
+            'platform' => ClassPlatform::class,
+            'is_published' => 'boolean',
         ];
     }
 }

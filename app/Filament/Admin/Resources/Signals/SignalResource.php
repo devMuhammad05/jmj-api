@@ -20,25 +20,24 @@ class SignalResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBolt;
 
-    protected static ?string $navigationLabel = "Trading Signals";
+    protected static ?string $navigationLabel = 'Trading Signals';
 
-    protected static \UnitEnum|string|null $navigationGroup = "Learning Hub";
+    protected static \UnitEnum|string|null $navigationGroup = 'Learning Hub';
 
     protected static ?int $navigationSort = 4;
 
-    protected static ?string $recordTitleAttribute = "symbol";
+    protected static ?string $recordTitleAttribute = 'symbol';
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()
-            ::where("status", \App\Enums\SignalStatus::ACTIVE)
+        return static::getModel()::where('status', \App\Enums\SignalStatus::ACTIVE)
             ->count() ?:
             null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return "info";
+        return 'info';
     }
 
     public static function form(Schema $schema): Schema
@@ -54,16 +53,16 @@ class SignalResource extends Resource
     public static function getRelations(): array
     {
         return [
-                //
-            ];
+            //
+        ];
     }
 
     public static function getPages(): array
     {
         return [
-            "index" => ListSignals::route("/"),
-            "create" => CreateSignal::route("/create"),
-            "edit" => EditSignal::route("/{record}/edit"),
+            'index' => ListSignals::route('/'),
+            'create' => CreateSignal::route('/create'),
+            'edit' => EditSignal::route('/{record}/edit'),
         ];
     }
 }

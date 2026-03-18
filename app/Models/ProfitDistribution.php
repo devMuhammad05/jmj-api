@@ -61,7 +61,7 @@ class ProfitDistribution extends Model
             ->logOnly(['pool_investment_id', 'profit_amount', 'pool_return', 'status', 'processed_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Profit Distribution {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Profit Distribution {$eventName}")
             ->useLogName('profit_distribution');
     }
 }

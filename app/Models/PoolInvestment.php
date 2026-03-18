@@ -85,7 +85,7 @@ class PoolInvestment extends Model
             ->logOnly(['user_id', 'pool_id', 'contribution', 'share_percentage', 'status', 'verified_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Pool Investment {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Pool Investment {$eventName}")
             ->useLogName('pool_investment');
     }
 }

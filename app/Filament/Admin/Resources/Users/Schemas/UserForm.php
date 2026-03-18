@@ -44,9 +44,8 @@ class UserForm
                     ->dehydrated(fn (?string $state) => filled($state))
                     ->revealable()
                     ->maxLength(255)
-                    ->helperText(fn (string $operation): string => 
-                        $operation === 'edit' 
-                            ? 'Leave empty to keep current password' 
+                    ->helperText(fn (string $operation): string => $operation === 'edit'
+                            ? 'Leave empty to keep current password'
                             : 'Minimum 8 characters recommended'
                     )
                     ->columnSpanFull(),

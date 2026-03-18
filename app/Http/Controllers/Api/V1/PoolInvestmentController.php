@@ -26,13 +26,14 @@ class PoolInvestmentController extends ApiController
         $investments = $user->poolInvestments()
             ->with('pool')
             ->latest()
-            ->paginate(10); 
+            ->paginate(10);
 
         return $this->successResponse(
             'Pool investments retrieved successfully',
             PoolInvestmentResource::collection($investments)
         );
     }
+
     /**
      * Store a newly created pool investment.
      */

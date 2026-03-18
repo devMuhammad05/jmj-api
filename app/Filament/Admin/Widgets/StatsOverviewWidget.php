@@ -34,29 +34,29 @@ class StatsOverviewWidget extends BaseWidget
 
         return [
             Stat::make('Total Users', $totalUsers)
-                ->description($usersThisMonth . ' new this month')
+                ->description($usersThisMonth.' new this month')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
                 ->chart([7, 12, 15, 18, 22, 25, $totalUsers])
                 ->url(route('filament.admin.resources.users.index')),
 
             Stat::make('Pending KYC', $pendingKyc)
-                ->description($approvedKyc . ' approved total')
+                ->description($approvedKyc.' approved total')
                 ->descriptionIcon('heroicon-m-document-check')
                 ->color($pendingKyc > 0 ? 'warning' : 'success')
                 ->url(route('filament.admin.resources.verifications.index', [
-                    'tableFilters' => ['status' => ['value' => 'pending']]
+                    'tableFilters' => ['status' => ['value' => 'pending']],
                 ])),
 
             Stat::make('MT Accounts', $activeMtAccounts)
-                ->description($mtAccountsThisMonth . ' added this month')
+                ->description($mtAccountsThisMonth.' added this month')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color('info')
                 ->chart([5, 8, 12, 15, 18, 20, $activeMtAccounts])
                 ->url(route('filament.admin.resources.meta-trader-credentials.index')),
 
             Stat::make('Active Signals', $activeSignals)
-                ->description($signalsThisMonth . ' created this month')
+                ->description($signalsThisMonth.' created this month')
                 ->descriptionIcon('heroicon-m-bolt')
                 ->color('primary')
                 ->url(route('filament.admin.resources.signals.index')),

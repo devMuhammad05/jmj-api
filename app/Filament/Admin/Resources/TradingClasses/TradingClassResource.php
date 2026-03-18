@@ -20,11 +20,11 @@ class TradingClassResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
-    protected static \UnitEnum|string|null $navigationGroup = "Learning Hub";
+    protected static \UnitEnum|string|null $navigationGroup = 'Learning Hub';
 
-    protected static ?string $modelLabel = "Trading Class";
+    protected static ?string $modelLabel = 'Trading Class';
 
-    protected static ?string $pluralModelLabel = "Trading Classes";
+    protected static ?string $pluralModelLabel = 'Trading Classes';
 
     public static function form(Schema $schema): Schema
     {
@@ -39,16 +39,16 @@ class TradingClassResource extends Resource
     public static function getRelations(): array
     {
         return [
-                //
-            ];
+            //
+        ];
     }
 
     public static function getPages(): array
     {
         return [
-            "index" => ListTradingClasses::route("/"),
-            "create" => CreateTradingClass::route("/create"),
-            "edit" => EditTradingClass::route("/{record}/edit"),
+            'index' => ListTradingClasses::route('/'),
+            'create' => CreateTradingClass::route('/create'),
+            'edit' => EditTradingClass::route('/{record}/edit'),
         ];
     }
 }

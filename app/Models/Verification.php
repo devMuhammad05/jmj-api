@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
 class Verification extends Model
 {
     /** @use HasFactory<\Database\Factories\VerificationFactory> */
@@ -60,7 +59,7 @@ class Verification extends Model
             ->logOnly(['status', 'rejection_reason', 'user_id'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Verification {$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Verification {$eventName}")
             ->useLogName('verification');
     }
 }

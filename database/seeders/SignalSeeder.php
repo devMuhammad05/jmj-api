@@ -59,7 +59,7 @@ class SignalSeeder extends Seeder
                 'notes' => 'Gold showing strong support at 2050. Buy on dip strategy.',
                 'is_published' => true,
             ],
-            
+
             // Completed Signals - Hit TP
             [
                 'symbol' => 'USDJPY',
@@ -91,7 +91,7 @@ class SignalSeeder extends Seeder
                 'is_published' => true,
                 'created_at' => now()->subDays(3),
             ],
-            
+
             // Completed Signals - Hit SL
             [
                 'symbol' => 'EURUSD',
@@ -108,7 +108,7 @@ class SignalSeeder extends Seeder
                 'is_published' => true,
                 'created_at' => now()->subDays(5),
             ],
-            
+
             // Cancelled Signal
             [
                 'symbol' => 'BTCUSD',

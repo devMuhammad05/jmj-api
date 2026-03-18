@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'fast_backend' => [
+        'base_url' => env('FAST_BACKEND_BASE_URL'),
+    ],
+
 ];
