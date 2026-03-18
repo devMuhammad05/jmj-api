@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\PoolInvestmentController;
 use App\Http\Controllers\Api\V1\ProfitDistributionController;
 use App\Http\Controllers\Api\V1\SignalController;
 use App\Http\Controllers\Api\V1\TradingClassController;
+use App\Http\Controllers\Api\V1\TradingStatsController;
 use App\Http\Controllers\Api\V1\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,8 @@ Route::prefix('v1')->group(function (): void {
             MetaTraderCredentialController::class,
             'store',
         ]);
+
+        Route::get('/trading-stats', [TradingStatsController::class, 'show']);
 
         Route::get('/verifications', [VerificationController::class, 'index']);
         Route::post('/verifications', [VerificationController::class, 'store']);

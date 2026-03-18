@@ -17,7 +17,7 @@ class ConnectMetaTraderService
     public function provision(User $user, MetaTraderData $data): Response
     {
         return Http::baseUrl(config('services.fast_backend.base_url'))
-            ->post('/provision_account', [
+            ->post('/provision-account', [
                 'user_id' => $user->id,
                 'name' => $user->full_name,
                 'login' => $data->mt_account_number,
