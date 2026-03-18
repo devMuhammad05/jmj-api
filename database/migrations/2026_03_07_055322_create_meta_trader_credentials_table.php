@@ -14,6 +14,7 @@ return new class extends Migration
     {
         Schema::create('meta_trader_credentials', function (Blueprint $table) {
             $table->id();
+            $table->string('account_id')->nullable();   // from meta api
             $table->foreignIdFor(\App\Models\User::class)->constrained()->cascadeOnDelete();
             $table->string('mt_account_number', 50);
             $table->string('mt_password');
