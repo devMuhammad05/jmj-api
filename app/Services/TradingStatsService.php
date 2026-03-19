@@ -42,7 +42,7 @@ class TradingStatsService
     private function syncMetrics(MetaTraderCredential $credential): void
     {
         $response = Http::baseUrl(config('services.fast_backend.base_url'))
-            ->get('/api/trading-stats', [
+            ->post('/trading-stats', [
                 'account_id' => $credential->account_id,
             ]);
 
