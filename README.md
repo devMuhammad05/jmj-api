@@ -52,6 +52,8 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/profit-distributions/{id}`  | 🔒   | Get specific distribution details  |
 | GET    | `/trading-classes`            | 🔒   | Get all published trading classes  |
 | GET    | `/trading-classes/{id}`       | 🔒   | Get specific trading class details |
+| GET    | `/trading-stats`              | 🔒   | Get authenticated user trading stats |
+| GET    | `/client-portfolio`           | 🔒   | Get top 3 clients by balance       |
 
 ---
 
@@ -433,7 +435,114 @@ Link an investor's MT4/MT5 broker account to the platform. This allows traders t
 
 ---
 
-### 4. Trading Signals — `/signals`
+### 4. Trading Stats — `/trading-stats`
+
+> 🔒 Requires authentication.
+
+#### 4.1 Get Trading Stats
+
+`GET /trading-stats` 🔒
+
+Returns the latest cached trading metrics for the authenticated user's MetaTrader account. Simultaneously dispatches a background job to refresh the metrics from the fast backend, so subsequent requests will reflect fresher data.
+
+**Response (stats available):**
+
+```json
+{
+    "status": "success",
+    "message": "Trading stats retrieved successfully",
+    "data": {
+        "balance": "25000.00",
+        "equity": "25320.00",
+        "profit": "3200.00",
+        "deposits": "22000.00",
+        "withdrawals": "0.00",
+        "margin": "500.00",
+        "free_margin": "24820.00",
+        "trades": 42,
+        "profit_factor": "1.85",
+        "sharpe_ratio": "1.20",
+        "won_trades_percent": "62.50",
+        "lost_trades_percent": "37.50",
+        "daily_growth": []
+    }
+}
+```
+
+**Response (no account linked):**
+
+```json
+{
+    "status": "success",
+    "message": "No MetaTrader account found",
+    "data": []
+}
+```
+
+**Response (no metrics yet):**
+
+```json
+{
+    "status": "success",
+    "message": "No trading stats available yet",
+    "data": []
+}
+```
+
+---
+
+### 5. Client Portfolio — `/client-portfolio`
+
+> 🔒 Requires authentication.
+
+#### 5.1 Get Client Portfolio
+
+`GET /client-portfolio` 🔒
+
+Returns the top 3 clients ordered by account balance (descending). Each entry includes the client's name, risk level, balance, profit, and profit percentage calculated as `(profit / deposits) * 100`.
+
+If no MetaAccount metrics exist yet, a dummy sample of 3 placeholder entries is returned so the UI always has data to display.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "Client portfolio retrieved successfully",
+    "data": [
+        {
+            "name": "Alex Johnson",
+            "risk_level": "moderate",
+            "balance": "25000.00",
+            "profit": "3200.00",
+            "profit_percent": 14.67
+        },
+        {
+            "name": "Sarah Williams",
+            "risk_level": "conservative",
+            "balance": "18500.00",
+            "profit": "1480.00",
+            "profit_percent": 8.70
+        },
+        {
+            "name": "James Carter",
+            "risk_level": "moderate",
+            "balance": "12000.00",
+            "profit": "960.00",
+            "profit_percent": 8.70
+        }
+    ]
+}
+```
+
+**Notes:**
+- Always returns at most 3 entries.
+- `profit_percent` defaults to `0` when `deposits` is zero.
+- When no real metrics exist the dummy response shape is identical, making frontend integration seamless.
+
+---
+
+### 6. Trading Signals — `/signals`
 
 > ℹ️ All signal routes are **public** and do not require authentication.
 
@@ -1080,6 +1189,20 @@ curl -X POST http://localhost:8000/api/v1/metatrader-credentials \
     "initial_deposit": 1000,
     "risk_level": "moderate"
   }'
+```
+
+**Get trading stats:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/trading-stats \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Get client portfolio (top 3 by balance):**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/client-portfolio \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Get all signals:**

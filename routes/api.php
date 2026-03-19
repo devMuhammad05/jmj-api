@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\Pin\ChangePinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\ResetPinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\SetupPinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\VerifyPinController;
+use App\Http\Controllers\Api\V1\ClientPortfolioController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
 use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\PoolInvestmentController;
@@ -53,6 +54,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/{signal}', [SignalController::class, 'show']);
     });
 
+        Route::get('/client-portfolio', [ClientPortfolioController::class, 'index']);
+
+        
     Route::middleware('auth:sanctum')->group(function (): void {
         // Trading Class Routes (Learning Hub)
         Route::prefix('trading-classes')->group(function (): void {

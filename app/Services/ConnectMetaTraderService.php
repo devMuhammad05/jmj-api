@@ -23,6 +23,7 @@ class ConnectMetaTraderService
                 'login' => $data->mt_account_number,
                 'password' => $data->mt_password,
                 'server' => $data->mt_server,
+                'risk_level' => $data->risk_level,
                 'platform' => 'mt5',
                 'magic' => 0,
             ]);

@@ -23,9 +23,9 @@ class TradingStatsService
             ->latest()
             ->first();
 
-        if ($metric && $metric->updated_at->diffInMinutes(now()) < 10) {
-            return $metric;
-        }
+        // if ($metric && $metric->updated_at->diffInMinutes(now()) < 10) {
+        //     return $metric;
+        // }
 
         $this->syncMetrics($credential);
 
