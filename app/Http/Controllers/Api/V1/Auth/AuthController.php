@@ -9,12 +9,15 @@ use App\Http\Requests\Api\V1\Auth\LoginUserRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterUserRequest;
 use App\Http\Requests\Api\V1\Auth\UpdateProfileRequest;
 use App\Models\User;
+use App\Traits\Otp;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\JsonResponse;
 
 final class AuthController extends ApiController
 {
+    use Otp;
+
     public function __construct(
         private readonly Hasher $hasher,
         private readonly AuthManager $authManager,
@@ -32,15 +35,12 @@ final class AuthController extends ApiController
             'password' => $this->hasher->make($request->password),
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $this->sendOtp($user->email);
 
         return $this->successResponse(
-            'User registered successfully',
+            'Registration successful. Please check your email for OTP verification.',
             [
-                'user' => $user,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'pin_configured' => false,
+                'email' => $user->email,
             ],
             201,
         );
@@ -56,6 +56,15 @@ final class AuthController extends ApiController
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
+
+        if (! $user->hasVerifiedEmail()) {
+            $this->sendOtp($user->email);
+
+            return $this->errorResponse(
+                'Email not verified. A new OTP has been sent to your email.',
+                403
+            );
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

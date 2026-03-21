@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\V1\Auth\Pin\ChangePinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\ResetPinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\SetupPinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\VerifyPinController;
+use App\Http\Controllers\Api\V1\Auth\GetOtpController;
+use App\Http\Controllers\Api\V1\Auth\SendOtpController;
+use App\Http\Controllers\Api\V1\Auth\VerifyRegistrationOtpController;
 use App\Http\Controllers\Api\V1\ClientPortfolioController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
 use App\Http\Controllers\Api\V1\PoolController;
@@ -28,6 +31,9 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('auth')->group(function (): void {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/verify-registration-otp', VerifyRegistrationOtpController::class);
+        Route::post('/send-otp', SendOtpController::class);
+        Route::get('/get-otp', GetOtpController::class);
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::post('/logout', [AuthController::class, 'logout']);
