@@ -30,7 +30,7 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | POST   | `/auth/register`              | No   | Register new user (sends OTP)      |
 | POST   | `/auth/verify-registration-otp` | No | Verify OTP to complete registration |
 | POST   | `/auth/send-otp`              | No   | Resend OTP to email                |
-| POST   | `/auth/get-otp`               | No   | Get OTP for testing (dev only)     |
+| GET    | `/auth/get-otp`               | No   | Get OTP for testing (dev only)     |
 | POST   | `/auth/login`                 | No   | Login user (requires verified email) |
 | POST   | `/auth/logout`                | 🔒   | Logout user                        |
 | GET    | `/auth/me`                    | 🔒   | Get authenticated user profile     |
