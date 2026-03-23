@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 use App\Traits\Otp;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,6 +42,7 @@ final class VerifyRegistrationOtpController extends ApiController
         }
 
         $user->markEmailAsVerified();
+        $user->notify(new WelcomeNotification);
 
         return $this->successResponse('OTP verified successfully. You can now login.');
     }

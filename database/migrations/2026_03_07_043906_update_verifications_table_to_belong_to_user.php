@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::table('verifications', function (Blueprint $table) {
             $table->dropForeign(['client_id']);
+            $table->dropUnique(['client_id']);
+        });
+
+        Schema::table('verifications', function (Blueprint $table) {
             $table->dropColumn('client_id');
+        });
+
+        Schema::table('verifications', function (Blueprint $table) {
             $table->foreignId('user_id')->unique()->after('id')->constrained()->cascadeOnDelete();
         });
     }

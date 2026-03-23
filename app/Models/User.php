@@ -48,7 +48,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
      *
      * @var list<string>
      */
-    protected $hidden = ['password', 'remember_token', 'pin'];
+    protected $hidden = ['password', 'remember_token', 'pin', 'role'];
 
     public function getFilamentName(): string
     {
