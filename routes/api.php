@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\GetOtpController;
 use App\Http\Controllers\Api\V1\Auth\Pin\ChangePinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\ResetPinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\SetupPinController;
 use App\Http\Controllers\Api\V1\Auth\Pin\VerifyPinController;
-use App\Http\Controllers\Api\V1\Auth\GetOtpController;
 use App\Http\Controllers\Api\V1\Auth\SendOtpController;
 use App\Http\Controllers\Api\V1\Auth\VerifyRegistrationOtpController;
 use App\Http\Controllers\Api\V1\ClientPortfolioController;
@@ -35,14 +35,14 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/send-otp', SendOtpController::class);
         Route::get('/get-otp', GetOtpController::class);
 
-        Route::middleware('auth:sanctum')->group(function (): void {
+        Route::middleware(['auth:sanctum', 'verified.email'])->group(function (): void {
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::get('/me', [AuthController::class, 'me']);
             Route::put('/profile', [AuthController::class, 'update']);
         });
 
         // PIN Routes
-        Route::middleware(['auth:sanctum', 'throttle:10,1'])
+        Route::middleware(['auth:sanctum', 'verified.email', 'throttle:10,1'])
             ->prefix('pin')
             ->group(function (): void {
                 Route::post('/setup', SetupPinController::class);
@@ -60,10 +60,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/{signal}', [SignalController::class, 'show']);
     });
 
-        Route::get('/client-portfolio', [ClientPortfolioController::class, 'index']);
+    Route::get('/client-portfolio', [ClientPortfolioController::class, 'index']);
 
-        
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware(['auth:sanctum', 'verified.email'])->group(function (): void {
         // Trading Class Routes (Learning Hub)
         Route::prefix('trading-classes')->group(function (): void {
             Route::get('/', [TradingClassController::class, 'index']);

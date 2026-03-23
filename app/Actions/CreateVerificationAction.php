@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\DTOs\VerificationData;
+use App\Enums\Role;
 use App\Enums\VerificationStatus;
 use App\Models\User;
 use App\Models\Verification;
+use App\Notifications\KycSubmittedNotification;
+use Illuminate\Support\Facades\Notification;
 
 class CreateVerificationAction
 {
     public function execute(User $user, VerificationData $data): Verification
     {
-        return $user->verification()->updateOrCreate(
+        $verification = $user->verification()->updateOrCreate(
             ['user_id' => $user->id],
             [
                 'id_type' => $data->id_type,
@@ -24,5 +27,11 @@ class CreateVerificationAction
                 'status' => VerificationStatus::PENDING,
             ]
         );
+
+        $admins = User::query()->where('role', Role::Admin)->get();
+
+        Notification::send($admins, new KycSubmittedNotification($verification));
+
+        return $verification;
     }
 }

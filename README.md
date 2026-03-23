@@ -120,7 +120,39 @@ Create a new user account.
 
 ---
 
-#### 1.2 Login
+#### 1.2 Get OTP (Development Only)
+
+`GET /auth/get-otp`
+
+Retrieve the OTP stored in cache for a given email. **For development and testing purposes only — must not be exposed in production.**
+
+**Query Parameters:**
+
+| Field   | Type   | Required | Notes               |
+| ------- | ------ | -------- | ------------------- |
+| `email` | string | ✓        | Valid email address |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "OTP retrieved successfully.",
+    "data": {
+        "email": "john@example.com",
+        "otp": "123456"
+    }
+}
+```
+
+**Error Responses:**
+
+- `404`: No OTP found for the given email (not yet sent or already expired)
+- `422`: Validation error (missing or invalid email)
+
+---
+
+#### 1.3 Login
 
 `POST /auth/login`
 
@@ -157,7 +189,7 @@ Authenticate an existing user.
 
 ---
 
-#### 1.3 Logout
+#### 1.4 Logout
 
 `POST /auth/logout` 🔒
 
@@ -175,7 +207,7 @@ Revoke the current access token and log out the user.
 
 ---
 
-#### 1.4 Get Profile
+#### 1.5 Get Profile
 
 `GET /auth/me` 🔒
 
@@ -201,7 +233,7 @@ Retrieve the authenticated user's profile information.
 
 ---
 
-#### 1.5 Update Profile
+#### 1.6 Update Profile
 
 `PUT /auth/profile` 🔒
 
@@ -235,11 +267,11 @@ Update the authenticated user's profile information.
 
 ---
 
-#### 1.6 PIN Management
+#### 1.7 PIN Management
 
 All PIN endpoints are throttled to prevent brute-force attacks.
 
-##### 1.6.1 Setup PIN
+##### 1.7.1 Setup PIN
 
 `POST /auth/pin/setup` 🔒
 
@@ -264,7 +296,7 @@ Configure a new 4-digit security PIN. This can only be done if a PIN is not alre
 
 ---
 
-##### 1.6.2 Verify PIN
+##### 1.7.2 Verify PIN
 
 `POST /auth/pin/verify` 🔒
 
@@ -288,7 +320,7 @@ Verify the user's security PIN. 5 failed attempts will lock the PIN for 30 minut
 
 ---
 
-##### 1.6.3 Change PIN
+##### 1.7.3 Change PIN
 
 `POST /auth/pin/change` 🔒
 
@@ -314,7 +346,7 @@ Change an existing security PIN. Requires the current PIN.
 
 ---
 
-##### 1.6.4 Reset PIN
+##### 1.7.4 Reset PIN
 
 `POST /auth/pin/reset` 🔒
 
