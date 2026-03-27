@@ -8,6 +8,7 @@ use App\DTOs\MetaTraderData;
 use App\Models\User;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ConnectMetaTraderService
 {
@@ -16,7 +17,11 @@ class ConnectMetaTraderService
      */
     public function provision(User $user, MetaTraderData $data): Response
     {
-        return Http::baseUrl(config('services.fast_backend.base_url'))
+        $baseUrl = config('services.fast_backend.base_url');
+
+        Log::info('MetaTrader provision request', ['url' => "{$baseUrl}/provision-account"]);
+
+        return Http::baseUrl($baseUrl)
             ->post('/provision-account', [
                 'user_id' => $user->id,
                 'name' => $user->full_name,

@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\DTOs\MetaTraderData;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreMetaTraderCredentialRequest;
-use App\Jobs\ConnectMetaTraderAccount;
+use App\Services\ConnectMetaTraderService;
 use Illuminate\Http\JsonResponse;
 
 class MetaTraderCredentialController extends ApiController
@@ -15,11 +15,18 @@ class MetaTraderCredentialController extends ApiController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMetaTraderCredentialRequest $request): JsonResponse
+    public function store(StoreMetaTraderCredentialRequest $request, ConnectMetaTraderService $connectMetaTrader): JsonResponse
     {
         $data = MetaTraderData::fromRequest($request);
 
-        ConnectMetaTraderAccount::dispatch($request->user(), $data);
+        $response = $connectMetaTrader->provision($request->user(), $data);
+
+        if (! $response->successful()) {
+            return $this->errorResponse(
+                $response->json('message') ?? 'Failed to connect MetaTrader account',
+                $response->status(),
+            );
+        }
 
         return $this->createdResponse(
             'MetaTrader credentials saved successfully'
