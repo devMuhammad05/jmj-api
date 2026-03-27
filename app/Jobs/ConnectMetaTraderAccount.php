@@ -35,6 +35,9 @@ class ConnectMetaTraderAccount implements ShouldQueue
             Log::error('Failed to connect MetaTrader account', [
                 'user_id' => $this->user->id,
                 'status' => $response->status(),
+                'body' => $response->json() ?? $response->body(),
+                'login' => $this->data->mt_account_number,
+                'server' => $this->data->mt_server,
             ]);
         }
     }
