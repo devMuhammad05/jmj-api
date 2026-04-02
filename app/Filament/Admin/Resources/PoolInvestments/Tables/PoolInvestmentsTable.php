@@ -53,8 +53,7 @@ class PoolInvestmentsTable
                             $state
                         ) {
                             PoolInvestmentStatus::PENDING => 'warning',
-                            PoolInvestmentStatus::VERIFIED => 'info',
-                            PoolInvestmentStatus::ACTIVE => 'success',
+                            PoolInvestmentStatus::VERIFIED => 'success',
                             PoolInvestmentStatus::REJECTED => 'danger',
                         },
                     )

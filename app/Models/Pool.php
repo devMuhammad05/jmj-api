@@ -54,7 +54,7 @@ class Pool extends Model
      */
     public function activeInvestments(): HasMany
     {
-        return $this->hasMany(PoolInvestment::class)->where('status', 'active');
+        return $this->hasMany(PoolInvestment::class)->where('status', 'verified');
     }
 
     /**

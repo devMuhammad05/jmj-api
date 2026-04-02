@@ -267,9 +267,6 @@ class PoolInvestmentTest extends TestCase
             'mt_account_number' => '123456',
             'mt_server' => 'Exness-MT5Real',
         ]);
-
-        $response->assertJsonPath('data.meta_trader_account.mt_account_number', '123456');
-        $response->assertJsonPath('data.meta_trader_account.mt_server', 'Exness-MT5Real');
     }
 
     public function test_can_submit_pool_investment_without_meta_trader_account(): void
@@ -291,7 +288,7 @@ class PoolInvestmentTest extends TestCase
         $response->assertStatus(201);
 
         $this->assertDatabaseCount('meta_trader_credentials', 0);
-        $this->assertNull($response->json('data.meta_trader_account'));
+        $this->assertArrayNotHasKey('pool_meta_trader_account', $response->json('data'));
     }
 
     public function test_meta_trader_fields_are_required_together(): void

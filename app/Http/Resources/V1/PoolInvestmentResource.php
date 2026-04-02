@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use App\Enums\PoolInvestmentStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,13 +26,19 @@ class PoolInvestmentResource extends JsonResource
             'terms_accepted' => $this->terms_accepted,
             'verified_at' => $this->verified_at?->toDateTimeString(),
             'rejection_reason' => $this->when($this->status->value === 'rejected', $this->rejection_reason),
-            'meta_trader_account' => $this->whenLoaded('metaTraderCredential', fn () => $this->metaTraderCredential ? [
-                'mt_account_number' => $this->metaTraderCredential->mt_account_number,
-                'mt_server' => $this->metaTraderCredential->mt_server,
-                'platform_type' => $this->metaTraderCredential->platform_type,
-                'risk_level' => $this->metaTraderCredential->risk_level,
-                'initial_deposit' => $this->metaTraderCredential->initial_deposit,
-            ] : null),
+            'pool_meta_trader_account' => $this->when(
+                $this->status === PoolInvestmentStatus::VERIFIED
+                    && $this->relationLoaded('pool')
+                    && $this->pool->relationLoaded('metaTraderCredential')
+                    && $this->pool->metaTraderCredential !== null,
+                fn () => [
+                    'mt_account_number' => $this->pool->metaTraderCredential->mt_account_number,
+                    'mt_server' => $this->pool->metaTraderCredential->mt_server,
+                    'platform_type' => $this->pool->metaTraderCredential->platform_type,
+                    'risk_level' => $this->pool->metaTraderCredential->risk_level,
+                    'initial_deposit' => $this->pool->metaTraderCredential->initial_deposit,
+                ]
+            ),
             'submitted_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];
