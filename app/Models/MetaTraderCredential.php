@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
 
 class MetaTraderCredential extends Model
 {
@@ -18,6 +19,8 @@ class MetaTraderCredential extends Model
      */
     protected $fillable = [
         'user_id',
+        'pool_id',
+        'pool_investment_id',
         'mt_account_number',
         'mt_password',
         'mt_server',
@@ -55,6 +58,22 @@ class MetaTraderCredential extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the pool this credential belongs to.
+     */
+    public function pool(): BelongsTo
+    {
+        return $this->belongsTo(Pool::class);
+    }
+
+    /**
+     * Get the pool investment this credential belongs to.
+     */
+    public function poolInvestment(): BelongsTo
+    {
+        return $this->belongsTo(PoolInvestment::class);
     }
 
     /**

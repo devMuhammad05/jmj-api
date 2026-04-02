@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PoolInvestment extends Model
 {
@@ -74,6 +75,14 @@ class PoolInvestment extends Model
     public function profitDistributions(): HasMany
     {
         return $this->hasMany(ProfitDistribution::class);
+    }
+
+    /**
+     * Get the MetaTrader credential linked to this investment.
+     */
+    public function metaTraderCredential(): HasOne
+    {
+        return $this->hasOne(MetaTraderCredential::class);
     }
 
     /**

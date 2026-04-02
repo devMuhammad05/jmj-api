@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\Activitylog\LogOptions;
 
 class Pool extends Model
 {
@@ -55,6 +57,14 @@ class Pool extends Model
     public function activeInvestments(): HasMany
     {
         return $this->hasMany(PoolInvestment::class)->where('status', 'active');
+    }
+
+    /**
+     * Get the MetaTrader credential for this pool.
+     */
+    public function metaTraderCredential(): HasOne
+    {
+        return $this->hasOne(MetaTraderCredential::class);
     }
 
     /**

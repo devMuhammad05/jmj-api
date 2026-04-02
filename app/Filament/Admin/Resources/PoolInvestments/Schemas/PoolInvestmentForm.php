@@ -89,6 +89,7 @@ class PoolInvestmentForm
                             ->placeholder('Provide a reason if rejected...')
                             ->columnSpanFull(),
                     ])->columns(2),
+
             ]);
     }
 }

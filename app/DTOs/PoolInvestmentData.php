@@ -18,6 +18,12 @@ readonly class PoolInvestmentData
         public float $contribution,
         public string $payment_proof_path,
         public bool $terms_accepted,
+        public ?string $mt_account_number = null,
+        public ?string $mt_password = null,
+        public ?string $mt_server = null,
+        public ?string $platform_type = null,
+        public ?float $initial_deposit = null,
+        public ?string $risk_level = null,
     ) {}
 
     public static function fromRequest(Request $request): self
@@ -32,6 +38,12 @@ readonly class PoolInvestmentData
             contribution: $request->float('contribution'),
             payment_proof_path: $request->string('payment_proof_path')->value(),
             terms_accepted: $request->boolean('terms_accepted'),
+            mt_account_number: $request->filled('mt_account_number') ? $request->string('mt_account_number')->value() : null,
+            mt_password: $request->filled('mt_password') ? $request->string('mt_password')->value() : null,
+            mt_server: $request->filled('mt_server') ? $request->string('mt_server')->value() : null,
+            platform_type: $request->filled('platform_type') ? $request->string('platform_type')->value() : null,
+            initial_deposit: $request->filled('initial_deposit') ? $request->float('initial_deposit') : null,
+            risk_level: $request->filled('risk_level') ? $request->string('risk_level')->value() : null,
         );
     }
 }

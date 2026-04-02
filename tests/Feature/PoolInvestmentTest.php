@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\MetaTraderPlatformType;
 use App\Enums\PoolInvestmentStatus;
 use App\Enums\PoolStatus;
+use App\Enums\RiskLevel;
 use App\Models\Pool;
 use App\Models\PoolInvestment;
 use App\Models\User;
@@ -37,7 +39,7 @@ class PoolInvestmentTest extends TestCase
         $response = $this->actingAs($this->user)->getJson('/api/v1/pools');
 
         $response->assertStatus(200)->assertJsonStructure([
-            'success',
+            'status',
             'message',
             'data' => [
                 '*' => [
@@ -59,7 +61,7 @@ class PoolInvestmentTest extends TestCase
         );
 
         $response->assertStatus(200)->assertJson([
-            'success' => true,
+            'status' => 'success',
             'data' => [
                 'id' => $this->pool->id,
                 'name' => 'Test Pool',
@@ -87,7 +89,7 @@ class PoolInvestmentTest extends TestCase
         );
 
         $response->assertStatus(201)->assertJson([
-            'success' => true,
+            'status' => 'success',
             'data' => [
                 'full_name' => 'John Doe',
                 'contribution' => '1000.00',
@@ -172,7 +174,7 @@ class PoolInvestmentTest extends TestCase
         );
 
         $response->assertStatus(200)->assertJsonStructure([
-            'success',
+            'status',
             'message',
             'data' => [
                 '*' => ['id', 'pool', 'full_name', 'contribution', 'status'],
@@ -228,11 +230,96 @@ class PoolInvestmentTest extends TestCase
         );
 
         $response->assertStatus(200)->assertJson([
-            'success' => true,
+            'status' => 'success',
             'data' => [
                 'id' => $investment->id,
                 'full_name' => 'John Doe',
             ],
+        ]);
+    }
+
+    public function test_can_submit_pool_investment_with_meta_trader_account(): void
+    {
+        $data = [
+            'pool_id' => $this->pool->id,
+            'full_name' => 'Jane Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'Jane Doe',
+            'contribution' => 5000,
+            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'terms_accepted' => true,
+            'mt_account_number' => '123456',
+            'mt_password' => 'secret123',
+            'mt_server' => 'Exness-MT5Real',
+            'platform_type' => MetaTraderPlatformType::MT5->value,
+            'initial_deposit' => 5000,
+            'risk_level' => RiskLevel::MODERATE->value,
+        ];
+
+        $response = $this->actingAs($this->user)->postJson('/api/v1/pool-investments', $data);
+
+        $response->assertStatus(201);
+
+        $investment = PoolInvestment::where('user_id', $this->user->id)->latest()->first();
+
+        $this->assertDatabaseHas('meta_trader_credentials', [
+            'user_id' => $this->user->id,
+            'pool_investment_id' => $investment->id,
+            'mt_account_number' => '123456',
+            'mt_server' => 'Exness-MT5Real',
+        ]);
+
+        $response->assertJsonPath('data.meta_trader_account.mt_account_number', '123456');
+        $response->assertJsonPath('data.meta_trader_account.mt_server', 'Exness-MT5Real');
+    }
+
+    public function test_can_submit_pool_investment_without_meta_trader_account(): void
+    {
+        $data = [
+            'pool_id' => $this->pool->id,
+            'full_name' => 'John Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'John Doe',
+            'contribution' => 1000,
+            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'terms_accepted' => true,
+        ];
+
+        $response = $this->actingAs($this->user)->postJson('/api/v1/pool-investments', $data);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseCount('meta_trader_credentials', 0);
+        $this->assertNull($response->json('data.meta_trader_account'));
+    }
+
+    public function test_meta_trader_fields_are_required_together(): void
+    {
+        $data = [
+            'pool_id' => $this->pool->id,
+            'full_name' => 'Jane Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'Jane Doe',
+            'contribution' => 1000,
+            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'terms_accepted' => true,
+            'mt_account_number' => '123456', // Provided without the other MT fields
+        ];
+
+        $response = $this->actingAs($this->user)->postJson('/api/v1/pool-investments', $data);
+
+        $response->assertStatus(422)->assertJsonValidationErrors([
+            'mt_password',
+            'mt_server',
+            'platform_type',
+            'initial_deposit',
+            'risk_level',
         ]);
     }
 

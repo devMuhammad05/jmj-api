@@ -46,7 +46,7 @@ class PoolInvestmentController extends ApiController
             PoolInvestmentData::fromRequest($request)
         );
 
-        $investment->load('pool');
+        $investment->load('pool', 'metaTraderCredential');
 
         return $this->createdResponse(
             'Pool investment application submitted successfully. Payment verification will take 24-48 hours.',
@@ -61,7 +61,7 @@ class PoolInvestmentController extends ApiController
     {
         Gate::authorize('view', $poolInvestment);
 
-        $poolInvestment->load('pool');
+        $poolInvestment->load('pool', 'metaTraderCredential');
 
         return $this->successResponse(
             'Pool investment details retrieved successfully',

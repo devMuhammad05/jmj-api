@@ -860,6 +860,12 @@ Submit an application to join an investment pool. Payment verification takes 24-
 | `contribution`         | numeric | ✓        | Investment amount (minimum $1,000)       |
 | `payment_proof_path`   | URL     | ✓        | URL to payment screenshot                |
 | `terms_accepted`       | boolean | ✓        | Must be `true`                           |
+| `mt_account_number`    | string  |          | MetaTrader account number for pool trading |
+| `mt_password`          | string  |          | Required when `mt_account_number` is set |
+| `mt_server`            | string  |          | Required when `mt_account_number` is set (e.g. `Exness-MT5Real`) |
+| `platform_type`        | string  |          | Required when `mt_account_number` is set. One of: `mt4`, `mt5` |
+| `initial_deposit`      | numeric |          | Required when `mt_account_number` is set |
+| `risk_level`           | string  |          | Required when `mt_account_number` is set. One of: `conservative`, `moderate` |
 
 **Response:**
 
@@ -885,11 +891,20 @@ Submit an application to join an investment pool. Payment verification takes 24-
         "status": "pending",
         "terms_accepted": true,
         "verified_at": null,
+        "meta_trader_account": {
+            "mt_account_number": "123456",
+            "mt_server": "Exness-MT5Real",
+            "platform_type": "mt5",
+            "risk_level": "moderate",
+            "initial_deposit": "5000.00"
+        },
         "submitted_at": "2026-03-08 14:20:00",
         "updated_at": "2026-03-08 14:20:00"
     }
 }
 ```
+
+> `meta_trader_account` is `null` when no MetaTrader account was provided.
 
 **Investment Status Values:**
 - `pending` — Application submitted, awaiting admin verification

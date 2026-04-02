@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Enums\MetaTraderPlatformType;
+use App\Enums\RiskLevel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StorePoolInvestmentRequest extends FormRequest
 {
@@ -31,6 +34,13 @@ class StorePoolInvestmentRequest extends FormRequest
             'contribution' => ['required', 'numeric', 'min:1000'],
             'payment_proof_path' => ['required', 'url'],
             'terms_accepted' => ['required', 'boolean', 'accepted'],
+            // MetaTrader account — all optional, but if account number is given the rest become required
+            'mt_account_number' => ['nullable', 'string', 'max:50'],
+            'mt_password' => ['nullable', 'required_with:mt_account_number', 'string'],
+            'mt_server' => ['nullable', 'required_with:mt_account_number', 'string', 'max:100'],
+            'platform_type' => ['nullable', 'required_with:mt_account_number', Rule::enum(MetaTraderPlatformType::class)],
+            'initial_deposit' => ['nullable', 'required_with:mt_account_number', 'numeric', 'min:0'],
+            'risk_level' => ['nullable', 'required_with:mt_account_number', Rule::enum(RiskLevel::class)],
         ];
     }
 
