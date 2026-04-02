@@ -24,7 +24,7 @@ class PoolInvestmentController extends ApiController
         $user = $request->user();
 
         $investments = $user->poolInvestments()
-            ->with('pool.metaTraderCredential')
+            ->with('pool.metaTraderCredential.metric')
             ->latest()
             ->paginate(10);
 
@@ -46,7 +46,7 @@ class PoolInvestmentController extends ApiController
             PoolInvestmentData::fromRequest($request)
         );
 
-        $investment->load('pool.metaTraderCredential');
+        $investment->load('pool.metaTraderCredential.metric');
 
         return $this->createdResponse(
             'Pool investment application submitted successfully. Payment verification will take 24-48 hours.',
@@ -61,7 +61,7 @@ class PoolInvestmentController extends ApiController
     {
         Gate::authorize('view', $poolInvestment);
 
-        $poolInvestment->load('pool.metaTraderCredential');
+        $poolInvestment->load('pool.metaTraderCredential.metric');
 
         return $this->successResponse(
             'Pool investment details retrieved successfully',

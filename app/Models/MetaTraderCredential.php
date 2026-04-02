@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\LogOptions;
 
 class MetaTraderCredential extends Model
@@ -65,6 +66,14 @@ class MetaTraderCredential extends Model
     public function pool(): BelongsTo
     {
         return $this->belongsTo(Pool::class);
+    }
+
+    /**
+     * Get the account metrics for this credential.
+     */
+    public function metric(): HasOne
+    {
+        return $this->hasOne(MetaAccountMetric::class, 'account_id', 'account_id');
     }
 
     /**

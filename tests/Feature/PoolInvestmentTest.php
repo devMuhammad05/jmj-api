@@ -6,6 +6,8 @@ use App\Enums\MetaTraderPlatformType;
 use App\Enums\PoolInvestmentStatus;
 use App\Enums\PoolStatus;
 use App\Enums\RiskLevel;
+use App\Models\MetaAccountMetric;
+use App\Models\MetaTraderCredential;
 use App\Models\Pool;
 use App\Models\PoolInvestment;
 use App\Models\User;
@@ -314,6 +316,57 @@ class PoolInvestmentTest extends TestCase
             'platform_type',
             'initial_deposit',
             'risk_level',
+        ]);
+    }
+
+    public function test_verified_investment_includes_metric_data(): void
+    {
+        $accountId = fake()->uuid();
+
+        $credential = MetaTraderCredential::create([
+            'user_id' => $this->user->id,
+            'pool_id' => $this->pool->id,
+            'account_id' => $accountId,
+            'mt_account_number' => '1234567',
+            'mt_password' => 'secret',
+            'mt_server' => 'Exness-MT5Real',
+            'platform_type' => MetaTraderPlatformType::MT5->value,
+            'initial_deposit' => 5000,
+            'risk_level' => RiskLevel::MODERATE->value,
+        ]);
+
+        MetaAccountMetric::create([
+            'account_id' => $accountId,
+            'balance' => 5250.00,
+            'equity' => 5300.00,
+            'margin' => 150.00,
+        ]);
+
+        $investment = PoolInvestment::create([
+            'user_id' => $this->user->id,
+            'pool_id' => $this->pool->id,
+            'full_name' => 'John Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'John Doe',
+            'contribution' => 5000,
+            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'terms_accepted' => true,
+            'status' => PoolInvestmentStatus::VERIFIED,
+            'verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson("/api/v1/pool-investments/{$investment->id}");
+
+        $response->assertStatus(200)->assertJson([
+            'data' => [
+                'pool_meta_trader_account' => [
+                    'balance' => '5250.00',
+                    'equity' => '5300.00',
+                    'margin' => '150.00',
+                ],
+            ],
         ]);
     }
 

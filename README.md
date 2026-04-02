@@ -891,20 +891,13 @@ Submit an application to join an investment pool. Payment verification takes 24-
         "status": "pending",
         "terms_accepted": true,
         "verified_at": null,
-        "meta_trader_account": {
-            "mt_account_number": "123456",
-            "mt_server": "Exness-MT5Real",
-            "platform_type": "mt5",
-            "risk_level": "moderate",
-            "initial_deposit": "5000.00"
-        },
         "submitted_at": "2026-03-08 14:20:00",
         "updated_at": "2026-03-08 14:20:00"
     }
 }
 ```
 
-> `meta_trader_account` is `null` when no MetaTrader account was provided.
+> `pool_meta_trader_account` is only included in the response when `status` is `verified`. It is omitted for `pending` and `rejected` investments.
 
 **Investment Status Values:**
 - `pending` — Application submitted, awaiting admin verification
@@ -942,9 +935,19 @@ Retrieve all pool investments for the authenticated user.
             "phone_number": "+2348012345678",
             "contribution": "500.00",
             "share_percentage": "1.00",
-            "status": "active",
+            "status": "verified",
             "terms_accepted": true,
             "verified_at": "2026-03-10 10:00:00",
+            "pool_meta_trader_account": {
+                "mt_account_number": "123456",
+                "mt_server": "Exness-MT5Real",
+                "platform_type": "mt5",
+                "risk_level": "moderate",
+                "initial_deposit": "5000.00",
+                "balance": "5250.00",
+                "equity": "5300.00",
+                "margin": "150.00"
+            },
             "submitted_at": "2026-03-08 14:20:00",
             "updated_at": "2026-03-10 10:00:00"
         }
@@ -953,6 +956,8 @@ Retrieve all pool investments for the authenticated user.
     "meta": {...}
 }
 ```
+
+> `pool_meta_trader_account` is only present when `status` is `verified` and the pool has a linked MetaTrader credential. `balance`, `equity`, and `margin` are `null` if no metrics have been synced yet.
 
 ---
 
@@ -975,14 +980,26 @@ Retrieve detailed information about a specific pool investment. Users can only v
         "phone_number": "+2348012345678",
         "contribution": "500.00",
         "share_percentage": "1.00",
-        "status": "active",
+        "status": "verified",
         "terms_accepted": true,
         "verified_at": "2026-03-10 10:00:00",
+        "pool_meta_trader_account": {
+            "mt_account_number": "123456",
+            "mt_server": "Exness-MT5Real",
+            "platform_type": "mt5",
+            "risk_level": "moderate",
+            "initial_deposit": "5000.00",
+            "balance": "5250.00",
+            "equity": "5300.00",
+            "margin": "150.00"
+        },
         "submitted_at": "2026-03-08 14:20:00",
         "updated_at": "2026-03-10 10:00:00"
     }
 }
 ```
+
+> `pool_meta_trader_account` is only present when `status` is `verified` and the pool has a linked MetaTrader credential. `balance`, `equity`, and `margin` are `null` if no metrics have been synced yet.
 
 ---
 

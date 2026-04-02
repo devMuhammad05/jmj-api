@@ -31,16 +31,23 @@ class PoolInvestmentResource extends JsonResource
                     && $this->relationLoaded('pool')
                     && $this->pool->relationLoaded('metaTraderCredential')
                     && $this->pool->metaTraderCredential !== null,
-                fn () => [
-                    'mt_account_number' => $this->pool->metaTraderCredential->mt_account_number,
-                    'mt_server' => $this->pool->metaTraderCredential->mt_server,
-                    'platform_type' => $this->pool->metaTraderCredential->platform_type,
-                    'risk_level' => $this->pool->metaTraderCredential->risk_level,
-                    'initial_deposit' => $this->pool->metaTraderCredential->initial_deposit,
-                ]
+                function () {
+                    $credential = $this->pool->metaTraderCredential;
+                    $metric = $credential->relationLoaded('metric') ? $credential->metric : null;
+
+                    return [
+                        'mt_account_number' => $credential->mt_account_number,
+                        'mt_server' => $credential->mt_server,
+                        'platform_type' => $credential->platform_type,
+                        'risk_level' => $credential->risk_level,
+                        'initial_deposit' => $credential->initial_deposit,
+                        'balance' => $metric?->balance,
+                        'equity' => $metric?->equity,
+                        'margin' => $metric?->margin,
+                    ];
+                }
             ),
             'submitted_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
         ];
     }
 }
