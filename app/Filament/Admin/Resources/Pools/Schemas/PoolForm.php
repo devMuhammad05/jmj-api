@@ -62,26 +62,30 @@ class PoolForm
                 ->columnSpan(1),
 
             Section::make('MetaTrader Trading Account')
-                ->description('Optional — configure the MetaTrader account used for trading this pool.')
+                ->description('Configure the MetaTrader account used for trading this pool.')
                 ->icon('heroicon-o-computer-desktop')
-                ->collapsed()
                 ->schema([
                     TextInput::make('mt_account_number')
                         ->label('Account Number')
+                        ->required()
                         ->maxLength(50),
                     TextInput::make('mt_server')
                         ->label('Server')
+                        ->required()
                         ->placeholder('e.g., Exness-MT5Real')
                         ->maxLength(100),
                     Select::make('platform_type')
                         ->label('Platform')
+                        ->required()
                         ->options(MetaTraderPlatformType::class)
                         ->default(MetaTraderPlatformType::MT5),
                     Select::make('risk_level')
                         ->label('Risk Level')
+                        ->required()
                         ->options(RiskLevel::class),
                     TextInput::make('mt_password')
                         ->label('Password')
+                        ->required()
                         ->password()
                         ->revealable(),
                 ])

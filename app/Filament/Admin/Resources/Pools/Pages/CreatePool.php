@@ -37,20 +37,18 @@ class CreatePool extends CreateRecord
 
     protected function afterCreate(): void
     {
-        if (filled($this->metaTraderData['mt_account_number'] ?? null)) {
-            ConnectMetaTraderAccount::dispatch(
-                auth()->user(),
-                new MetaTraderData(
-                    mt_account_number: $this->metaTraderData['mt_account_number'],
-                    mt_password: $this->metaTraderData['mt_password'],
-                    mt_server: $this->metaTraderData['mt_server'],
-                    initial_deposit: 0.0,
-                    risk_level: $this->metaTraderData['risk_level'] instanceof RiskLevel
-                        ? $this->metaTraderData['risk_level']->value
-                        : $this->metaTraderData['risk_level'],
-                    pool_id: (string) $this->record->id,
-                )
-            );
-        }
+        ConnectMetaTraderAccount::dispatch(
+            auth()->user(),
+            new MetaTraderData(
+                mt_account_number: $this->metaTraderData['mt_account_number'],
+                mt_password: $this->metaTraderData['mt_password'],
+                mt_server: $this->metaTraderData['mt_server'],
+                initial_deposit: 0.0,
+                risk_level: $this->metaTraderData['risk_level'] instanceof RiskLevel
+                    ? $this->metaTraderData['risk_level']->value
+                    : $this->metaTraderData['risk_level'],
+                pool_id: (string) $this->record->id,
+            )
+        );
     }
 }
