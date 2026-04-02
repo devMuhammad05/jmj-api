@@ -20,7 +20,6 @@ class MetaTraderCredential extends Model
     protected $fillable = [
         'user_id',
         'pool_id',
-        'pool_investment_id',
         'mt_account_number',
         'mt_password',
         'mt_server',
@@ -66,14 +65,6 @@ class MetaTraderCredential extends Model
     public function pool(): BelongsTo
     {
         return $this->belongsTo(Pool::class);
-    }
-
-    /**
-     * Get the pool investment this credential belongs to.
-     */
-    public function poolInvestment(): BelongsTo
-    {
-        return $this->belongsTo(PoolInvestment::class);
     }
 
     /**

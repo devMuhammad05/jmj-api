@@ -20,9 +20,9 @@ class PoolResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCircleStack;
 
-    protected static ?string $navigationLabel = 'Investment Pools';
+    protected static ?string $navigationLabel = 'Pools';
 
-    protected static ?string $modelLabel = 'Investment Pool';
+    protected static ?string $modelLabel = 'Pool';
 
     protected static ?int $navigationSort = 5;
 

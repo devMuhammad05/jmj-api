@@ -20,7 +20,14 @@ class MetaTraderCredentialForm
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->disabled(fn (string $operation) => $operation === 'edit')
+                    ->disabled(fn (string $operation): bool => $operation === 'edit')
+                    ->columnSpanFull(),
+                Select::make('pool_id')
+                    ->label('Pool')
+                    ->relationship('pool', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
                     ->columnSpanFull(),
                 TextInput::make('mt_account_number')
                     ->label('MT Account Number')

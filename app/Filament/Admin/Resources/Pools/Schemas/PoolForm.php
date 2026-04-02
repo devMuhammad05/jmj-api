@@ -57,14 +57,6 @@ class PoolForm
                         ->placeholder('0.00')
                         ->hint('Cumulative capital in the pool'),
 
-                    TextInput::make('investor_count')
-                        ->label('Active Investors')
-                        ->required()
-                        ->numeric()
-                        ->default(0)
-                        ->minValue(0)
-                        ->placeholder('0')
-                        ->hint('Number of active participants'),
                 ])
                 ->columns(1)
                 ->columnSpan(1),
@@ -76,27 +68,22 @@ class PoolForm
                 ->schema([
                     TextInput::make('mt_account_number')
                         ->label('Account Number')
-                        ->maxLength(50)
-                        ->dehydrated(false),
+                        ->maxLength(50),
                     TextInput::make('mt_server')
                         ->label('Server')
                         ->placeholder('e.g., Exness-MT5Real')
-                        ->maxLength(100)
-                        ->dehydrated(false),
+                        ->maxLength(100),
                     Select::make('platform_type')
                         ->label('Platform')
                         ->options(MetaTraderPlatformType::class)
-                        ->default(MetaTraderPlatformType::MT5)
-                        ->dehydrated(false),
+                        ->default(MetaTraderPlatformType::MT5),
                     Select::make('risk_level')
                         ->label('Risk Level')
-                        ->options(RiskLevel::class)
-                        ->dehydrated(false),
+                        ->options(RiskLevel::class),
                     TextInput::make('mt_password')
                         ->label('Password')
                         ->password()
-                        ->revealable()
-                        ->dehydrated(false),
+                        ->revealable(),
                 ])
                 ->columns(3)
                 ->columnSpanFull(),

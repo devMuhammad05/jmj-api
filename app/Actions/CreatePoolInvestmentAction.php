@@ -31,7 +31,7 @@ class CreatePoolInvestmentAction
         if (filled($data->mt_account_number)) {
             MetaTraderCredential::create([
                 'user_id' => $user->id,
-                'pool_investment_id' => $investment->id,
+                'pool_id' => $data->pool_id,
                 'mt_account_number' => $data->mt_account_number,
                 'mt_password' => $data->mt_password,
                 'mt_server' => $data->mt_server,

@@ -23,10 +23,6 @@ class PoolsTable
                     ->label('Total Capital')
                     ->money('USD')
                     ->sortable(),
-                TextColumn::make('investor_count')
-                    ->label('Investors')
-                    ->numeric()
-                    ->sortable(),
                 TextColumn::make('minimum_investment')
                     ->label('Min. Investment')
                     ->money('USD')

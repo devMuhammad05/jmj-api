@@ -23,7 +23,6 @@ class Pool extends Model
     protected $fillable = [
         'name',
         'total_amount',
-        'investor_count',
         'minimum_investment',
         'status',
     ];
@@ -38,7 +37,6 @@ class Pool extends Model
         return [
             'total_amount' => 'decimal:2',
             'minimum_investment' => 'decimal:2',
-            'investor_count' => 'integer',
             'status' => PoolStatus::class,
         ];
     }
@@ -73,7 +71,7 @@ class Pool extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'total_amount', 'investor_count', 'status'])
+            ->logOnly(['name', 'total_amount', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(

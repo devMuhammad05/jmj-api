@@ -2,8 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Pools\Pages;
 
+use App\DTOs\MetaTraderData;
+use App\Enums\RiskLevel;
 use App\Filament\Admin\Resources\Pools\PoolResource;
-use App\Models\MetaTraderCredential;
+use App\Jobs\ConnectMetaTraderAccount;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePool extends CreateRecord
@@ -36,10 +38,19 @@ class CreatePool extends CreateRecord
     protected function afterCreate(): void
     {
         if (filled($this->metaTraderData['mt_account_number'] ?? null)) {
-            MetaTraderCredential::create([
-                'pool_id' => $this->record->id,
-                ...$this->metaTraderData,
-            ]);
+            ConnectMetaTraderAccount::dispatch(
+                auth()->user(),
+                new MetaTraderData(
+                    mt_account_number: $this->metaTraderData['mt_account_number'],
+                    mt_password: $this->metaTraderData['mt_password'],
+                    mt_server: $this->metaTraderData['mt_server'],
+                    initial_deposit: 0.0,
+                    risk_level: $this->metaTraderData['risk_level'] instanceof RiskLevel
+                        ? $this->metaTraderData['risk_level']->value
+                        : $this->metaTraderData['risk_level'],
+                    pool_id: (string) $this->record->id,
+                )
+            );
         }
     }
 }

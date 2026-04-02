@@ -31,6 +31,7 @@ class ConnectMetaTraderService
                 'risk_level' => $data->risk_level,
                 'platform' => 'mt5',
                 'magic' => 0,
+                'pool_id' => $data->pool_id,
             ]);
     }
 }

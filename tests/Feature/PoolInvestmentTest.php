@@ -262,11 +262,8 @@ class PoolInvestmentTest extends TestCase
 
         $response->assertStatus(201);
 
-        $investment = PoolInvestment::where('user_id', $this->user->id)->latest()->first();
-
         $this->assertDatabaseHas('meta_trader_credentials', [
             'user_id' => $this->user->id,
-            'pool_investment_id' => $investment->id,
             'mt_account_number' => '123456',
             'mt_server' => 'Exness-MT5Real',
         ]);
