@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\SignalAction;
 use App\Enums\SignalStatus;
-use App\Enums\SignalType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +20,6 @@ class Signal extends Model
     protected $fillable = [
         'symbol',
         'action',
-        'type',
         'entry_price',
         'stop_loss',
         'take_profit_1',
@@ -41,7 +39,6 @@ class Signal extends Model
     protected function casts(): array
     {
         return [
-            'type' => SignalType::class,
             'status' => SignalStatus::class,
             'action' => SignalAction::class,
             'is_published' => 'boolean',
@@ -53,6 +50,11 @@ class Signal extends Model
             'take_profit_3' => 'decimal:5',
             'pips_result' => 'decimal:2',
         ];
+    }
+
+    public function plans(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        return $this->morphToMany(Plan::class, 'feature', 'plan_features');
     }
 
     /**

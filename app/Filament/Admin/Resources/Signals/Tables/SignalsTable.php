@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources\Signals\Tables;
 
 use App\Enums\SignalAction;
 use App\Enums\SignalStatus;
-use App\Enums\SignalType;
 use App\Models\Signal;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -40,15 +39,12 @@ class SignalsTable
                         },
                     )
                     ->sortable(),
-                TextColumn::make('type')
+                TextColumn::make('plans.name')
+                    ->label('Plans')
                     ->badge()
-                    ->color(
-                        fn (SignalType $state): string => match ($state) {
-                            SignalType::FREE => 'info',
-                            SignalType::PREMIUM => 'warning',
-                        },
-                    )
-                    ->sortable(),
+                    ->separator(',')
+                    ->color('primary')
+                    ->placeholder('—'),
                 TextColumn::make('entry_price')
                     ->label('Entry')
                     ->numeric(decimalPlaces: 5)
@@ -107,7 +103,6 @@ class SignalsTable
                     ->options(SignalStatus::class)
                     ->default(SignalStatus::ACTIVE->value),
                 SelectFilter::make('action')->options(SignalAction::class),
-                SelectFilter::make('type')->options(SignalType::class),
             ])
             ->recordActions([
                 Action::make('hit_tp')

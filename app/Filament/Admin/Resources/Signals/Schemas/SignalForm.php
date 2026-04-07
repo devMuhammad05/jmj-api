@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources\Signals\Schemas;
 
 use App\Enums\SignalAction;
 use App\Enums\SignalStatus;
-use App\Enums\SignalType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -34,13 +33,6 @@ class SignalForm
                         Select::make('action')
                             ->label('Action')
                             ->options(SignalAction::class)
-                            ->required()
-                            ->columnSpan(1),
-
-                        Select::make('type')
-                            ->label('Signal Type')
-                            ->options(SignalType::class)
-                            ->default(SignalType::FREE)
                             ->required()
                             ->columnSpan(1),
 
@@ -111,7 +103,21 @@ class SignalForm
                     ->columns(2)
                     ->collapsible(),
 
-                // ── 3. Outcome & Visibility ────────────────────────────────
+                // ── 3. Plans ───────────────────────────────────────────────
+                Section::make('Plans')
+                    ->description('Assign this signal to one or more subscription plans.')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->schema([
+                        Select::make('plans')
+                            ->relationship('plans', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable()
+                            ->label('Included in Plans'),
+                    ])
+                    ->collapsible(),
+
+                // ── 4. Outcome & Visibility ────────────────────────────────
                 Section::make('Outcome & Visibility')
                     ->description(
                         'Track the signal result and control whether it is visible to subscribers.',

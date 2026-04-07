@@ -38,4 +38,9 @@ class TradingClass extends Model
             'is_published' => 'boolean',
         ];
     }
+
+    public function plans(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    {
+        return $this->morphToMany(Plan::class, 'feature', 'plan_features');
+    }
 }

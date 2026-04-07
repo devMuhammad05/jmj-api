@@ -52,6 +52,13 @@ class TradingClassesTable
                     ->boolean()
                     ->sortable(),
 
+                TextColumn::make('plans.name')
+                    ->label('Plans')
+                    ->badge()
+                    ->separator(',')
+                    ->color('primary')
+                    ->placeholder('—'),
+
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime()

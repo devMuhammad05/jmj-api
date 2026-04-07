@@ -77,6 +77,7 @@ class DatabaseSeeder extends Seeder
             SignalSeeder::class,
             PoolInvestmentSeeder::class,
             TradingClassSeeder::class,
+            PlanSeeder::class,
         ]);
     }
 }

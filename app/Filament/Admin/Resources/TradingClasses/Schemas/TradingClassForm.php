@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\TradingClasses\Schemas;
 
 use App\Enums\ClassPlatform;
+use App\Models\Plan;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -74,7 +75,21 @@ class TradingClassForm
                     ->columns(2)
                     ->collapsible(),
 
-                // ── 3. Publishing ──────────────────────────────────────────
+                // ── 3. Plans ───────────────────────────────────────────────
+                Section::make('Plans')
+                    ->description('Assign this class to one or more subscription plans.')
+                    ->icon('heroicon-o-rectangle-stack')
+                    ->schema([
+                        Select::make('plans')
+                            ->relationship('plans', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable()
+                            ->label('Included in Plans'),
+                    ])
+                    ->collapsible(),
+
+                // ── 4. Publishing ──────────────────────────────────────────
                 Section::make('Publishing')
                     ->description(
                         'Control the visibility of this class in the Learning Hub.',

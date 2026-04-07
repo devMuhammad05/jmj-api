@@ -150,4 +150,22 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     {
         return $this->hasMany(PoolInvestment::class);
     }
+
+    /**
+     * Get the subscriptions associated with the user.
+     *
+     * @return HasMany<Subscription, $this>
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * Get the active subscription for the user.
+     */
+    public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Subscription::class)->where('is_active', true)->latestOfMany();
+    }
 }

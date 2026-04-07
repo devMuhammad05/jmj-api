@@ -4,23 +4,17 @@ namespace Database\Seeders;
 
 use App\Enums\SignalAction;
 use App\Enums\SignalStatus;
-use App\Enums\SignalType;
 use App\Models\Signal;
 use Illuminate\Database\Seeder;
 
 class SignalSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $signals = [
-            // Active Signals
             [
                 'symbol' => 'EURUSD',
                 'action' => SignalAction::BUY,
-                'type' => SignalType::FREE,
                 'entry_price' => 1.08500,
                 'stop_loss' => 1.08200,
                 'take_profit_1' => 1.09000,
@@ -34,7 +28,6 @@ class SignalSeeder extends Seeder
             [
                 'symbol' => 'GBPUSD',
                 'action' => SignalAction::SELL,
-                'type' => SignalType::PREMIUM,
                 'entry_price' => 1.27500,
                 'stop_loss' => 1.27800,
                 'take_profit_1' => 1.27000,
@@ -48,7 +41,6 @@ class SignalSeeder extends Seeder
             [
                 'symbol' => 'XAUUSD',
                 'action' => SignalAction::BUY_LIMIT,
-                'type' => SignalType::FREE,
                 'entry_price' => 2050.00,
                 'stop_loss' => 2040.00,
                 'take_profit_1' => 2070.00,
@@ -59,12 +51,9 @@ class SignalSeeder extends Seeder
                 'notes' => 'Gold showing strong support at 2050. Buy on dip strategy.',
                 'is_published' => true,
             ],
-
-            // Completed Signals - Hit TP
             [
                 'symbol' => 'USDJPY',
                 'action' => SignalAction::BUY,
-                'type' => SignalType::FREE,
                 'entry_price' => 148.500,
                 'stop_loss' => 148.200,
                 'take_profit_1' => 149.000,
@@ -79,7 +68,6 @@ class SignalSeeder extends Seeder
             [
                 'symbol' => 'AUDUSD',
                 'action' => SignalAction::SELL,
-                'type' => SignalType::PREMIUM,
                 'entry_price' => 0.66500,
                 'stop_loss' => 0.66800,
                 'take_profit_1' => 0.66000,
@@ -91,12 +79,9 @@ class SignalSeeder extends Seeder
                 'is_published' => true,
                 'created_at' => now()->subDays(3),
             ],
-
-            // Completed Signals - Hit SL
             [
                 'symbol' => 'EURUSD',
                 'action' => SignalAction::SELL,
-                'type' => SignalType::FREE,
                 'entry_price' => 1.08000,
                 'stop_loss' => 1.08300,
                 'take_profit_1' => 1.07500,
@@ -108,12 +93,9 @@ class SignalSeeder extends Seeder
                 'is_published' => true,
                 'created_at' => now()->subDays(5),
             ],
-
-            // Cancelled Signal
             [
                 'symbol' => 'BTCUSD',
                 'action' => SignalAction::BUY,
-                'type' => SignalType::PREMIUM,
                 'entry_price' => 45000.00,
                 'stop_loss' => 44500.00,
                 'take_profit_1' => 46000.00,
