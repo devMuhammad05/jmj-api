@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\V1\Auth\SendOtpController;
 use App\Http\Controllers\Api\V1\Auth\VerifyRegistrationOtpController;
 use App\Http\Controllers\Api\V1\ClientPortfolioController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
+use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\PlanController;
 use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\PoolInvestmentController;
 use App\Http\Controllers\Api\V1\ProfitDistributionController;
@@ -52,9 +54,11 @@ Route::prefix('v1')->group(function (): void {
             });
     });
 
+    // Plans (public)
+    Route::get('/plans', [PlanController::class, 'index']);
+
     // Public Signal Routes (no authentication required)
-    Route::prefix('signals')->group(function (): void {
-        Route::get('/', [SignalController::class, 'index']);
+    Route::prefix('signals')->group(function (): void {        Route::get('/', [SignalController::class, 'index']);
         Route::get('/active', [SignalController::class, 'active']);
         Route::get('/statistics', [SignalController::class, 'statistics']);
         Route::get('/{signal}', [SignalController::class, 'show']);
@@ -109,5 +113,9 @@ Route::prefix('v1')->group(function (): void {
             ProfitDistributionController::class,
             'show',
         ]);
+
+        // Payment Routes
+        Route::get('/payment-gateways', [PaymentController::class, 'gateways']);
+
     });
 });

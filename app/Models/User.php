@@ -162,6 +162,16 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     }
 
     /**
+     * Get the payments associated with the user.
+     *
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
      * Get the active subscription for the user.
      */
     public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
