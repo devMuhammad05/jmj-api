@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SubscriptionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,7 @@ class Subscription extends Model
     protected $fillable = [
         'user_id',
         'plan_id',
+        'payment_id',
         'starts_at',
         'ends_at',
         'is_active',
@@ -38,8 +40,26 @@ class Subscription extends Model
         return $this->belongsTo(Plan::class);
     }
 
+    public function getStatusAttribute(): SubscriptionStatus
+    {
+        if ($this->ends_at->isPast()) {
+            return SubscriptionStatus::Expired;
+        }
+
+        if ($this->is_active) {
+            return SubscriptionStatus::Active;
+        }
+
+        return SubscriptionStatus::Inactive;
+    }
+
     public function isExpired(): bool
     {
         return $this->ends_at->isPast();
+    }
+
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class);
     }
 }

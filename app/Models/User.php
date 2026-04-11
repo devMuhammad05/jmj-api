@@ -176,6 +176,9 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
      */
     public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(Subscription::class)->where('is_active', true)->latestOfMany();
+        return $this->hasOne(Subscription::class)
+            ->where('is_active', true)
+            ->where('ends_at', '>', now())
+            ->latestOfMany('starts_at');
     }
 }

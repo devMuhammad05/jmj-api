@@ -11,11 +11,13 @@ use App\Http\Controllers\Api\V1\Auth\VerifyRegistrationOtpController;
 use App\Http\Controllers\Api\V1\ClientPortfolioController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
 use App\Http\Controllers\Api\V1\PaymentController;
+use App\Http\Controllers\Api\V1\PaymentGatewayController;
 use App\Http\Controllers\Api\V1\PlanController;
 use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\PoolInvestmentController;
 use App\Http\Controllers\Api\V1\ProfitDistributionController;
 use App\Http\Controllers\Api\V1\SignalController;
+use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\TradingClassController;
 use App\Http\Controllers\Api\V1\TradingStatsController;
 use App\Http\Controllers\Api\V1\VerificationController;
@@ -58,7 +60,8 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/plans', [PlanController::class, 'index']);
 
     // Public Signal Routes (no authentication required)
-    Route::prefix('signals')->group(function (): void {        Route::get('/', [SignalController::class, 'index']);
+    Route::prefix('signals')->group(function (): void {
+        Route::get('/', [SignalController::class, 'index']);
         Route::get('/active', [SignalController::class, 'active']);
         Route::get('/statistics', [SignalController::class, 'statistics']);
         Route::get('/{signal}', [SignalController::class, 'show']);
@@ -70,16 +73,10 @@ Route::prefix('v1')->group(function (): void {
         // Trading Class Routes (Learning Hub)
         Route::prefix('trading-classes')->group(function (): void {
             Route::get('/', [TradingClassController::class, 'index']);
-            Route::get('/{tradingClass}', [
-                TradingClassController::class,
-                'show',
-            ]);
+            Route::get('/{tradingClass}', [TradingClassController::class, 'show']);
         });
 
-        Route::post('/metatrader-credentials', [
-            MetaTraderCredentialController::class,
-            'store',
-        ]);
+        Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
 
         Route::get('/trading-stats', [TradingStatsController::class, 'show']);
 
@@ -91,31 +88,24 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/pools/{pool}', [PoolController::class, 'show']);
 
         // Pool Investment Routes
-        Route::get('/pool-investments', [
-            PoolInvestmentController::class,
-            'index',
-        ]);
-        Route::post('/pool-investments', [
-            PoolInvestmentController::class,
-            'store',
-        ]);
-        Route::get('/pool-investments/{poolInvestment}', [
-            PoolInvestmentController::class,
-            'show',
-        ]);
+        Route::get('/pool-investments', [PoolInvestmentController::class, 'index']);
+        Route::post('/pool-investments', [PoolInvestmentController::class, 'store']);
+        Route::get('/pool-investments/{poolInvestment}', [PoolInvestmentController::class, 'show']);
 
         // Profit Distribution Routes
-        Route::get('/profit-distributions', [
-            ProfitDistributionController::class,
-            'index',
-        ]);
-        Route::get('/profit-distributions/{profitDistribution}', [
-            ProfitDistributionController::class,
-            'show',
-        ]);
+        Route::get('/profit-distributions', [ProfitDistributionController::class, 'index']);
+        Route::get('/profit-distributions/{profitDistribution}', [ProfitDistributionController::class, 'show']);
+
+        // Payment Gateway Routes
+        Route::get('/payment-gateways', [PaymentGatewayController::class, 'index']);
 
         // Payment Routes
-        Route::get('/payment-gateways', [PaymentController::class, 'gateways']);
+        Route::get('/payments', [PaymentController::class, 'index']);
+        Route::get('/payments/{payment}', [PaymentController::class, 'show']);
 
+        // Subscription Routes
+        Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
+        Route::get('/subscriptions/current', [SubscriptionController::class, 'current']);
+        Route::get('/subscriptions', [SubscriptionController::class, 'index']);
     });
 });

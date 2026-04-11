@@ -57,6 +57,12 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/trading-classes/{id}`       | 🔒   | Get specific trading class details |
 | GET    | `/trading-stats`              | 🔒   | Get authenticated user trading stats |
 | GET    | `/client-portfolio`           | 🔒   | Get top 3 clients by balance       |
+| GET    | `/payment-gateways`           | 🔒   | List active payment gateways       |
+| POST   | `/subscribe`                  | 🔒   | Submit a subscription request      |
+| GET    | `/payments`                   | 🔒   | List user's payments               |
+| GET    | `/payments/{id}`              | 🔒   | Get a specific payment             |
+| GET    | `/subscriptions/current`      | 🔒   | Get current active subscription    |
+| GET    | `/subscriptions`              | 🔒   | List subscription history          |
 
 ---
 
@@ -1128,6 +1134,146 @@ Retrieve detailed information about a specific trading class.
 
 - 404: Class not found or is not published.
 
+### 7. Payments & Subscriptions
+
+#### 7.1 List Payment Gateways
+
+`GET /api/v1/payment-gateways` 🔒
+
+Returns all active payment gateways (bank accounts, wallets, etc.) the user can pay through.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Payment gateways retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "name": "Bank Transfer",
+      "code": "bank_transfer",
+      "details": {
+        "bank_name": "GTBank",
+        "account_number": "0123456789",
+        "account_name": "JMJ Trading Ltd"
+      }
+    }
+  ]
+}
+```
+
+---
+
+#### 7.2 Subscribe (Single Entry Point)
+
+`POST /api/v1/subscribe` 🔒
+
+Creates a payment and records proof of payment in one atomic request. The amount is derived automatically from the selected plan — no client input needed. Subscription is activated only after an admin approves the payment in the admin panel.
+
+**Request Body:**
+
+| Field           | Type   | Required | Notes                          |
+|-----------------|--------|----------|--------------------------------|
+| `plan_id`       | integer | ✓       | Must be an active plan         |
+| `gateway_code`  | string  | ✓       | Must be an active gateway code |
+| `payment_proof` | string  | ✓       | URL to payment screenshot      |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Subscription request submitted. Awaiting admin approval.",
+  "data": {
+    "id": 1,
+    "plan": { "id": 1, "name": "Basic", "price": "500.00", "duration_days": 30 },
+    "gateway": { "id": 1, "name": "Bank Transfer", "code": "bank_transfer" },
+    "amount": "500.00",
+    "status": "submitted",
+    "reference": "SUB-01HZ...",
+    "transaction_id": "TXN-01HZ...",
+    "proofs": [{ "payment_proof_url": "https://example.com/proof.jpg" }],
+    "created_at": "2026-04-10 12:00:00"
+  }
+}
+```
+
+**Error Responses:**
+
+- 401: Unauthenticated
+- 422: `plan_id` is inactive or not found / `gateway_code` is inactive or not found / `payment_proof` is not a valid URL
+
+---
+
+#### 7.3 List Payments
+
+`GET /api/v1/payments` 🔒
+
+Returns a paginated list of the authenticated user's payments, newest first.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Payments retrieved successfully",
+  "data": [ ... ]
+}
+```
+
+---
+
+#### 7.4 Get Payment
+
+`GET /api/v1/payments/{id}` 🔒
+
+Returns a single payment with plan, gateway, and proof details.
+
+**Error Responses:**
+
+- 403: Payment does not belong to the authenticated user
+- 404: Payment not found
+
+---
+
+#### 7.5 Get Current Subscription
+
+`GET /api/v1/subscriptions/current` 🔒
+
+Returns the user's currently active subscription.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Active subscription retrieved successfully",
+  "data": {
+    "id": 1,
+    "plan": { "id": 1, "name": "Basic", "price": "500.00", "duration_days": 30 },
+    "starts_at": "2026-04-10 12:00:00",
+    "ends_at": "2026-05-10 12:00:00",
+    "status": "active",
+    "created_at": "2026-04-10 12:00:00"
+  }
+}
+```
+
+**Error Responses:**
+
+- 404: No active subscription found
+
+---
+
+#### 7.6 Subscription History
+
+`GET /api/v1/subscriptions` 🔒
+
+Returns a paginated list of all the user's subscriptions, newest first. Each record includes the derived `status` field: `active`, `expired`, or `inactive`.
+
+---
+
 ## Response Format
 
 All API responses follow a consistent JSON structure.
@@ -1339,6 +1485,33 @@ curl -X GET http://localhost:8000/api/v1/pool-investments \
 
 ```bash
 curl -X GET http://localhost:8000/api/v1/profit-distributions \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**List payment gateways:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/payment-gateways \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Subscribe to a plan:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/subscribe \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan_id": 1,
+    "gateway_code": "bank_transfer",
+    "payment_proof": "https://example.com/proof.jpg"
+  }'
+```
+
+**Get current active subscription:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/subscriptions/current \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 

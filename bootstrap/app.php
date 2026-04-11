@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'pin' => \App\Http\Middleware\RequirePin::class,
             'verified.email' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'subscribed' => \App\Http\Middleware\EnsureActiveSubscription::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

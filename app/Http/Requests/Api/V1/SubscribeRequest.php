@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Api\V1;
 
-use App\Rules\MatchesPlanPrice;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePaymentRequest extends FormRequest
+class SubscribeRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -18,7 +19,7 @@ class StorePaymentRequest extends FormRequest
         return [
             'plan_id' => ['required', 'integer', Rule::exists('plans', 'id')->where('is_active', true)],
             'gateway_code' => ['required', 'string', Rule::exists('payment_gateways', 'code')->where('is_active', true)],
-            'amount' => ['required', 'numeric', new MatchesPlanPrice($this->integer('plan_id'))],
+            'payment_proof' => ['required', 'string', 'url'],
         ];
     }
 }
