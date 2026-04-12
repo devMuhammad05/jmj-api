@@ -18,7 +18,6 @@ class SignalResource extends JsonResource
             'id' => $this->id,
             'symbol' => $this->symbol,
             'action' => $this->action->value,
-            'type' => $this->type->value,
             'entry_price' => $this->entry_price,
             'stop_loss' => $this->stop_loss,
             'take_profit_1' => $this->take_profit_1,
@@ -28,7 +27,7 @@ class SignalResource extends JsonResource
             'pips_result' => $this->pips_result,
             'notes' => $this->notes,
             'is_published' => $this->is_published,
-            'published_at' => $this->published_at?->toIso8601String(),
+            'is_free' => $this->is_free,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

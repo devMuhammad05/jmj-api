@@ -66,11 +66,6 @@ class GetSignalsAction
             $query->where('action', $request->action);
         }
 
-        // Filter by type (forex, crypto, etc.)
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
-        }
-
         // Get only active signals by default (unless status is specified or include_all is set)
         if ($activeOnly || (! $request->has('status') && ! $request->has('include_all'))) {
             $query->where('status', SignalStatus::ACTIVE);

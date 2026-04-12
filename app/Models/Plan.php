@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use App\Enums\PlanType;
+use App\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Plan extends Model
 {
     /** @use HasFactory<\Database\Factories\PlanFactory> */
-    use HasFactory;
+    use HasFactory, HasSlug;
 
     protected $fillable = [
         'name',
@@ -32,15 +32,6 @@ class Plan extends Model
             'level' => 'integer',
             'type' => PlanType::class,
         ];
-    }
-
-    protected static function booted(): void
-    {
-        static::creating(function (Plan $plan) {
-            if (empty($plan->slug)) {
-                $plan->slug = Str::slug($plan->name);
-            }
-        });
     }
 
     public function subscriptions(): HasMany

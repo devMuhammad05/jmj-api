@@ -39,6 +39,7 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | POST   | `/auth/pin/verify`            | 🔒   | Verify security PIN                |
 | POST   | `/auth/pin/change`            | 🔒   | Change existing security PIN       |
 | POST   | `/auth/pin/reset`             | 🔒   | Reset PIN using account password   |
+| GET    | `/plans`                      | No   | List all active plans grouped by type      |
 | GET    | `/signals`                    | No   | Get signals (filtered by subscription tier) |
 | GET    | `/signals/active`             | No   | Get active signals (filtered by subscription tier) |
 | GET    | `/signals/statistics`         | No   | Get signal performance statistics  |
@@ -583,7 +584,74 @@ If no MetaAccount metrics exist yet, a dummy sample of 3 placeholder entries is 
 
 ---
 
-### 6. Trading Signals — `/signals`
+### 6. Plans — `/plans`
+
+#### 6.1 List All Active Plans
+
+`GET /api/v1/plans`
+
+Returns all active plans grouped by type. Pass an optional `type` query parameter to filter to a single group.
+
+**Query Parameters:**
+
+| Parameter | Type   | Required | Description                                      |
+|-----------|--------|----------|--------------------------------------------------|
+| `type`    | string | —        | Filter by type: `signals` or `trading_classes`   |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Plans retrieved successfully",
+  "data": {
+    "signals": [
+      {
+        "id": 1,
+        "name": "Signals PRO",
+        "slug": "signals-pro",
+        "type": "signals",
+        "level": 2,
+        "price": "29.99",
+        "duration_days": 30
+      },
+      {
+        "id": 2,
+        "name": "Signals VIP",
+        "slug": "signals-vip",
+        "type": "signals",
+        "level": 3,
+        "price": "199.99",
+        "duration_days": 365
+      }
+    ],
+    "trading_classes": [
+      {
+        "id": 3,
+        "name": "Trading Classes PRO",
+        "slug": "trading-pro",
+        "type": "trading_classes",
+        "level": 2,
+        "price": "29.99",
+        "duration_days": 30
+      },
+      {
+        "id": 4,
+        "name": "Trading Classes VIP",
+        "slug": "trading-vip",
+        "type": "trading_classes",
+        "level": 3,
+        "price": "199.99",
+        "duration_days": 365
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 7. Trading Signals — `/signals`
 
 > ℹ️ Signal routes are **public** — no authentication required.
 > Content is filtered by subscription tier:
@@ -787,7 +855,7 @@ Retrieve details of a specific signal by ID.
 
 ---
 
-### 5. Pool Funding — `/pools`, `/pool-investments`, `/profit-distributions`
+### 8. Pool Funding — `/pools`, `/pool-investments`, `/profit-distributions`
 
 > 🔒 All routes require authentication.
 > ℹ️ **No KYC Required**: Users do NOT need to complete KYC verification to invest in pools.
@@ -1071,7 +1139,7 @@ Retrieve detailed information about a specific profit distribution. Users can on
 
 ---
 
-### 6. Trading Classes (Learning Hub) — `/trading-classes`
+### 9. Trading Classes (Learning Hub) — `/trading-classes`
 
 > 🔒 All routes require authentication.
 > Content is filtered by subscription tier:
@@ -1141,7 +1209,7 @@ Retrieve detailed information about a specific trading class.
 
 - 404: Class not found or is not published.
 
-### 7. Payments & Subscriptions
+### 10. Payments & Subscriptions
 
 #### 7.1 List Payment Gateways
 
@@ -1205,9 +1273,9 @@ A user may hold **two concurrent active subscriptions** — one for **Signals** 
   "message": "Subscription request submitted. Awaiting admin approval.",
   "data": {
     "id": 1,
-    "plan": { "id": 1, "name": "Basic", "price": "500.00", "duration_days": 30 },
+    "plan": { "id": 1, "name": "Signals PRO", "slug": "signals-pro", "type": "signals", "price": "29.99", "duration_days": 30 },
     "gateway": { "id": 1, "name": "Bank Transfer", "code": "bank_transfer" },
-    "amount": "500.00",
+    "amount": "29.99",
     "status": "submitted",
     "reference": "SUB-01HZ...",
     "transaction_id": "TXN-01HZ...",
@@ -1220,6 +1288,7 @@ A user may hold **two concurrent active subscriptions** — one for **Signals** 
 **Error Responses:**
 
 - 401: Unauthenticated
+- 409: Already have an active subscription of the same type
 - 422: `plan_id` is inactive or not found / `gateway_code` is inactive or not found / `payment_proof` is not a valid URL
 
 ---
@@ -1269,7 +1338,7 @@ Returns the user's currently active subscription.
   "message": "Active subscription retrieved successfully",
   "data": {
     "id": 1,
-    "plan": { "id": 1, "name": "Basic", "price": "500.00", "duration_days": 30 },
+    "plan": { "id": 1, "name": "Signals PRO", "slug": "signals-pro", "type": "signals", "price": "29.99", "duration_days": 30 },
     "starts_at": "2026-04-10 12:00:00",
     "ends_at": "2026-05-10 12:00:00",
     "status": "active",
