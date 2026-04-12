@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\SubscribeRequest;
 use App\Http\Resources\V1\PaymentResource;
 use App\Http\Resources\V1\SubscriptionResource;
+use App\Models\Plan;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,14 +23,17 @@ class SubscriptionController extends ApiController
      */
     public function subscribe(SubscribeRequest $request): JsonResponse
     {
-        if ($request->user()->activeSubscription()->exists()) {
+        $plan = Plan::findOrFail($request->integer('plan_id'));
+        $user = $request->user();
+
+        if ($user->activeSubscriptionFor($plan->type) !== null) {
             return $this->errorResponse(
-                'You already have an active subscription.',
+                "You already have an active {$plan->type->label()} subscription.",
                 \Symfony\Component\HttpFoundation\Response::HTTP_CONFLICT,
             );
         }
 
-        $payment = $this->subscribeAction->execute($request->user(), $request);
+        $payment = $this->subscribeAction->execute($user, $request);
 
         return $this->createdResponse(
             'Subscription request submitted. Awaiting admin approval.',

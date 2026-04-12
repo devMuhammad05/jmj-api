@@ -3,13 +3,14 @@
 namespace App\Filament\Admin\Resources\TradingClasses\Schemas;
 
 use App\Enums\ClassPlatform;
-use App\Models\Plan;
+use App\Enums\PlanType;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class TradingClassForm
@@ -75,17 +76,30 @@ class TradingClassForm
                     ->columns(2)
                     ->collapsible(),
 
-                // ── 3. Plans ───────────────────────────────────────────────
-                Section::make('Plans')
-                    ->description('Assign this class to one or more subscription plans.')
+                // ── 3. Access ──────────────────────────────────────────────
+                Section::make('Access')
+                    ->description('Control who can see this class.')
                     ->icon('heroicon-o-rectangle-stack')
                     ->schema([
+                        Toggle::make('is_free')
+                            ->label('Free Access')
+                            ->helperText('When enabled, all users can see this class — no plan assignment needed.')
+                            ->default(false)
+                            ->live()
+                            ->inline(false),
+
                         Select::make('plans')
-                            ->relationship('plans', 'name')
+                            ->relationship(
+                                'plans',
+                                'name',
+                                fn ($query) => $query->where('type', PlanType::TradingClasses)->orderBy('level'),
+                            )
                             ->multiple()
                             ->preload()
                             ->searchable()
-                            ->label('Included in Plans'),
+                            ->label('Included in Plans')
+                            ->helperText('Only Trading Classes plans are shown.')
+                            ->visible(fn (Get $get) => ! $get('is_free')),
                     ])
                     ->collapsible(),
 

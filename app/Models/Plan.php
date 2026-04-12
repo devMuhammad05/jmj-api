@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PlanType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,6 +20,7 @@ class Plan extends Model
         'duration_days',
         'is_active',
         'level',
+        'type',
     ];
 
     protected function casts(): array
@@ -28,6 +30,7 @@ class Plan extends Model
             'duration_days' => 'integer',
             'is_active' => 'boolean',
             'level' => 'integer',
+            'type' => PlanType::class,
         ];
     }
 

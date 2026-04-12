@@ -9,6 +9,7 @@ use App\Http\Resources\V1\PlanResource;
 use App\Models\Plan;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 class PlanController extends ApiController
 {
     /**
@@ -18,10 +19,13 @@ class PlanController extends ApiController
     {
         $plans = Plan::where('is_active', true)
             ->when($request->type, fn ($q, $type) => $q->where('type', $type))
-            // ->orderBy('type')
             ->orderBy('level')
             ->get();
 
-        return $this->successResponse('Plans retrieved successfully', PlanResource::collection($plans));
+        $grouped = $plans
+            ->groupBy(fn ($plan) => $plan->type?->value)
+            ->map(fn ($group) => PlanResource::collection($group));
+
+        return $this->successResponse('Plans retrieved successfully', $grouped);
     }
 }

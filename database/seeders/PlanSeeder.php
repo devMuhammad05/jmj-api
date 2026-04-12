@@ -2,58 +2,54 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PlanType;
 use App\Models\Plan;
-use App\Models\Signal;
-use App\Models\TradingClass;
 use Illuminate\Database\Seeder;
 
 class PlanSeeder extends Seeder
 {
     public function run(): void
     {
-        // Free plan — access to free signals only, no classes
-        $free = Plan::firstOrCreate(
-            ['slug' => 'free'],
+        $plans = [
             [
-                'name' => 'Free',
-                'price' => 0.00,
-                'duration_days' => 36500,
-                'is_active' => true,
-                'level' => 1,
-            ],
-        );
-
-        $pro = Plan::firstOrCreate(
-            ['slug' => 'pro'],
-            [
-                'name' => 'Pro',
+                'slug' => 'signals-pro',
+                'name' => 'Signals PRO',
+                'type' => PlanType::Signals,
                 'price' => 29.99,
                 'duration_days' => 30,
-                'is_active' => true,
                 'level' => 2,
             ],
-        );
-
-        $vip = Plan::firstOrCreate(
-            ['slug' => 'vip'],
             [
-                'name' => 'VIP',
+                'slug' => 'signals-vip',
+                'name' => 'Signals VIP',
+                'type' => PlanType::Signals,
                 'price' => 199.99,
                 'duration_days' => 365,
-                'is_active' => true,
                 'level' => 3,
             ],
-        );
+            [
+                'slug' => 'trading-pro',
+                'name' => 'Trading Classes PRO',
+                'type' => PlanType::TradingClasses,
+                'price' => 29.99,
+                'duration_days' => 30,
+                'level' => 2,
+            ],
+            [
+                'slug' => 'trading-vip',
+                'name' => 'Trading Classes VIP',
+                'type' => PlanType::TradingClasses,
+                'price' => 199.99,
+                'duration_days' => 365,
+                'level' => 3,
+            ],
+        ];
 
-        $allSignals = Signal::all();
-        $allClasses = TradingClass::all();
-
-        // Free plan: no signals by default (assign manually per signal)
-        // Pro & VIP: all signals + all trading classes
-        $pro->signals()->syncWithoutDetaching($allSignals->pluck('id')->toArray());
-        $pro->tradingClasses()->syncWithoutDetaching($allClasses->pluck('id')->toArray());
-
-        $vip->signals()->syncWithoutDetaching($allSignals->pluck('id')->toArray());
-        $vip->tradingClasses()->syncWithoutDetaching($allClasses->pluck('id')->toArray());
+        foreach ($plans as $data) {
+            Plan::firstOrCreate(
+                ['slug' => $data['slug']],
+                array_merge($data, ['is_active' => true]),
+            );
+        }
     }
 }

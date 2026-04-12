@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\PlanType;
 use App\Enums\Role;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
@@ -172,7 +173,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     }
 
     /**
-     * Get the active subscription for the user.
+     * Get the active subscription for the user (any type).
      */
     public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
@@ -180,5 +181,34 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
             ->where('is_active', true)
             ->where('ends_at', '>', now())
             ->latestOfMany('starts_at');
+    }
+
+    /**
+     * Get the user's active subscription for a specific plan type.
+     */
+    public function activeSubscriptionFor(PlanType $type): ?\App\Models\Subscription
+    {
+        return $this->subscriptions()
+            ->where('is_active', true)
+            ->where('ends_at', '>', now())
+            ->whereHas('plan', fn ($q) => $q->where('type', $type))
+            ->latest('starts_at')
+            ->first();
+    }
+
+    /**
+     * Determine whether the user has an active subscription for signals.
+     */
+    public function hasActiveSignalsSubscription(): bool
+    {
+        return $this->activeSubscriptionFor(PlanType::Signals) !== null;
+    }
+
+    /**
+     * Determine whether the user has an active subscription for trading classes.
+     */
+    public function hasActiveTradingSubscription(): bool
+    {
+        return $this->activeSubscriptionFor(PlanType::TradingClasses) !== null;
     }
 }

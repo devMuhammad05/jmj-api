@@ -2,12 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Plans\Schemas;
 
-use App\Models\Signal;
-use App\Models\TradingClass;
+use App\Enums\PlanType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class PlanForm
@@ -45,15 +45,27 @@ class PlanForm
                         ->minValue(1)
                         ->placeholder('30'),
 
+                    Select::make('type')
+                        ->label('Plan Type')
+                        ->options(PlanType::class)
+                        ->required()
+                        ->live()
+                        ->helperText('Signals plans gate signal access; Trading Classes plans gate class access.'),
+
                     TextInput::make('level')
                         ->label('Level')
                         ->required()
                         ->numeric()
-                        ->minValue(1)
-                        ->default(1)
-                        ->placeholder('1')
-                        ->unique(table: 'plans', column: 'level', ignoreRecord: true)
-                        ->helperText('Higher level = more access (e.g. 1 = Free, 2 = Pro, 3 = VIP)'),
+                        ->minValue(2)
+                        ->default(2)
+                        ->placeholder('2')
+                        ->unique(
+                            table: 'plans',
+                            column: 'level',
+                            ignoreRecord: true,
+                            modifyRuleUsing: fn ($rule, Get $get) => $rule->where('type', $get('type')),
+                        )
+                        ->helperText('Unique per type. 2 = PRO, 3 = VIP.'),
 
                     Toggle::make('is_active')
                         ->label('Active')
@@ -63,25 +75,6 @@ class PlanForm
                 ->columns(2)
                 ->columnSpan(1),
 
-            Section::make('Features')
-                ->icon('heroicon-o-sparkles')
-                ->description('Assign signals and trading classes included in this plan.')
-                ->schema([
-                    Select::make('signals')
-                        ->relationship('signals', 'symbol')
-                        ->multiple()
-                        ->preload()
-                        ->searchable()
-                        ->label('Signals'),
-
-                    Select::make('tradingClasses')
-                        ->relationship('tradingClasses', 'title')
-                        ->multiple()
-                        ->preload()
-                        ->searchable()
-                        ->label('Trading Classes'),
-                ])
-                ->columnSpan(1),
         ]);
     }
 }

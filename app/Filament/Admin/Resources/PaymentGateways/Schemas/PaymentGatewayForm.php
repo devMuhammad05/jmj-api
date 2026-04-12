@@ -2,7 +2,8 @@
 
 namespace App\Filament\Admin\Resources\PaymentGateways\Schemas;
 
-use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
@@ -35,18 +36,36 @@ class PaymentGatewayForm
                 ])
                 ->columns(2),
 
-            Section::make('Configuration')
-                ->icon('heroicon-o-cog-6-tooth')
-                ->description('Add payment details such as wallet address, account number, bank name, etc.')
+            Section::make('Wallet Details')
+                ->icon('heroicon-o-wallet')
+                ->description('Payment destination details shown to users during checkout.')
                 ->schema([
-                    KeyValue::make('config')
-                        ->label('Config Fields')
-                        ->keyLabel('Field')
-                        ->valueLabel('Value')
-                        ->addActionLabel('Add config field')
-                        ->reorderable()
+                    TextInput::make('wallet_address')
+                        ->label('Wallet Address')
+                        ->maxLength(255)
+                        ->placeholder('e.g. TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE')
                         ->columnSpanFull(),
-                ]),
+
+                    Select::make('network')
+                        ->label('Network')
+                        ->options([
+                            'TRC20' => 'TRC20 (Tron)',
+                            'ERC20' => 'ERC20 (Ethereum)',
+                            'BEP20' => 'BEP20 (BNB Smart Chain)',
+                            'BTC' => 'BTC (Bitcoin)',
+                            'SOL' => 'SOL (Solana)',
+                            'other' => 'Other',
+                        ])
+                        ->native(false),
+
+                    FileUpload::make('bar_code_path')
+                        ->label('QR Code / Barcode Image')
+                        ->image()
+                        ->disk('public')
+                        ->directory('gateways/barcodes')
+                        ->columnSpanFull(),
+                ])
+                ->columns(2),
         ]);
     }
 }

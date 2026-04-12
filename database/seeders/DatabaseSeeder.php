@@ -78,6 +78,7 @@ class DatabaseSeeder extends Seeder
             PoolInvestmentSeeder::class,
             TradingClassSeeder::class,
             PlanSeeder::class,
+            PaymentGatewaySeeder::class,
         ]);
     }
 }

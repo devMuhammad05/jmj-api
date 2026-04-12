@@ -39,8 +39,8 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | POST   | `/auth/pin/verify`            | 🔒   | Verify security PIN                |
 | POST   | `/auth/pin/change`            | 🔒   | Change existing security PIN       |
 | POST   | `/auth/pin/reset`             | 🔒   | Reset PIN using account password   |
-| GET    | `/signals`                    | No   | Get all published signals          |
-| GET    | `/signals/active`             | No   | Get active signals only            |
+| GET    | `/signals`                    | No   | Get signals (filtered by subscription tier) |
+| GET    | `/signals/active`             | No   | Get active signals (filtered by subscription tier) |
 | GET    | `/signals/statistics`         | No   | Get signal performance statistics  |
 | GET    | `/signals/{id}`               | No   | Get specific signal details        |
 | GET    | `/verifications`              | 🔒   | Get KYC verification status        |
@@ -53,8 +53,8 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/pool-investments/{id}`      | 🔒   | Get specific investment details    |
 | GET    | `/profit-distributions`       | 🔒   | Get user's profit distributions    |
 | GET    | `/profit-distributions/{id}`  | 🔒   | Get specific distribution details  |
-| GET    | `/trading-classes`            | 🔒   | Get all published trading classes  |
-| GET    | `/trading-classes/{id}`       | 🔒   | Get specific trading class details |
+| GET    | `/trading-classes`            | 🔒   | Get trading classes (filtered by subscription tier) |
+| GET    | `/trading-classes/{id}`       | 🔒   | Get specific trading class (403 if paid & no subscription) |
 | GET    | `/trading-stats`              | 🔒   | Get authenticated user trading stats |
 | GET    | `/client-portfolio`           | 🔒   | Get top 3 clients by balance       |
 | GET    | `/payment-gateways`           | 🔒   | List active payment gateways       |
@@ -585,7 +585,10 @@ If no MetaAccount metrics exist yet, a dummy sample of 3 placeholder entries is 
 
 ### 6. Trading Signals — `/signals`
 
-> ℹ️ All signal routes are **public** and do not require authentication.
+> ℹ️ Signal routes are **public** — no authentication required.
+> Content is filtered by subscription tier:
+> - **No subscription / unauthenticated** — only signals marked `is_free = true` are returned.
+> - **Active Signals subscription** — free signals + all signals assigned to the user's plan.
 
 #### 4.1 Get All Signals
 
@@ -1071,6 +1074,10 @@ Retrieve detailed information about a specific profit distribution. Users can on
 ### 6. Trading Classes (Learning Hub) — `/trading-classes`
 
 > 🔒 All routes require authentication.
+> Content is filtered by subscription tier:
+> - **No active Trading Classes subscription** — only classes marked `is_free = true` are returned.
+> - **Active Trading Classes subscription** — free classes + all classes assigned to the user's plan.
+> - Accessing a specific paid class without a subscription returns `403`.
 
 Trading Classes (Learning Hub) allows administrators to post educational sessions, webinars, and workshops. Each class includes a schedule, a description, and a meeting link for platforms like Zoom or Telegram.
 
@@ -1171,13 +1178,24 @@ Returns all active payment gateways (bank accounts, wallets, etc.) the user can 
 
 Creates a payment and records proof of payment in one atomic request. The amount is derived automatically from the selected plan — no client input needed. Subscription is activated only after an admin approves the payment in the admin panel.
 
+A user may hold **two concurrent active subscriptions** — one for **Signals** and one for **Trading Classes** — since they are independent plan types. Subscribing to a second plan of the same type (e.g. Signals PRO while already on Signals VIP) is blocked with a `409`.
+
+**Available Plans:**
+
+| Slug | Name | Type |
+|------|------|------|
+| `signals-pro` | Signals PRO | signals |
+| `signals-vip` | Signals VIP | signals |
+| `trading-pro` | Trading Classes PRO | trading_classes |
+| `trading-vip` | Trading Classes VIP | trading_classes |
+
 **Request Body:**
 
-| Field           | Type   | Required | Notes                          |
-|-----------------|--------|----------|--------------------------------|
-| `plan_id`       | integer | ✓       | Must be an active plan         |
-| `gateway_code`  | string  | ✓       | Must be an active gateway code |
-| `payment_proof` | string  | ✓       | URL to payment screenshot      |
+| Field           | Type    | Required | Notes                                    |
+|-----------------|---------|----------|------------------------------------------|
+| `plan_id`       | integer | ✓        | Must be an active plan                   |
+| `gateway_code`  | string  | ✓        | Must be an active gateway code           |
+| `payment_proof` | string  | ✓        | URL to payment screenshot                |
 
 **Response:**
 

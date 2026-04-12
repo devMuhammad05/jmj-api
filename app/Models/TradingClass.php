@@ -23,6 +23,7 @@ class TradingClass extends Model
         'platform',
         'meeting_link',
         'is_published',
+        'is_free',
     ];
 
     /**
@@ -36,6 +37,7 @@ class TradingClass extends Model
             'scheduled_at' => 'datetime',
             'platform' => ClassPlatform::class,
             'is_published' => 'boolean',
+            'is_free' => 'boolean',
         ];
     }
 

@@ -6,6 +6,7 @@ use App\Enums\SignalAction;
 use App\Enums\SignalStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
 
 class Signal extends Model
 {
@@ -29,6 +30,7 @@ class Signal extends Model
         'pips_result',
         'notes',
         'is_published',
+        'is_free',
     ];
 
     /**
@@ -42,6 +44,7 @@ class Signal extends Model
             'status' => SignalStatus::class,
             'action' => SignalAction::class,
             'is_published' => 'boolean',
+            'is_free' => 'boolean',
             'published_at' => 'datetime',
             'entry_price' => 'decimal:5',
             'stop_loss' => 'decimal:5',

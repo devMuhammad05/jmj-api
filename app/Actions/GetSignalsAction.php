@@ -2,8 +2,10 @@
 
 namespace App\Actions;
 
+use App\Enums\PlanType;
 use App\Enums\SignalStatus;
 use App\Models\Signal;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -15,7 +17,22 @@ class GetSignalsAction
      */
     public function execute(Request $request, bool $activeOnly = false): LengthAwarePaginator
     {
-        $query = Signal::query()->where('is_published', true);
+        /** @var User|null $user */
+        $user = $request->user();
+        $subscription = $user?->activeSubscriptionFor(PlanType::Signals);
+
+        $query = Signal::query()
+            ->where('is_published', true)
+            ->where(function (Builder $q) use ($subscription): void {
+                $q->where('is_free', true);
+
+                if ($subscription) {
+                    $q->orWhereHas(
+                        'plans',
+                        fn (Builder $pq) => $pq->where('plans.id', $subscription->plan_id),
+                    );
+                }
+            });
 
         // Apply filters
         $this->applyFilters($query, $request, $activeOnly);
