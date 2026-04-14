@@ -18,16 +18,18 @@ class TradingClassController extends Controller
     public function index(Request $request): JsonResponse
     {
         $subscription = $request->user()?->activeSubscriptionFor(PlanType::TradingClasses);
+        $userPlan = $subscription?->plan;
 
         $classes = TradingClass::query()
             ->where('is_published', true)
-            ->where(function (Builder $q) use ($subscription): void {
+            ->where(function (Builder $q) use ($userPlan): void {
                 $q->where('is_free', true);
 
-                if ($subscription) {
+                if ($userPlan) {
                     $q->orWhereHas(
                         'plans',
-                        fn (Builder $pq) => $pq->where('plans.id', $subscription->plan_id),
+                        fn (Builder $pq) => $pq->where('plans.type', $userPlan->type)
+                            ->where('plans.level', '<=', $userPlan->level),
                     );
                 }
             })
@@ -57,8 +59,12 @@ class TradingClassController extends Controller
         }
 
         $subscription = $request->user()?->activeSubscriptionFor(PlanType::TradingClasses);
+        $userPlan = $subscription?->plan;
         $accessible = $tradingClass->is_free
-            || ($subscription && $tradingClass->plans()->where('plans.id', $subscription->plan_id)->exists());
+            || ($userPlan && $tradingClass->plans()
+                ->where('plans.type', $userPlan->type)
+                ->where('plans.level', '<=', $userPlan->level)
+                ->exists());
 
         if (! $accessible) {
             return response()->json(

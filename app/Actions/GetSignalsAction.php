@@ -20,16 +20,18 @@ class GetSignalsAction
         /** @var User|null $user */
         $user = $request->user();
         $subscription = $user?->activeSubscriptionFor(PlanType::Signals);
+        $userPlan = $subscription?->plan;
 
         $query = Signal::query()
             ->where('is_published', true)
-            ->where(function (Builder $q) use ($subscription): void {
+            ->where(function (Builder $q) use ($userPlan): void {
                 $q->where('is_free', true);
 
-                if ($subscription) {
+                if ($userPlan) {
                     $q->orWhereHas(
                         'plans',
-                        fn (Builder $pq) => $pq->where('plans.id', $subscription->plan_id),
+                        fn (Builder $pq) => $pq->where('plans.type', $userPlan->type)
+                            ->where('plans.level', '<=', $userPlan->level),
                     );
                 }
             });
