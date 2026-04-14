@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Enums\PaymentStatus;
-use App\Mail\SubscriptionApprovedMail;
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Notifications\User\SubscriptionActivatedNotification;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class ApprovePaymentAction
 {
@@ -34,7 +33,7 @@ class ApprovePaymentAction
 
             $subscription->load(['user', 'plan']);
 
-            Mail::to($payment->user->email)->send(new SubscriptionApprovedMail($subscription));
+            $payment->user->notify(new SubscriptionActivatedNotification($subscription));
 
             return $subscription;
         });

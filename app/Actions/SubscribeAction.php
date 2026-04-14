@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Enums\PaymentStatus;
+use App\Enums\Role;
 use App\Http\Requests\Api\V1\SubscribeRequest;
-use App\Mail\NewSubscriptionRequestMail;
 use App\Models\Payment;
 use App\Models\PaymentGateway;
 use App\Models\Plan;
 use App\Models\User;
+use App\Notifications\Admin\NewPaymentSubmittedNotification;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class SubscribeAction
@@ -42,9 +43,8 @@ class SubscribeAction
 
             $payment->load(['plan', 'gateway', 'proofs', 'user']);
 
-            if ($adminEmail = config('app.admin_email')) {
-                Mail::to($adminEmail)->send(new NewSubscriptionRequestMail($payment));
-            }
+            $admins = User::query()->where('role', Role::Admin)->get();
+            Notification::send($admins, new NewPaymentSubmittedNotification($payment));
 
             return $payment;
         });

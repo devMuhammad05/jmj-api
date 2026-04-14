@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Enums\ClassPlatform;
+use App\Observers\TradingClassObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[ObservedBy(TradingClassObserver::class)]
 class TradingClass extends Model
 {
     /** @use HasFactory<\Database\Factories\TradingClassFactory> */

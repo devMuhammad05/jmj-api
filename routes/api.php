@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Auth\SendOtpController;
 use App\Http\Controllers\Api\V1\Auth\VerifyRegistrationOtpController;
 use App\Http\Controllers\Api\V1\ClientPortfolioController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentGatewayController;
 use App\Http\Controllers\Api\V1\PlanController;
@@ -107,5 +108,13 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
         Route::get('/subscriptions/current', [SubscriptionController::class, 'current']);
         Route::get('/subscriptions', [SubscriptionController::class, 'index']);
+
+        // Notification Routes
+        Route::prefix('notifications')->group(function (): void {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+            Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
+            Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+        });
     });
 });

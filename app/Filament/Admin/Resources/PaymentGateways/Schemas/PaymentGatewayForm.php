@@ -3,11 +3,13 @@
 namespace App\Filament\Admin\Resources\PaymentGateways\Schemas;
 
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 
 class PaymentGatewayForm
 {
@@ -58,11 +60,19 @@ class PaymentGatewayForm
                         ])
                         ->native(false),
 
+                    Placeholder::make('bar_code_preview')
+                        ->label('Current QR Code')
+                        ->content(fn ($record): HtmlString|string => $record?->bar_code_path
+                            ? new HtmlString('<img src="'.asset($record->bar_code_path).'" class="max-h-40 object-contain rounded-lg border border-gray-200 dark:border-gray-700" />')
+                            : 'No QR code set.'
+                        )
+                        ->visible(fn (string $operation) => $operation === 'edit'),
+
                     FileUpload::make('bar_code_path')
-                        ->label('QR Code / Barcode Image')
+                        ->label('Upload New QR Code')
                         ->image()
                         ->disk('public')
-                        ->directory('gateways/barcodes')
+                        ->directory('img/payment-gateway')
                         ->columnSpanFull(),
                 ])
                 ->columns(2),

@@ -4,9 +4,13 @@ namespace App\Models;
 
 use App\Enums\SignalAction;
 use App\Enums\SignalStatus;
+use App\Observers\SignalObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
+
+#[ObservedBy(SignalObserver::class)]
 
 class Signal extends Model
 {

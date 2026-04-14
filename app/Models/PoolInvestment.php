@@ -3,13 +3,17 @@
 namespace App\Models;
 
 use App\Enums\PoolInvestmentStatus;
+use App\Observers\PoolInvestmentObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Spatie\Activitylog\LogOptions;
 
+#[ObservedBy(PoolInvestmentObserver::class)]
 class PoolInvestment extends Model
 {
     /** @use HasFactory<\Database\Factories\PoolInvestmentFactory> */

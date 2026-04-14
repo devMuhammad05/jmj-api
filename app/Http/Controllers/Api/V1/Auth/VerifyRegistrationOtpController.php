@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Models\User;
-use App\Notifications\WelcomeNotification;
+use App\Notifications\User\WelcomeNotification;
 use App\Traits\Otp;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

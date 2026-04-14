@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\User;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,18 +13,13 @@ class WelcomeNotification extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * Get the notification's delivery channels.
-     *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database', 'broadcast'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
@@ -37,15 +33,19 @@ class WelcomeNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get the array representation of the notification.
-     *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
         return [
             'type' => 'welcome',
-            'message' => 'Welcome to '.config('app.name'),
+            'title' => 'Welcome to '.config('app.name'),
+            'message' => 'Your account is ready. Start exploring the platform!',
         ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toArray($notifiable));
     }
 }

@@ -9,7 +9,7 @@ use App\Enums\Role;
 use App\Enums\VerificationStatus;
 use App\Models\User;
 use App\Models\Verification;
-use App\Notifications\KycSubmittedNotification;
+use App\Notifications\Admin\KycSubmittedNotification;
 use Illuminate\Support\Facades\Notification;
 
 class CreateVerificationAction
