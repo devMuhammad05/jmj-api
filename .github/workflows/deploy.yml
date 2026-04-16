@@ -1,0 +1,115 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add VPS to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+          VPS_PATH: ${{ secrets.VPS_PATH }}
+        run: |
+          ssh $VPS_USERNAME@$VPS_HOST << EOF
+            set -e
+
+            # Set project path
+            VPS_PATH="${VPS_PATH}"
+
+            echo "🚀 Starting deployment..."
+            cd \$VPS_PATH
+
+            echo "🔓 Fixing permissions before Git operations..."
+            # Fix ownership and permissions for Git operations
+            sudo chown -R \$USER:\$USER .
+            sudo chmod -R u+rwX .
+
+            # Specifically fix bootstrap/cache and storage
+            sudo chown -R \$USER:\$USER bootstrap/cache storage || true
+            sudo chmod -R u+rw bootstrap/cache storage || true
+
+            # Remove Git lock file if it exists
+            rm -f .git/index.lock
+
+            echo "📥 Pulling latest changes from GitHub..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "📦 Installing Composer dependencies..."
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+            echo "📦 Installing npm dependencies (including devDependencies for build tools)..."
+            npm ci
+
+            echo "🏗️ Building frontend assets..."
+            npm run build
+
+            echo "🧹 Cleaning up node_modules to save space..."
+            rm -rf node_modules
+
+            echo "🗄️ Running database migrations..."
+            php artisan migrate --force
+
+            echo "🧹 Clearing caches..."
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan filament:optimize-clear
+
+            echo "⚡ Optimizing..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan filament:optimize
+
+            echo "🔒 Fixing writable directories for Laravel..."
+            sudo chown -R www-data:www-data storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
+
+            echo "⏹️ Stopping existing queue workers and Reverb..."
+            php artisan queue:restart
+            sudo supervisorctl stop laravel-reverb:* || true
+
+            echo "🔄 Restarting services..."
+            sudo systemctl restart php8.4-fpm
+            sudo systemctl reload nginx
+
+            echo "🚀 Starting queue workers and Reverb..."
+            sudo supervisorctl reread
+            sudo supervisorctl update
+            sudo supervisorctl start laravel-queue:*
+            sudo supervisorctl start laravel-reverb:*
+
+            echo "✅ Deployment completed successfully!"
+          EOF
+
+      - name: Deployment Status
+        if: always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Deployment succeeded!"
+          else
+            echo "❌ Deployment failed!"
+            exit 1
+          fi
