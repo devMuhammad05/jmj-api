@@ -92,7 +92,7 @@ jobs:
             sudo supervisorctl stop laravel-reverb:* || true
 
             echo "🔄 Restarting services..."
-            sudo systemctl restart php8.4-fpm
+            sudo systemctl restart php8.3-fpm
             sudo systemctl reload nginx
 
             echo "🚀 Starting queue workers and Reverb..."
