@@ -64,6 +64,10 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/payments/{id}`              | 🔒   | Get a specific payment             |
 | GET    | `/subscriptions/current`      | 🔒   | Get current active subscription    |
 | GET    | `/subscriptions`              | 🔒   | List subscription history          |
+| GET    | `/notifications`              | 🔒   | List user notifications (paginated) |
+| GET    | `/notifications/unread-count` | 🔒   | Get unread notification count      |
+| POST   | `/notifications/{id}/read`    | 🔒   | Mark a notification as read        |
+| POST   | `/notifications/read-all`     | 🔒   | Mark all notifications as read     |
 
 ---
 
@@ -1361,6 +1365,148 @@ Returns a paginated list of all the user's subscriptions, newest first. Each rec
 
 ---
 
+### 11. Notifications — `/notifications`
+
+> 🔒 All routes require authentication.
+
+#### 11.1 List Notifications
+
+`GET /api/v1/notifications` 🔒
+
+Returns a paginated list of the authenticated user's notifications, newest first.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Notifications retrieved.",
+  "data": {
+    "data": [
+      {
+        "id": "9d4e5f6a-7b8c-9d0e-1f2a-3b4c5d6e7f8a",
+        "type": "App\\Notifications\\User\\NewSignalNotification",
+        "notifiable_type": "App\\Models\\User",
+        "notifiable_id": 1,
+        "data": {
+          "type": "new_signal",
+          "title": "New Signal: EURUSD BUY",
+          "message": "A new EURUSD BUY signal has been published. Entry: 1.09500",
+          "signal_id": 42,
+          "symbol": "EURUSD",
+          "action": "buy",
+          "entry_price": "1.09500"
+        },
+        "read_at": null,
+        "created_at": "2026-04-16T10:00:00.000000Z",
+        "updated_at": "2026-04-16T10:00:00.000000Z"
+      }
+    ],
+    "links": {
+      "first": "http://localhost:8000/api/v1/notifications?page=1",
+      "last": "http://localhost:8000/api/v1/notifications?page=2",
+      "prev": null,
+      "next": "http://localhost:8000/api/v1/notifications?page=2"
+    },
+    "meta": {
+      "current_page": 1,
+      "from": 1,
+      "last_page": 2,
+      "per_page": 20,
+      "to": 20,
+      "total": 35
+    }
+  }
+}
+```
+
+**Notification `data` shapes by `type`:**
+
+| `type` | Extra fields in `data` |
+|--------|------------------------|
+| `new_signal` | `signal_id`, `symbol`, `action`, `entry_price` |
+| `signal_closed` | `signal_id`, `symbol`, `action`, `status`, `pips_result` |
+| `subscription_activated` | `subscription_id`, `plan_name`, `ends_at` |
+| `subscription_expiring` | `subscription_id`, `plan_name`, `ends_at`, `days_remaining` |
+| `payment_rejected` | `payment_id`, `plan_name`, `reason` |
+| `account_verified` | *(title + message only)* |
+| `kyc_rejected` | `rejection_reason` |
+| `new_trading_class` | `trading_class_id`, `title`, `scheduled_at`, `platform`, `meeting_link` |
+| `trading_class_reminder` | `trading_class_id`, `title`, `scheduled_at`, `platform`, `meeting_link` |
+| `pool_investment_approved` | `pool_investment_id`, `pool_name`, `contribution` |
+| `pool_investment_rejected` | `pool_investment_id`, `pool_name`, `rejection_reason` |
+| `profit_distributed` | `profit_distribution_id`, `amount`, `distribution_date` |
+
+A notification is **unread** when `read_at` is `null`.
+
+---
+
+#### 11.2 Get Unread Count
+
+`GET /api/v1/notifications/unread-count` 🔒
+
+Returns the number of unread notifications for the authenticated user.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Unread count retrieved.",
+  "data": {
+    "unread_count": 5
+  }
+}
+```
+
+---
+
+#### 11.3 Mark Notification as Read
+
+`POST /api/v1/notifications/{id}/read` 🔒
+
+Marks a single notification as read by its UUID.
+
+**URL Parameters:**
+
+| Parameter | Type   | Required | Description         |
+|-----------|--------|----------|---------------------|
+| `id`      | UUID   | ✓        | Notification UUID   |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Notification marked as read.",
+  "data": []
+}
+```
+
+**Error Responses:**
+
+- 404: Notification not found or does not belong to the authenticated user
+
+---
+
+#### 11.4 Mark All Notifications as Read
+
+`POST /api/v1/notifications/read-all` 🔒
+
+Marks all unread notifications as read for the authenticated user.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "All notifications marked as read.",
+  "data": []
+}
+```
+
+---
+
 ## Response Format
 
 All API responses follow a consistent JSON structure.
@@ -1599,6 +1745,34 @@ curl -X POST http://localhost:8000/api/v1/subscribe \
 
 ```bash
 curl -X GET http://localhost:8000/api/v1/subscriptions/current \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Get notifications:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/notifications \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Get unread notification count:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/notifications/unread-count \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Mark a notification as read:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/notifications/9d4e5f6a-7b8c-9d0e-1f2a-3b4c5d6e7f8a/read \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Mark all notifications as read:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/notifications/read-all \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
