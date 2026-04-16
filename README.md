@@ -131,7 +131,64 @@ Create a new user account.
 
 ---
 
-#### 1.2 Get OTP (Development Only)
+#### 1.2 Verify Registration OTP
+
+`POST /auth/verify-registration-otp`
+
+Verify the OTP sent to the user's email after registration to complete email verification.
+
+**Request Body:**
+
+| Field   | Type    | Required | Notes                |
+| ------- | ------- | -------- | -------------------- |
+| `email` | string  | ✓        | Valid email address  |
+| `otp`   | integer | ✓        | 6-digit OTP          |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "OTP verified successfully. You can now login."
+}
+```
+
+**Error Responses:**
+
+- `404`: User not found
+- `422`: Invalid OTP provided
+
+---
+
+#### 1.3 Send OTP
+
+`POST /auth/send-otp`
+
+Resend a verification OTP to the user's email address.
+
+**Request Body:**
+
+| Field   | Type   | Required | Notes               |
+| ------- | ------ | -------- | ------------------- |
+| `email` | string | ✓        | Valid email address |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "OTP has been sent to your email."
+}
+```
+
+**Error Responses:**
+
+- `404`: No account found with the provided email
+- `500`: Failed to send OTP
+
+---
+
+#### 1.4 Get OTP (Development Only)
 
 `GET /auth/get-otp`
 
@@ -163,7 +220,7 @@ Retrieve the OTP stored in cache for a given email. **For development and testin
 
 ---
 
-#### 1.3 Login
+#### 1.5 Login
 
 `POST /auth/login`
 
@@ -200,7 +257,7 @@ Authenticate an existing user.
 
 ---
 
-#### 1.4 Logout
+#### 1.6 Logout
 
 `POST /auth/logout` 🔒
 
@@ -218,7 +275,7 @@ Revoke the current access token and log out the user.
 
 ---
 
-#### 1.5 Get Profile
+#### 1.7 Get Profile
 
 `GET /auth/me` 🔒
 
@@ -244,7 +301,7 @@ Retrieve the authenticated user's profile information.
 
 ---
 
-#### 1.6 Update Profile
+#### 1.8 Update Profile
 
 `PUT /auth/profile` 🔒
 
@@ -278,11 +335,11 @@ Update the authenticated user's profile information.
 
 ---
 
-#### 1.7 PIN Management
+#### 1.9 PIN Management
 
 All PIN endpoints are throttled to prevent brute-force attacks.
 
-##### 1.7.1 Setup PIN
+##### 1.9.1 Setup PIN
 
 `POST /auth/pin/setup` 🔒
 
@@ -1436,6 +1493,8 @@ Returns a paginated list of the authenticated user's notifications, newest first
 | `pool_investment_approved` | `pool_investment_id`, `pool_name`, `contribution` |
 | `pool_investment_rejected` | `pool_investment_id`, `pool_name`, `rejection_reason` |
 | `profit_distributed` | `profit_distribution_id`, `amount`, `distribution_date` |
+| `announcement` | `announcement_id`, `title`, `message` |
+
 
 A notification is **unread** when `read_at` is `null`.
 
