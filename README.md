@@ -1837,6 +1837,294 @@ curl -X POST http://localhost:8000/api/v1/notifications/read-all \
 
 ---
 
+## React Native Real-Time Guide (Laravel Echo + Reverb)
+
+The JMJ API uses **Laravel Reverb** (WebSocket server) to push real-time notifications to connected clients. Every notification that gets sent to a user is also broadcast over their private channel so React Native clients can react instantly — without polling.
+
+### How It Works
+
+```
+Admin sends announcement
+        ↓
+SendAnnouncementJob (queued)
+        ↓
+AnnouncementNotification → saved to database + broadcast via Reverb
+        ↓
+private-App.Models.User.{id}  ← your RN app listens here
+        ↓
+Your UI updates in real-time
+```
+
+The same pipeline fires for all notification types: signals, subscription events, KYC status changes, etc.
+
+---
+
+### 1. Install Dependencies
+
+```bash
+npm install laravel-echo pusher-js
+# or
+yarn add laravel-echo pusher-js
+```
+
+React Native does not expose `window` by default. Assign the global shim **before** importing Echo:
+
+```js
+// index.js or App.js — must be the very first thing
+if (typeof window !== 'undefined') {
+  window.global = window;
+} else {
+  global.window = global;
+}
+```
+
+---
+
+### 2. Create the Echo Instance
+
+Create a dedicated `echo.js` utility, for example in `src/services/echo.js`:
+
+```js
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+
+// Pusher must be on global before Echo is constructed
+global.Pusher = Pusher;
+
+/**
+ * Build an authenticated Echo instance.
+ * Call this after the user has logged in and you have their token.
+ *
+ * @param {string} token  - Sanctum Bearer token from login response
+ * @returns {Echo}
+ */
+export function createEcho(token) {
+  return new Echo({
+    broadcaster: 'reverb',
+    key: 'fh0s52qfgjl0iyhnxd0i',
+    wsHost: 'ws.api.jmj.finance.com',
+    wsPort: 443,
+    wssPort: 443,
+    forceTLS: true,
+    enabledTransports: ['ws', 'wss'],
+    authEndpoint: 'https://api.jmj.finance.com/api/broadcasting/auth',
+    auth: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+    },
+  });
+}
+```
+
+> In production replace `wsHost`, `wsPort`, and `authEndpoint` with your live server values and set `forceTLS: true`.
+
+---
+
+### 3. Connect After Login
+
+```js
+import { createEcho } from '../services/echo';
+
+// After a successful login API call:
+const { access_token, user } = loginResponse.data;
+
+// Store the token however you prefer (SecureStore, MMKV, etc.)
+await SecureStore.setItemAsync('auth_token', access_token);
+
+// Boot the Echo instance and store it somewhere accessible (context, zustand, etc.)
+const echo = createEcho(access_token);
+```
+
+---
+
+### 4. Subscribe to Notifications
+
+Private channels require authentication. The server validates the token through `/api/broadcasting/auth` automatically — you only need to subscribe to the correct channel.
+
+The channel name follows Laravel's convention: `App.Models.User.{userId}`.
+
+```js
+import { useEffect } from 'react';
+
+export function useRealtimeNotifications(echo, userId, onNotification) {
+  useEffect(() => {
+    if (!echo || !userId) return;
+
+    const channel = echo.private(`App.Models.User.${userId}`);
+
+    // Laravel broadcasts notifications on this event name
+    channel.notification((notification) => {
+      onNotification(notification);
+    });
+
+    return () => {
+      echo.leave(`App.Models.User.${userId}`);
+    };
+  }, [echo, userId]);
+}
+```
+
+**Usage in a component:**
+
+```js
+useRealtimeNotifications(echo, currentUser.id, (notification) => {
+  console.log('New notification:', notification);
+  // notification.type tells you what kind it is
+  // notification.title and notification.message are always present
+});
+```
+
+---
+
+### 5. Notification Payload Reference
+
+Every broadcast payload contains at minimum:
+
+```json
+{
+  "id": "uuid",
+  "type": "App\\Notifications\\User\\AnnouncementNotification",
+  "data": {
+    "type": "announcement",
+    "title": "System Maintenance",
+    "message": "The platform will be down at 2am.",
+    "announcement_id": 1
+  }
+}
+```
+
+Use `notification.data.type` (the short type string) to branch your UI logic:
+
+| `data.type` | Extra fields | Suggested UI action |
+|---|---|---|
+| `announcement` | `announcement_id`, `title`, `message` | Show banner / push notification |
+| `new_signal` | `signal_id`, `symbol`, `action`, `entry_price` | Badge on signals tab |
+| `signal_closed` | `signal_id`, `symbol`, `status`, `pips_result` | Update signal card |
+| `subscription_activated` | `subscription_id`, `plan_name`, `ends_at` | Unlock premium content |
+| `subscription_expiring` | `subscription_id`, `plan_name`, `days_remaining` | Show renewal prompt |
+| `payment_rejected` | `payment_id`, `plan_name`, `reason` | Show error alert |
+| `account_verified` | *(title + message only)* | Show success toast |
+| `kyc_rejected` | `rejection_reason` | Prompt user to resubmit |
+| `new_trading_class` | `trading_class_id`, `title`, `scheduled_at`, `platform`, `meeting_link` | Add to calendar |
+| `trading_class_reminder` | same as above | Push reminder notification |
+| `pool_investment_approved` | `pool_investment_id`, `pool_name`, `contribution` | Show success toast |
+| `pool_investment_rejected` | `pool_investment_id`, `pool_name`, `rejection_reason` | Show rejection reason |
+| `profit_distributed` | `profit_distribution_id`, `amount`, `distribution_date` | Show earnings banner |
+
+---
+
+### 6. Full Example with React Context
+
+```js
+// src/context/EchoContext.js
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createEcho } from '../services/echo';
+
+const EchoContext = createContext(null);
+
+export function EchoProvider({ token, userId, children }) {
+  const echoRef = useRef(null);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    if (!token || !userId) return;
+
+    echoRef.current = createEcho(token);
+
+    echoRef.current
+      .private(`App.Models.User.${userId}`)
+      .notification((notification) => {
+        setNotifications((prev) => [notification, ...prev]);
+      });
+
+    return () => {
+      echoRef.current?.disconnect();
+    };
+  }, [token, userId]);
+
+  return (
+    <EchoContext.Provider value={{ echo: echoRef.current, notifications, setNotifications }}>
+      {children}
+    </EchoContext.Provider>
+  );
+}
+
+export const useEcho = () => useContext(EchoContext);
+```
+
+```js
+// App.js
+import { EchoProvider } from './src/context/EchoContext';
+
+export default function App() {
+  const { token, user } = useAuthStore();
+
+  return (
+    <EchoProvider token={token} userId={user?.id}>
+      <RootNavigator />
+    </EchoProvider>
+  );
+}
+```
+
+```js
+// Any screen
+import { useEcho } from '../context/EchoContext';
+
+export function NotificationBell() {
+  const { notifications } = useEcho();
+  const unread = notifications.filter((n) => !n.read_at).length;
+
+  return <BellIcon badgeCount={unread} />;
+}
+```
+
+---
+
+### 7. Disconnect on Logout
+
+Always disconnect Echo when the user logs out to avoid memory leaks and stale subscriptions:
+
+```js
+async function handleLogout() {
+  await api.post('/auth/logout');
+  echo.disconnect();         // close the WebSocket
+  await SecureStore.deleteItemAsync('auth_token');
+  navigation.replace('Login');
+}
+```
+
+---
+
+### 8. Combining Real-Time with REST Notifications
+
+Real-time handles live events. For notifications the user missed while offline, fetch the REST endpoint on app start:
+
+```js
+// On app foreground / login
+const { data } = await api.get('/notifications');
+setNotifications(data.data.data);
+
+// Then layer real-time on top — new events prepend to the list
+echo.private(`App.Models.User.${userId}`).notification((n) => {
+  setNotifications((prev) => [n, ...prev]);
+});
+```
+
+Mark as read via REST — the real-time channel is receive-only:
+
+```js
+// Single notification
+await api.post(`/notifications/${id}/read`);
+
+// All at once
+await api.post('/notifications/read-all');
+```
+
+---
+
 ## Setup Instructions
 
 1. Clone the repository
@@ -1846,6 +2134,8 @@ curl -X POST http://localhost:8000/api/v1/notifications/read-all \
 5. Run migrations: `php artisan migrate`
 6. (Optional) Seed database: `php artisan db:seed`
 7. Start the server: `php artisan serve`
+8. Start Reverb: `php artisan reverb:start`
+9. Start queue worker: `php artisan queue:work`
 
 ---
 

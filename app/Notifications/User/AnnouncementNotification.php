@@ -3,6 +3,7 @@
 namespace App\Notifications\User;
 
 use App\Models\Announcement;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -38,5 +39,10 @@ class AnnouncementNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toArray($notifiable));
+    }
+
+    public function broadcastOn(): array
+    {
+        return [new Channel('announcements')];
     }
 }
