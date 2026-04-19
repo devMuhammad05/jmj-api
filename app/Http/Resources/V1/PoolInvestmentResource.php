@@ -21,7 +21,11 @@ class PoolInvestmentResource extends JsonResource
             'full_name' => $this->full_name,
             'phone_number' => $this->phone_number,
             'contribution' => $this->contribution,
+            'amount_paid' => $this->amount_paid,
             'share_percentage' => $this->share_percentage,
+            'payment_proof_url' => $this->whenLoaded('payment', function () {
+                return $this->payment->proofs->first()?->payment_proof_url;
+            }),
             'status' => $this->status,
             'terms_accepted' => $this->terms_accepted,
             'verified_at' => $this->verified_at?->toDateTimeString(),

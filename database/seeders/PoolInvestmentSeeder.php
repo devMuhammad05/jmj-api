@@ -2,12 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PaymentStatus;
 use App\Enums\PoolInvestmentStatus;
 use App\Enums\PoolStatus;
+use App\Models\Payment;
+use App\Models\PaymentGateway;
+use App\Models\PaymentProof;
 use App\Models\Pool;
 use App\Models\PoolInvestment;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PoolInvestmentSeeder extends Seeder
 {
@@ -81,6 +86,8 @@ class PoolInvestmentSeeder extends Seeder
             ->get()
             ->keyBy('email');
 
+        $gateway = PaymentGateway::first();
+
         /** @var array<int, array<string, mixed>> */
         $investments = [
             // Muhammad — Active investment in Growth Fund Alpha
@@ -93,8 +100,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '3012345678',
                 'account_name' => 'Muhammad Abdullah',
                 'contribution' => 15000.0,
-                'share_percentage' => 6.0,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',
+                'amount_paid' => 15525.0,
+                'proof_url' => 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',
                 'status' => PoolInvestmentStatus::VERIFIED,
                 'terms_accepted' => true,
                 'verified_at' => now()->subDays(10),
@@ -111,8 +118,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '3012345678',
                 'account_name' => 'Muhammad Abdullah',
                 'contribution' => 5000.0,
-                'share_percentage' => 0.0,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80',
+                'amount_paid' => 5175.0,
+                'proof_url' => 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80',
                 'status' => PoolInvestmentStatus::PENDING,
                 'terms_accepted' => true,
                 'verified_at' => null,
@@ -129,8 +136,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '0123456789',
                 'account_name' => 'Big Jam Okafor',
                 'contribution' => 25000.0,
-                'share_percentage' => 10.0,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=800&q=80',
+                'amount_paid' => 25875.0,
+                'proof_url' => 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=800&q=80',
                 'status' => PoolInvestmentStatus::VERIFIED,
                 'terms_accepted' => true,
                 'verified_at' => now()->subDays(3),
@@ -147,8 +154,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '0123456789',
                 'account_name' => 'Big Jam Okafor',
                 'contribution' => 10000.0,
-                'share_percentage' => 0.0,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1571867424488-4565932edb41?w=800&q=80',
+                'amount_paid' => 10350.0,
+                'proof_url' => 'https://images.unsplash.com/photo-1571867424488-4565932edb41?w=800&q=80',
                 'status' => PoolInvestmentStatus::REJECTED,
                 'terms_accepted' => true,
                 'verified_at' => null,
@@ -165,8 +172,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '0987654321',
                 'account_name' => 'Hameed Balogun',
                 'contribution' => 7500.0,
-                'share_percentage' => 4.1667,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1520694478166-daaaaec95b69?w=800&q=80',
+                'amount_paid' => 7762.5,
+                'proof_url' => 'https://images.unsplash.com/photo-1520694478166-daaaaec95b69?w=800&q=80',
                 'status' => PoolInvestmentStatus::VERIFIED,
                 'terms_accepted' => true,
                 'verified_at' => now()->subDays(15),
@@ -183,8 +190,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '0987654321',
                 'account_name' => 'Hameed Balogun',
                 'contribution' => 10000.0,
-                'share_percentage' => 0.0,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80',
+                'amount_paid' => 10350.0,
+                'proof_url' => 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80',
                 'status' => PoolInvestmentStatus::PENDING,
                 'terms_accepted' => true,
                 'verified_at' => null,
@@ -201,8 +208,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '2109876543',
                 'account_name' => 'Raji T. Codes',
                 'contribution' => 20000.0,
-                'share_percentage' => 8.0,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
+                'amount_paid' => 20700.0,
+                'proof_url' => 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
                 'status' => PoolInvestmentStatus::VERIFIED,
                 'terms_accepted' => true,
                 'verified_at' => now()->subDays(20),
@@ -219,8 +226,8 @@ class PoolInvestmentSeeder extends Seeder
                 'account_number' => '2109876543',
                 'account_name' => 'Raji T. Codes',
                 'contribution' => 3000.0,
-                'share_percentage' => 0.0,
-                'payment_proof_path' => 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&q=80',
+                'amount_paid' => 3105.0,
+                'proof_url' => 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&q=80',
                 'status' => PoolInvestmentStatus::PENDING,
                 'terms_accepted' => true,
                 'verified_at' => null,
@@ -236,26 +243,45 @@ class PoolInvestmentSeeder extends Seeder
                 continue;
             }
 
-            PoolInvestment::firstOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'pool_id' => $pool->id,
-                    'contribution' => $data['contribution'],
-                ],
-                [
-                    'full_name' => $data['full_name'],
-                    'phone_number' => $data['phone_number'],
-                    'bank_name' => $data['bank_name'],
-                    'account_number' => $data['account_number'],
-                    'account_name' => $data['account_name'],
-                    'share_percentage' => $data['share_percentage'],
-                    'payment_proof_path' => $data['payment_proof_path'],
-                    'status' => $data['status'],
-                    'terms_accepted' => $data['terms_accepted'],
-                    'verified_at' => $data['verified_at'],
-                    'rejection_reason' => $data['rejection_reason'],
-                ],
-            );
+            DB::transaction(function () use ($user, $pool, $data, $gateway) {
+                $investment = PoolInvestment::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'pool_id' => $pool->id,
+                        'contribution' => $data['contribution'],
+                    ],
+                    [
+                        'full_name' => $data['full_name'],
+                        'phone_number' => $data['phone_number'],
+                        'bank_name' => $data['bank_name'],
+                        'account_number' => $data['account_number'],
+                        'account_name' => $data['account_name'],
+                        'amount_paid' => $data['amount_paid'],
+                        'share_percentage' => $data['share_percentage'] ?? 0,
+                        'status' => $data['status'],
+                        'terms_accepted' => $data['terms_accepted'],
+                        'verified_at' => $data['verified_at'],
+                        'rejection_reason' => $data['rejection_reason'],
+                    ],
+                );
+
+                // Only create payment + proof if this is a new record
+                if ($investment->wasRecentlyCreated) {
+                    $payment = Payment::create([
+                        'user_id' => $user->id,
+                        'pool_investment_id' => $investment->id,
+                        'payment_gateway_id' => $gateway?->id,
+                        'amount' => $data['amount_paid'],
+                        'status' => PaymentStatus::Pending,
+                        'type' => 'pool_investment',
+                    ]);
+
+                    PaymentProof::create([
+                        'payment_id' => $payment->id,
+                        'payment_proof_url' => $data['proof_url'],
+                    ]);
+                }
+            });
         }
     }
 }

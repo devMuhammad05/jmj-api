@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('account_number');
             $table->string('account_name');
             $table->decimal('contribution', 15, 2);
+            $table->decimal('amount_paid', 10, 2)->default(0);
             $table->decimal('share_percentage', 8, 4)->default(0);
-            $table->string('payment_proof_path');
             $table->string('status')->default(PoolInvestmentStatus::PENDING->value);
             $table->boolean('terms_accepted')->default(false);
             $table->timestamp('verified_at')->nullable();

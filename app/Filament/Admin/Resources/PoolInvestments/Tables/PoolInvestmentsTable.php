@@ -40,11 +40,16 @@ class PoolInvestmentsTable
                     ->money('USD')
                     ->sortable(),
 
-                TextColumn::make('share_percentage')
-                    ->label('Share')
-                    ->numeric(decimalPlaces: 2)
-                    ->suffix('%')
+                TextColumn::make('amount_paid')
+                    ->label('Amount Paid')
+                    ->money('USD')
                     ->sortable(),
+
+                // TextColumn::make('share_percentage')
+                //     ->label('Share')
+                //     ->numeric(decimalPlaces: 2)
+                //     ->suffix('%')
+                //     ->sortable(),
 
                 TextColumn::make('status')
                     ->badge()
@@ -92,7 +97,7 @@ class PoolInvestmentsTable
                         ): HtmlString => new HtmlString(
                             '<div class="flex items-center justify-center p-4">'.
                                 '<img src="'.
-                                e($record->payment_proof_path).
+                                e($record->payment?->proofs?->first()?->payment_proof_url).
                                 '" '.
                                 'alt="Payment Proof" '.
                                 'class="max-w-full max-h-[70vh] rounded-xl shadow-lg object-contain" '.
@@ -106,13 +111,13 @@ class PoolInvestmentsTable
                     ->slideOver()
                     ->visible(
                         fn (PoolInvestment $record): bool => filled(
-                            $record->payment_proof_path,
+                            $record->payment?->proofs?->first()?->payment_proof_url,
                         ),
                     ),
 
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([DeleteBulkAction::make()]),
             ]);
     }

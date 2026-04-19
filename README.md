@@ -996,7 +996,9 @@ Submit an application to join an investment pool. Payment verification takes 24-
 | `account_number`       | string  | ✓        | 10-digit bank account number             |
 | `account_name`         | string  | ✓        | Name on bank account                     |
 | `contribution`         | numeric | ✓        | Investment amount (minimum $1,000)       |
-| `payment_proof_path`   | URL     | ✓        | URL to payment screenshot                |
+| `amount_paid`          | numeric | ✓        | Total amount paid (including fees)        |
+| `payment_gateway_id`   | integer | ✓        | ID of the payment gateway used            |
+| `payment_proof_url`    | URL     | ✓        | URL to payment screenshot                |
 | `terms_accepted`       | boolean | ✓        | Must be `true`                           |
 | `mt_account_number`    | string  |          | MetaTrader account number for pool trading |
 | `mt_password`          | string  |          | Required when `mt_account_number` is set |
@@ -1024,8 +1026,10 @@ Submit an application to join an investment pool. Payment verification takes 24-
         },
         "full_name": "John Doe",
         "phone_number": "+2348012345678",
-        "contribution": "500.00",
+        "contribution": "1000.00",
+        "amount_paid": "1035.00",
         "share_percentage": "1.00",
+        "payment_proof_url": "https://example.com/proof.jpg",
         "status": "pending",
         "terms_accepted": true,
         "verified_at": null,
@@ -1761,7 +1765,9 @@ curl -X POST http://localhost:8000/api/v1/pool-investments \
     "account_number": "0123456789",
     "account_name": "John Doe",
     "contribution": 1000,
-    "payment_proof_path": "https://example.com/proof.jpg",
+    "amount_paid": 1035,
+    "payment_gateway_id": 1,
+    "payment_proof_url": "https://example.com/proof.jpg",
     "terms_accepted": true
   }'
 ```

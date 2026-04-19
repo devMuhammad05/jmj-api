@@ -33,8 +33,8 @@ class PoolInvestment extends Model
         'account_number',
         'account_name',
         'contribution',
+        'amount_paid',
         'share_percentage',
-        'payment_proof_path',
         'status',
         'terms_accepted',
         'verified_at',
@@ -50,6 +50,7 @@ class PoolInvestment extends Model
     {
         return [
             'contribution' => 'decimal:2',
+            'amount_paid' => 'decimal:2',
             'share_percentage' => 'decimal:4',
             'terms_accepted' => 'boolean',
             'verified_at' => 'datetime',
@@ -90,12 +91,20 @@ class PoolInvestment extends Model
     }
 
     /**
+     * Get the payment associated with this investment.
+     */
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    /**
      * Get the options for logging activity.
      */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['user_id', 'pool_id', 'contribution', 'share_percentage', 'status', 'verified_at'])
+            ->logOnly(['user_id', 'pool_id', 'contribution', 'amount_paid', 'share_percentage', 'status', 'verified_at'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn (string $eventName) => "Pool Investment {$eventName}")

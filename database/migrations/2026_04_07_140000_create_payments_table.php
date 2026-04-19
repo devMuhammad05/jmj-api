@@ -12,10 +12,12 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('plan_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('plan_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignUuid('pool_investment_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('payment_gateway_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('amount', 10, 2);
             $table->string('status')->default(PaymentStatus::Pending->value);
+            $table->string('type')->nullable();
             $table->string('reference')->nullable();
             $table->string('transaction_id')->nullable();
             $table->timestamps();

@@ -32,7 +32,9 @@ class StorePoolInvestmentRequest extends FormRequest
             'account_number' => ['required', 'string', 'max:20'],
             'account_name' => ['required', 'string', 'max:255'],
             'contribution' => ['required', 'numeric', 'min:1000'],
-            'payment_proof_path' => ['required', 'url'],
+            'amount_paid' => ['required', 'numeric', 'min:0'],
+            'payment_gateway_id' => ['required', 'integer', 'exists:payment_gateways,id'],
+            'payment_proof_url' => ['required', 'url'],
             'terms_accepted' => ['required', 'boolean', 'accepted'],
             // MetaTrader account — all optional, but if account number is given the rest become required
             'mt_account_number' => ['nullable', 'string', 'max:50'],
