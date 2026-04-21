@@ -15,6 +15,7 @@ readonly class MetaTraderData
         public float $initial_deposit,
         public string $risk_level,
         public ?string $pool_id = null,
+        public ?int $payment_id = null,
     ) {}
 
     public static function fromRequest(Request $request): self

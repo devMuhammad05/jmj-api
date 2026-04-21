@@ -29,6 +29,9 @@ class StoreMetaTraderCredentialRequest extends FormRequest
             'mt_server' => ['required', 'string', 'max:100'],
             'initial_deposit' => ['required', 'numeric', 'min:0'],
             'risk_level' => ['required', new Enum(RiskLevel::class)],
+            'payment_gateway_id' => ['required', 'exists:payment_gateways,id'],
+            'payment_proof_url' => ['required', 'url'],
+            'amount_paid' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

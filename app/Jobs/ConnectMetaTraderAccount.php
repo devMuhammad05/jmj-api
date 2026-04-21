@@ -31,7 +31,24 @@ class ConnectMetaTraderAccount implements ShouldQueue
             'body' => $response->json(),
         ]);
 
-        if (! $response->successful()) {
+        if ($response->successful()) {
+            // Create the MetaTrader credential if provisioning was successful
+            $credential = $this->user->metaTraderCredentials()->create([
+                'mt_account_number' => $this->data->mt_account_number,
+                'mt_password' => $this->data->mt_password,
+                'mt_server' => $this->data->mt_server,
+                'platform_type' => \App\Enums\MetaTraderPlatformType::MT5,
+                'initial_deposit' => $this->data->initial_deposit,
+                'risk_level' => $this->data->risk_level,
+                'pool_id' => $this->data->pool_id,
+            ]);
+
+            // Link the payment to the credential
+            if ($this->data->payment_id) {
+                \App\Models\Payment::where('id', $this->data->payment_id)
+                    ->update(['meta_trader_credential_id' => $credential->id]);
+            }
+        } else {
             Log::error('Failed to connect MetaTrader account', [
                 'user_id' => $this->user->id,
                 'status' => $response->status(),

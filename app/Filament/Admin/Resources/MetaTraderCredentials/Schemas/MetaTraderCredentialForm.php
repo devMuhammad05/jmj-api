@@ -64,6 +64,22 @@ class MetaTraderCredentialForm
                     ->options(RiskLevel::class)
                     ->required()
                     ->helperText('Determines position sizing and risk management'),
+                TextInput::make('payment.amount')
+                    ->label('Amount Paid')
+                    ->numeric()
+                    ->prefix('$')
+                    ->step(0.01)
+                    ->disabled()
+                    ->dehydrated(false),
+                Select::make('payment.gateway.name')
+                    ->label('Payment Gateway')
+                    ->disabled()
+                    ->dehydrated(false),
+                TextInput::make('payment.proofs.0.payment_proof_url')
+                    ->label('Payment Proof URL')
+                    ->url()
+                    ->disabled()
+                    ->dehydrated(false),
             ])
             ->columns(2);
     }

@@ -16,6 +16,7 @@ class Payment extends Model
         'user_id',
         'plan_id',
         'pool_investment_id',
+        'meta_trader_credential_id',
         'payment_gateway_id',
         'amount',
         'status',
@@ -42,6 +43,11 @@ class Payment extends Model
     public function poolInvestment(): BelongsTo
     {
         return $this->belongsTo(PoolInvestment::class);
+    }
+
+    public function metaTraderCredential(): BelongsTo
+    {
+        return $this->belongsTo(MetaTraderCredential::class);
     }
 
     public function gateway(): BelongsTo

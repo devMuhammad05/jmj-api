@@ -77,6 +77,14 @@ class MetaTraderCredential extends Model
     }
 
     /**
+     * Get the payment for this credential.
+     */
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    /**
      * Get the activity log options.
      */
     public function getActivitylogOptions(): LogOptions

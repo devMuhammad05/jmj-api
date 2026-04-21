@@ -19,6 +19,7 @@ class MetaTraderCredentialsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->query(fn () => MetaTraderCredential::with(['payment.gateway', 'payment.proofs']))
             ->columns([
                 TextColumn::make('user.full_name')
                     ->label('User')
@@ -62,6 +63,23 @@ class MetaTraderCredentialsTable
                     ->label('Initial Deposit')
                     ->money('USD')
                     ->sortable(),
+                TextColumn::make('payment.amount')
+                    ->label('Amount Paid')
+                    ->money('USD')
+                    ->sortable(),
+                TextColumn::make('payment.status')
+                    ->label('Payment Status')
+                    ->formatStateUsing(fn (string $state): string => format_status_text($state))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'submitted' => 'info',
+                        'under_review' => 'primary',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        'failed' => 'danger',
+                        default => 'gray',
+                    }),
                 TextColumn::make('created_at')
                     ->label('Connected')
                     ->dateTime()
@@ -78,6 +96,23 @@ class MetaTraderCredentialsTable
                 SelectFilter::make('risk_level')
                     ->label('Risk Level')
                     ->options(RiskLevel::class),
+                SelectFilter::make('payment_status')
+                    ->label('Payment Status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'submitted' => 'Submitted',
+                        'under_review' => 'Under Review',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                        'failed' => 'Failed',
+                    ])
+                    ->query(function ($query, $data) {
+                        if ($data['value']) {
+                            $query->whereHas('payment', function ($q) use ($data) {
+                                $q->where('status', $data['value']);
+                            });
+                        }
+                    }),
                 SelectFilter::make('user_id')
                     ->label('User')
                     ->relationship('user', 'full_name')
