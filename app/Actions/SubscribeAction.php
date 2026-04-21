@@ -39,7 +39,7 @@ class SubscribeAction
                 'payment_proof_url' => $request->string('payment_proof')->value(),
             ]);
 
-            $payment->update(['status' => PaymentStatus::Submitted]);
+            $payment->update(['status' => PaymentStatus::Approved]);
 
             $payment->load(['plan', 'gateway', 'proofs', 'user']);
 

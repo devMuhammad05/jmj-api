@@ -33,7 +33,7 @@ class ApprovePaymentActionTest extends TestCase
             'user_id' => $user->id,
             'plan_id' => $plan->id,
             'amount' => $plan->price,
-            'status' => PaymentStatus::Submitted,
+            'status' => PaymentStatus::Approved,
             'reference' => 'REF-001',
         ]);
     }

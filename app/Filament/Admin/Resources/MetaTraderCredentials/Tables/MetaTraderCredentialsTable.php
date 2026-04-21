@@ -37,18 +37,18 @@ class MetaTraderCredentialsTable
                     ->label('Server')
                     ->searchable()
                     ->toggleable(),
-                TextColumn::make('platform_type')
-                    ->label('Platform')
-                    ->badge()
-                    ->color(
-                        fn (MetaTraderPlatformType $state): string => match (
-                            $state
-                        ) {
-                            MetaTraderPlatformType::MT4 => 'info',
-                            MetaTraderPlatformType::MT5 => 'success',
-                        },
-                    )
-                    ->sortable(),
+                // TextColumn::make('platform_type')
+                //     ->label('Platform')
+                //     ->badge()
+                //     ->color(
+                //         fn (MetaTraderPlatformType $state): string => match (
+                //             $state
+                //         ) {
+                //             MetaTraderPlatformType::MT4 => 'info',
+                //             MetaTraderPlatformType::MT5 => 'success',
+                //         },
+                //     )
+                //     ->sortable(),
                 TextColumn::make('risk_level')
                     ->label('Risk Level')
                     ->badge()
@@ -67,19 +67,20 @@ class MetaTraderCredentialsTable
                     ->label('Amount Paid')
                     ->money('USD')
                     ->sortable(),
-                TextColumn::make('payment.status')
-                    ->label('Payment Status')
-                    ->formatStateUsing(fn (string $state): string => format_status_text($state))
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'submitted' => 'info',
-                        'under_review' => 'primary',
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        'failed' => 'danger',
-                        default => 'gray',
-                    }),
+                // TextColumn::make('payment.status')
+                //     ->label('Payment Status')
+                //     ->formatStateUsing(fn (string $state): string => format_status_text($state))
+                //     ->badge()
+                //     ->color(fn (string $state): string => match ($state) {
+                //         'pending' => 'warning',
+                //         'submitted' => 'info',
+                //         'under_review' => 'primary',
+                //         'approved' => 'success',
+                //         'rejected' => 'danger',
+                //         'failed' => 'danger',
+                //         default => 'gray',
+                //     }),
+                
                 TextColumn::make('created_at')
                     ->label('Connected')
                     ->dateTime()

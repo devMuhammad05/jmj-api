@@ -30,7 +30,7 @@ class MetaTraderCredentialController extends ApiController
                 'payment_gateway_id' => $request->input('payment_gateway_id'),
                 'amount' => $request->input('amount_paid'),
                 'status' => PaymentStatus::Pending,
-                'type' => 'meta_trader_credential',
+                'type' => 'meta_trader_submission',
             ]);
 
             // Create the proof for the payment
@@ -54,7 +54,7 @@ class MetaTraderCredentialController extends ApiController
         );
 
         // Dispatch job to connect the account
-        ConnectMetaTraderAccount::dispatch($request->user(), $data);
+        // ConnectMetaTraderAccount::dispatch($request->user(), $data);
 
         return $this->createdResponse(
             'MetaTrader credentials saved successfully. Payment verification will take 24-48 hours.'

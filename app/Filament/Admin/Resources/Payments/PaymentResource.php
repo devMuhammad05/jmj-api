@@ -22,6 +22,11 @@ class PaymentResource extends Resource
 
     protected static ?string $navigationLabel = 'Payments';
 
+    public static function getNavigationTooltip(): ?string
+    {
+        return 'Pending payments';
+    }
+
     protected static ?string $modelLabel = 'Payment';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Subscriptions';
@@ -33,9 +38,13 @@ class PaymentResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::whereIn('status', [
-            PaymentStatus::Submitted,
-            PaymentStatus::UnderReview,
+            PaymentStatus::Pending,
         ])->count() ?: null;
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Pending payments';
     }
 
     public static function getNavigationBadgeColor(): ?string

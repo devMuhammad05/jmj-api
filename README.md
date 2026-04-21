@@ -525,6 +525,10 @@ Link an investor's MT4/MT5 broker account to the platform. This allows traders t
 | `platform_type`     | string  | ✓        | `mt4` or `mt5`                           |
 | `initial_deposit`   | numeric | ✓        | Initial deposit amount, min `0`          |
 | `risk_level`        | string  | ✓        | `conservative`, `moderate`               |
+ `amount_paid`          | numeric | ✓        | Total amount paid (including fees)        |
+| `payment_gateway_id`   | integer | ✓        | ID of the payment gateway used            |
+| `payment_proof_url`    | URL     | ✓        | URL to payment 
+
 
 **Response:**
 

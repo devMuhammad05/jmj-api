@@ -25,11 +25,11 @@ class PaymentForm
                         ->dehydrated(false)
                         ->afterStateHydrated(fn ($component, $record) => $component->state($record?->user?->full_name)),
 
-                    TextInput::make('plan_name')
-                        ->label('Plan')
+                    TextInput::make('type')
+                        ->label('Payment Type')
                         ->disabled()
                         ->dehydrated(false)
-                        ->afterStateHydrated(fn ($component, $record) => $component->state($record?->plan?->name)),
+                        ->afterStateHydrated(fn ($component, $record) => $component->state($record?->type ? format_status_text($record->type) : null)),
 
                     TextInput::make('gateway_name')
                         ->label('Gateway')
@@ -52,6 +52,26 @@ class PaymentForm
                 ->columns(2)
                 ->columnSpan(1),
 
+            Section::make('Payment Proof')
+                ->description('Proof of payment submitted by the user.')
+                ->icon('heroicon-o-photo')
+                ->schema([
+                    Placeholder::make('payment proof')
+                        ->label('')
+                        ->content(fn ($record): HtmlString|string => $record?->proofs->isNotEmpty()
+                            ? new HtmlString(
+                                $record->proofs->map(fn ($proof): string => sprintf(
+                                    '<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="Payment Proof" style="max-width: 400px; max-height: 700px; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: block;"></a>',
+                                    e($proof->payment_proof_url),
+                                    e($proof->payment_proof_url),
+                                ))->join('<br>')
+                            )
+                            : 'No proofs submitted.'
+                        )
+                        ->columnSpanFull(),
+                ])
+                ->columnSpan(1),
+
             Section::make('Admin Review')
                 ->description('Update the payment status.')
                 ->icon('heroicon-o-shield-check')
@@ -61,28 +81,7 @@ class PaymentForm
                         ->required()
                         ->native(false),
                 ])
-                ->columns(1)
-                ->columnSpan(1),
-
-            Section::make('Payment Proofs')
-                ->description('Proof of payment submitted by the user.')
-                ->icon('heroicon-o-photo')
-                ->schema([
-                    Placeholder::make('proof_urls')
-                        ->label('')
-                        ->content(fn ($record): HtmlString|string => $record?->proofs->isNotEmpty()
-                            ? new HtmlString(
-                                $record->proofs->map(fn ($proof): string => sprintf(
-                                    '<a href="%s" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:underline break-all">%s</a>',
-                                    e($proof->payment_proof_url),
-                                    e($proof->payment_proof_url),
-                                ))->join('<br><br>')
-                            )
-                            : 'No proofs submitted.'
-                        )
-                        ->columnSpanFull(),
-                ])
-                ->columnSpanFull(),
+                ->columnSpanFull()
         ]);
     }
 }

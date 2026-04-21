@@ -24,10 +24,10 @@ class PaymentsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('plan.name')
-                    ->label('Plan')
-                    ->searchable()
-                    ->sortable(),
+                // TextColumn::make('plan.name')
+                //     ->label('Plan')
+                //     ->searchable()
+                //     ->sortable(),
 
                 TextColumn::make('gateway.name')
                     ->label('Gateway')
@@ -56,8 +56,6 @@ class PaymentsTable
                     ->badge()
                     ->color(fn (PaymentStatus $state): string => match ($state) {
                         PaymentStatus::Pending => 'gray',
-                        PaymentStatus::Submitted => 'info',
-                        PaymentStatus::UnderReview => 'warning',
                         PaymentStatus::Approved => 'success',
                         PaymentStatus::Rejected => 'danger',
                         PaymentStatus::Failed => 'danger',
