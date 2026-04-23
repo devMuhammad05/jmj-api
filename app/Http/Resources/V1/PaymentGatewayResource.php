@@ -19,6 +19,9 @@ class PaymentGatewayResource extends JsonResource
             'bar_code_url' => $this->bar_code_path
                 ? Storage::disk('public')->url($this->bar_code_path)
                 : null,
+            'bank_name' => $this->bank_name,
+            'account_name' => $this->account_name,
+            'account_number' => $this->account_number,
             'config' => $this->config,
         ];
     }

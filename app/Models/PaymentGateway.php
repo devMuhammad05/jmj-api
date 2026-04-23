@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentGateway extends Model
 {
-    protected $fillable = ['name', 'code', 'is_active', 'config', 'wallet_address', 'network', 'bar_code_path'];
+    protected $fillable = ['name', 'code', 'is_active', 'config', 'wallet_address', 'network', 'bar_code_path', 'bank_name', 'account_name', 'account_number'];
 
     protected $casts = [
         'is_active' => 'boolean',

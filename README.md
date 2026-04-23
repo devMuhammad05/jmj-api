@@ -1297,15 +1297,45 @@ Returns all active payment gateways (bank accounts, wallets, etc.) the user can 
       "id": 1,
       "name": "Bank Transfer",
       "code": "bank_transfer",
-      "details": {
-        "bank_name": "GTBank",
-        "account_number": "0123456789",
-        "account_name": "JMJ Trading Ltd"
-      }
+      "wallet_address": null,
+      "network": null,
+      "bar_code_url": null,
+      "bank_name": "Access Bank Nigeria",
+      "account_name": "JMJ Investments Ltd",
+      "account_number": "1234567890",
+      "config": {}
+    },
+    {
+      "id": 2,
+      "name": "USDT TRC20",
+      "code": "usdt_trc20",
+      "wallet_address": "TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE",
+      "network": "TRC20",
+      "bar_code_url": "http://localhost:8000/storage/img/payment-gateway/qr-code.png",
+      "bank_name": null,
+      "account_name": null,
+      "account_number": null,
+      "config": {}
     }
   ]
 }
 ```
+
+**Gateway Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique payment gateway identifier |
+| `name` | string | Human-readable gateway name (e.g., "Bank Transfer", "USDT TRC20") |
+| `code` | string | Unique code identifier used in API requests (e.g., "bank_transfer") |
+| `payment_type` | string | Type of payment: `crypto` or `bank` |
+| `wallet_address` | string\|null | Cryptocurrency wallet address for crypto gateways |
+| `network` | string\|null | Blockchain network (TRC20, ERC20, BEP20, BTC, SOL) |
+| `bar_code_url` | string\|null | URL to QR code image for crypto payments |
+| `bank_name` | string\|null | Bank name for bank transfer gateways |
+| `account_name` | string\|null | Account holder name for bank transfers |
+| `account_number` | string\|null | Bank account number |
+| `config` | object | Additional configuration data |
 
 ---
 
