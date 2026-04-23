@@ -79,6 +79,7 @@ class DatabaseSeeder extends Seeder
             TradingClassSeeder::class,
             PlanSeeder::class,
             PaymentGatewaySeeder::class,
+            RateSeeder::class,
         ]);
     }
 }
