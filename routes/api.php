@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\PlanController;
 use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\PoolInvestmentController;
 use App\Http\Controllers\Api\V1\ProfitDistributionController;
+use App\Http\Controllers\Api\V1\RateController;
 use App\Http\Controllers\Api\V1\SignalController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\TradingClassController;
@@ -60,6 +61,10 @@ Route::prefix('v1')->group(function (): void {
     // Plans (public)
     Route::get('/plans', [PlanController::class, 'index']);
 
+    // Rates (public)
+    Route::get('/rates', [RateController::class, 'index']);
+    Route::get('/rates/{key}', [RateController::class, 'show']);
+
     // Public Signal Routes (no authentication required)
     Route::prefix('signals')->group(function (): void {
         Route::get('/', [SignalController::class, 'index']);
@@ -68,9 +73,10 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/{signal}', [SignalController::class, 'show']);
     });
 
-    Route::get('/client-portfolio', [ClientPortfolioController::class, 'index']);
-
     Route::middleware(['auth:sanctum', 'verified.email'])->group(function (): void {
+        // Client Portfolio Route
+        Route::get('/client-portfolio', [ClientPortfolioController::class, 'index']);
+
         // Trading Class Routes (Learning Hub)
         Route::prefix('trading-classes')->group(function (): void {
             Route::get('/', [TradingClassController::class, 'index']);

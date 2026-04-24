@@ -40,6 +40,8 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | POST   | `/auth/pin/change`            | 🔒   | Change existing security PIN       |
 | POST   | `/auth/pin/reset`             | 🔒   | Reset PIN using account password   |
 | GET    | `/plans`                      | No   | List all active plans grouped by type      |
+| GET    | `/rates`                      | No   | List all exchange rates            |
+| GET    | `/rates/{key}`                | No   | Get specific rate by key           |
 | GET    | `/signals`                    | No   | Get signals (filtered by subscription tier) |
 | GET    | `/signals/active`             | No   | Get active signals (filtered by subscription tier) |
 | GET    | `/signals/statistics`         | No   | Get signal performance statistics  |
@@ -527,7 +529,7 @@ Link an investor's MT4/MT5 broker account to the platform. This allows traders t
 | `risk_level`        | string  | ✓        | `conservative`, `moderate`               |
  `amount_paid`          | numeric | ✓        | Total amount paid (including fees)        |
 | `payment_gateway_id`   | integer | ✓        | ID of the payment gateway used            |
-| `payment_proof_url`    | URL     | ✓        | URL to payment 
+| `payment_proof_url`    | URL     | ✓        | URL to payment
 
 
 **Response:**
@@ -716,7 +718,83 @@ Returns all active plans grouped by type. Pass an optional `type` query paramete
 
 ---
 
-### 7. Trading Signals — `/signals`
+### 7. Rates — `/rates`
+
+> ℹ️ Rate routes are **public** — no authentication required.
+
+#### 7.1 List All Rates
+
+`GET /api/v1/rates`
+
+Returns all available exchange rates.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Rates retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "key": "dollar",
+      "value": 1650.00,
+      "updated_at": "2026-04-24T22:16:55.000000Z"
+    }
+  ]
+}
+```
+
+**Error Response (500):**
+
+```json
+{
+  "status": "error",
+  "message": "Error message",
+  "data": null
+}
+```
+
+#### 7.2 Get Specific Rate by Key
+
+`GET /api/v1/rates/{key}`
+
+Retrieve a specific rate by its key identifier.
+
+**URL Parameters:**
+
+| Parameter | Type   | Required | Description           |
+|-----------|--------|----------|-----------------------|
+| `key`     | string | ✓        | The rate key (e.g., `dollar`, `euro`) |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Rate retrieved successfully",
+  "data": {
+    "id": 1,
+    "key": "dollar",
+    "value": 1650.00,
+    "updated_at": "2026-04-24T22:16:55.000000Z"
+  }
+}
+```
+
+**Error Response (404):**
+
+```json
+{
+  "status": "error",
+  "message": "Rate not found",
+  "data": null
+}
+```
+
+---
+
+### 8. Trading Signals — `/signals`
 
 > ℹ️ Signal routes are **public** — no authentication required.
 > Content is filtered by subscription tier:
@@ -920,7 +998,7 @@ Retrieve details of a specific signal by ID.
 
 ---
 
-### 8. Pool Funding — `/pools`, `/pool-investments`, `/profit-distributions`
+### 9. Pool Funding — `/pools`, `/pool-investments`, `/profit-distributions`
 
 > 🔒 All routes require authentication.
 > ℹ️ **No KYC Required**: Users do NOT need to complete KYC verification to invest in pools.
@@ -1208,7 +1286,7 @@ Retrieve detailed information about a specific profit distribution. Users can on
 
 ---
 
-### 9. Trading Classes (Learning Hub) — `/trading-classes`
+### 10. Trading Classes (Learning Hub) — `/trading-classes`
 
 > 🔒 All routes require authentication.
 > Content is filtered by subscription tier:
@@ -1278,7 +1356,7 @@ Retrieve detailed information about a specific trading class.
 
 - 404: Class not found or is not published.
 
-### 10. Payments & Subscriptions
+### 11. Payments & Subscriptions
 
 #### 7.1 List Payment Gateways
 
@@ -1460,7 +1538,7 @@ Returns a paginated list of all the user's subscriptions, newest first. Each rec
 
 ---
 
-### 11. Notifications — `/notifications`
+### 12. Notifications — `/notifications`
 
 > 🔒 All routes require authentication.
 

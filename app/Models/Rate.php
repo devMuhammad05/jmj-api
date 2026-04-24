@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rate extends Model
 {
+    protected $fillable = [
+        'key',
+        'value',
+    ];
+
     protected $casts = [
         'value' => 'decimal:2',
     ];
 
-    
     /**
      * Retrieve a rate value by key.
      */

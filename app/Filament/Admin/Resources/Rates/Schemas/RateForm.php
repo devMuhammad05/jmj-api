@@ -2,8 +2,8 @@
 
 namespace App\Filament\Admin\Resources\Rates\Schemas;
 
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
 
 class RateForm
 {
@@ -11,24 +11,17 @@ class RateForm
     {
         return $schema
             ->components([
-                TextColumn::make('key')
+                TextInput::make('key')
                     ->label('Rate Key')
-                    ->searchable()
-                    ->sortable()
-                    ->badge()
-                    ->color('gray'),
+                    ->required()
+                    ->maxLength(255)
+                    ->unique('rates', 'key', ignoreRecord: true),
 
-                TextColumn::make('value')
+                TextInput::make('value')
                     ->label('Value (₦)')
-                    ->numeric(decimalPlaces: 2)
-                    ->sortable()
-                    ->money('NGN'),
-
-                TextColumn::make('updated_at')
-                    ->label('Last Updated')
-                    ->dateTime('M d, Y H:i')
-                    ->sortable()
-                    ->color('gray'),
+                    ->numeric()
+                    ->required()
+                    ->step(0.01),
             ]);
     }
 }
