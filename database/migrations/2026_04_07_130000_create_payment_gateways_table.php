@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('code')->unique();
             $table->boolean('is_active')->default(true);
+            $table->string('payment_type')->nullable();
             $table->json('config')->nullable();
             $table->timestamps();
         });
