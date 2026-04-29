@@ -1406,7 +1406,6 @@ Returns all active payment gateways (bank accounts, wallets, etc.) the user can 
 | `id` | integer | Unique payment gateway identifier |
 | `name` | string | Human-readable gateway name (e.g., "Bank Transfer", "USDT TRC20") |
 | `code` | string | Unique code identifier used in API requests (e.g., "bank_transfer") |
-| `payment_type` | string | Type of payment: `crypto` or `bank` |
 | `wallet_address` | string\|null | Cryptocurrency wallet address for crypto gateways |
 | `network` | string\|null | Blockchain network (TRC20, ERC20, BEP20, BTC, SOL) |
 | `bar_code_url` | string\|null | URL to QR code image for crypto payments |
