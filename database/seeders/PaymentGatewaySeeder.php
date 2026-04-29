@@ -51,5 +51,16 @@ class PaymentGatewaySeeder extends Seeder
                 'is_active' => true,
             ],
         );
+
+        PaymentGateway::updateOrCreate(
+            ['code' => 'bank_transfer'],
+            [
+                'name' => 'Bank Transfer',
+                'account_name' => 'JMJ Trading Academy',
+                'account_number' => '1234567890',
+                'bank_name' => 'First Bank Nigeria',
+                'is_active' => true,
+            ],
+        );
     }
 }
