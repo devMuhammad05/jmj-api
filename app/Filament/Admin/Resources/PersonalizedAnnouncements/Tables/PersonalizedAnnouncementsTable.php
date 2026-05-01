@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Announcements\Tables;
+namespace App\Filament\Admin\Resources\PersonalizedAnnouncements\Tables;
 
-use App\Enums\AnnouncementTarget;
-use App\Jobs\SendAnnouncementJob;
-use App\Models\Announcement;
+use App\Jobs\SendPersonalizedAnnouncementJob;
+use App\Models\PersonalizedAnnouncement;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-class AnnouncementsTable
+class PersonalizedAnnouncementsTable
 {
     public static function configure(Table $table): Table
     {
@@ -25,15 +23,12 @@ class AnnouncementsTable
                     ->sortable()
                     ->weight('bold'),
 
-                TextColumn::make('target_audience')
+                TextColumn::make('users_count')
+                    ->label('Recipients')
+                    ->counts('users')
                     ->badge()
-                    ->color(
-                        fn (AnnouncementTarget $state): string => match ($state) {
-                            AnnouncementTarget::All => 'info',
-                            AnnouncementTarget::Subscribers => 'success',
-                        }
-                    )
-                    ->sortable(),
+                    ->color('primary')
+                    ->suffix(' users'),
 
                 TextColumn::make('sent_at')
                     ->label('Status')
@@ -47,25 +42,21 @@ class AnnouncementsTable
                     ->sortable()
                     ->toggleable(),
             ])
-            ->filters([
-                SelectFilter::make('target_audience')
-                    ->options(AnnouncementTarget::class),
-            ])
             ->recordActions([
                 Action::make('send')
                     ->label('Send')
                     ->icon('heroicon-o-paper-airplane')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->modalHeading('Send Announcement')
-                    ->modalDescription('This will immediately notify the target audience. This action cannot be undone.')
-                    ->disabled(fn (Announcement $record): bool => $record->isSent())
-                    ->action(function (Announcement $record): void {
-                        SendAnnouncementJob::dispatch($record);
+                    ->modalHeading('Send Personalized Announcement')
+                    ->modalDescription('This will immediately notify the selected recipients. This action cannot be undone.')
+                    ->disabled(fn (PersonalizedAnnouncement $record): bool => $record->isSent())
+                    ->action(function (PersonalizedAnnouncement $record): void {
+                        SendPersonalizedAnnouncementJob::dispatch($record);
 
                         Notification::make()
                             ->title('Announcement queued')
-                            ->body('The announcement is being sent to the target audience.')
+                            ->body('The announcement is being sent to the selected recipients.')
                             ->success()
                             ->send();
                     }),

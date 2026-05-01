@@ -43,14 +43,6 @@ class SendAnnouncementJob implements ShouldQueue
                 ->distinct()
                 ->get(),
 
-            AnnouncementTarget::Plan => User::query()
-                ->join('subscriptions', 'subscriptions.user_id', '=', 'users.id')
-                ->where('subscriptions.is_active', true)
-                ->where('subscriptions.ends_at', '>', now())
-                ->where('subscriptions.plan_id', $this->announcement->plan_id)
-                ->select('users.*')
-                ->distinct()
-                ->get(),
         };
     }
 }

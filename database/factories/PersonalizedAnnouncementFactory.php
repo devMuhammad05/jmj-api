@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Enums\AnnouncementTarget;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Announcement>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PersonalizedAnnouncement>
  */
-class AnnouncementFactory extends Factory
+class PersonalizedAnnouncementFactory extends Factory
 {
     /**
      * @return array<string, mixed>
@@ -18,7 +17,6 @@ class AnnouncementFactory extends Factory
         return [
             'title' => fake()->sentence(4),
             'message' => fake()->paragraph(),
-            'target_audience' => fake()->randomElement(AnnouncementTarget::cases()),
             'sent_at' => null,
         ];
     }

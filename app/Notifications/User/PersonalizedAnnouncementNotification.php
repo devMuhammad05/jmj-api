@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Notifications\User;
+
+use App\Models\PersonalizedAnnouncement;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
+
+class PersonalizedAnnouncementNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function __construct(public PersonalizedAnnouncement $announcement) {}
+
+    /**
+     * @return array<int, string>
+     */
+    public function via(object $notifiable): array
+    {
+        return ['database', 'broadcast'];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'type' => 'announcement',
+            'title' => $this->announcement->title,
+            'message' => $this->announcement->message,
+            'announcement_id' => $this->announcement->id,
+        ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toArray($notifiable));
+    }
+
+    public function broadcastOn(): array
+    {
+        return [new Channel('announcements')];
+    }
+}

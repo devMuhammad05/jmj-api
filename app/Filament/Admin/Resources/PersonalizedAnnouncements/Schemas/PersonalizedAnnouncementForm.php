@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Announcements\Schemas;
+namespace App\Filament\Admin\Resources\PersonalizedAnnouncements\Schemas;
 
-use App\Enums\AnnouncementTarget;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
-class AnnouncementForm
+class PersonalizedAnnouncementForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -22,27 +21,31 @@ class AnnouncementForm
                         TextInput::make('title')
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('e.g. Platform Maintenance Scheduled')
+                            ->placeholder('e.g. Special offer for you')
                             ->columnSpanFull(),
 
                         Textarea::make('message')
                             ->required()
                             ->rows(5)
-                            ->placeholder('Write your announcement here…')
+                            ->placeholder('Write your message here…')
                             ->columnSpanFull(),
                     ])
                     ->disabled(fn ($record) => $record !== null && $record->isSent())
                     ->collapsible(),
 
-                Section::make('Audience')
-                    ->description('Choose who will receive this announcement.')
-                    ->icon('heroicon-o-users')
+                Section::make('Recipients')
+                    ->description('Select the specific users who will receive this announcement.')
+                    ->icon('heroicon-o-user-group')
                     ->schema([
-                        Select::make('target_audience')
-                            ->label('Target Audience')
-                            ->options(AnnouncementTarget::class)
+                        Select::make('users')
+                            ->label('Select Users')
+                            ->relationship('users', 'full_name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->full_name} ({$record->email})")
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
                             ->required()
-                            ->default(AnnouncementTarget::All),
+                            ->columnSpanFull(),
                     ])
                     ->disabled(fn ($record) => $record !== null && $record->isSent())
                     ->collapsible(),

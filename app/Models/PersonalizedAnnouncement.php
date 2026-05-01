@@ -2,21 +2,25 @@
 
 namespace App\Models;
 
-use App\Enums\AnnouncementTarget;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Announcement extends Model
+class PersonalizedAnnouncement extends Model
 {
-    /** @use HasFactory<\Database\Factories\AnnouncementFactory> */
+    /** @use HasFactory<\Database\Factories\PersonalizedAnnouncementFactory> */
     use HasFactory;
 
     protected function casts(): array
     {
         return [
-            'target_audience' => AnnouncementTarget::class,
             'sent_at' => 'datetime',
         ];
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
     }
 
     public function isSent(): bool
