@@ -32,12 +32,12 @@ class SubscriptionResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('is_active', true)->count() ?: null;
+        return static::getModel()::whereNull('starts_at')->where('is_active', false)->count() ?: null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'success';
+        return 'warning';
     }
 
     public static function form(Schema $schema): Schema

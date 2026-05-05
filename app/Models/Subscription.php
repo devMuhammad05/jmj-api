@@ -42,6 +42,10 @@ class Subscription extends Model
 
     public function getStatusAttribute(): SubscriptionStatus
     {
+        if ($this->starts_at === null || $this->ends_at === null) {
+            return SubscriptionStatus::Pending;
+        }
+
         if ($this->ends_at->isPast()) {
             return SubscriptionStatus::Expired;
         }
@@ -55,7 +59,7 @@ class Subscription extends Model
 
     public function isExpired(): bool
     {
-        return $this->ends_at->isPast();
+        return $this->ends_at !== null && $this->ends_at->isPast();
     }
 
     public function payment(): BelongsTo

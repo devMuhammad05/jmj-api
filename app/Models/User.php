@@ -179,6 +179,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     {
         return $this->hasOne(Subscription::class)
             ->where('is_active', true)
+            ->whereNotNull('ends_at')
             ->where('ends_at', '>', now())
             ->latestOfMany('starts_at');
     }
@@ -190,6 +191,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     {
         return $this->subscriptions()
             ->where('is_active', true)
+            ->whereNotNull('ends_at')
             ->where('ends_at', '>', now())
             ->whereHas('plan', fn ($q) => $q->where('type', $type))
             ->latest('starts_at')

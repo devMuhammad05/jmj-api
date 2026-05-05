@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\DTOs\MetaTraderData;
+use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
+use App\Enums\Role;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreMetaTraderCredentialRequest;
-use App\Jobs\ConnectMetaTraderAccount;
 use App\Models\Payment;
-use App\Models\PaymentProof;
+use App\Models\User;
+use App\Notifications\Admin\NewPaymentSubmittedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class MetaTraderCredentialController extends ApiController
 {
@@ -22,40 +24,36 @@ class MetaTraderCredentialController extends ApiController
      */
     public function store(StoreMetaTraderCredentialRequest $request): JsonResponse
     {
-        $data = MetaTraderData::fromRequest($request);
+        DB::transaction(function () use ($request) {
+            $user = $request->user();
 
-        $payment = DB::transaction(function () use ($request) {
-            // Create a Payment record for this credential submission
+            $credential = $user->metaTraderCredentials()->create([
+                'mt_account_number' => $request->input('mt_account_number'),
+                'mt_password' => $request->input('mt_password'),
+                'mt_server' => $request->input('mt_server'),
+                'initial_deposit' => $request->input('initial_deposit'),
+                'risk_level' => $request->input('risk_level'),
+                'status' => MetaTraderCredentialConnectionStatus::Pending,
+            ]);
+
             $payment = Payment::create([
-                'user_id' => $request->user()->id,
+                'user_id' => $user->id,
+                'meta_trader_credential_id' => $credential->id,
                 'payment_gateway_id' => $request->input('payment_gateway_id'),
                 'amount' => $request->input('amount_paid'),
                 'type' => PaymentType::MetaCredential,
                 'status' => PaymentStatus::Pending,
             ]);
 
-            // Create the proof for the payment
-            PaymentProof::create([
-                'payment_id' => $payment->id,
+            $payment->proofs()->create([
                 'payment_proof_url' => $request->input('payment_proof_url'),
             ]);
 
-            return $payment;
+            $payment->load(['user', 'gateway', 'proofs']);
+
+            $admins = User::query()->where('role', Role::Admin)->get();
+            Notification::send($admins, new NewPaymentSubmittedNotification($payment));
         });
-
-        // Update data with payment ID
-        $data = new MetaTraderData(
-            mt_account_number: $data->mt_account_number,
-            mt_password: $data->mt_password,
-            mt_server: $data->mt_server,
-            initial_deposit: $data->initial_deposit,
-            risk_level: $data->risk_level,
-            pool_id: $data->pool_id,
-            payment_id: $payment->id,
-        );
-
-        // Dispatch job to connect the account
-        // ConnectMetaTraderAccount::dispatch($request->user(), $data);
 
         return $this->createdResponse(
             'MetaTrader credentials saved successfully. Payment verification will take 24-48 hours.'

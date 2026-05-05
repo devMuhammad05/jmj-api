@@ -11,9 +11,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 
 class MetaTraderCredentialsTable
 {
@@ -173,6 +175,25 @@ class MetaTraderCredentialsTable
                             ->info()
                             ->send();
                     }),
+                Action::make('view_payment')
+                    ->label('View Payment')
+                    ->icon(Heroicon::OutlinedPhoto)
+                    ->color('info')
+                    ->modalHeading('Payment Proof')
+                    ->modalContent(fn (MetaTraderCredential $record): HtmlString => $record->payment?->proofs?->isNotEmpty()
+                        ? new HtmlString(
+                            $record->payment->proofs->map(fn ($proof): string => sprintf(
+                                '<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="Payment Proof" style="max-width: 100%%; max-height: 700px; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: block;"></a>',
+                                e($proof->payment_proof_url),
+                                e($proof->payment_proof_url),
+                            ))->join('')
+                        )
+                        : new HtmlString('<p class="text-sm text-gray-500">No proof submitted for this payment.</p>')
+                    )
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->visible(fn (MetaTraderCredential $record): bool => $record->payment !== null),
+
                 // EditAction::make(),
             ])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])

@@ -26,4 +26,13 @@ class SubscriptionFactory extends Factory
             'is_active' => true,
         ];
     }
+
+    public function pending(): static
+    {
+        return $this->state([
+            'starts_at' => null,
+            'ends_at' => null,
+            'is_active' => false,
+        ]);
+    }
 }

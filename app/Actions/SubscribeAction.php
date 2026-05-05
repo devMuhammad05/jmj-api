@@ -41,6 +41,14 @@ class SubscribeAction
                 'payment_proof_url' => $request->string('payment_proof')->value(),
             ]);
 
+            $user->subscriptions()->create([
+                'plan_id' => $plan->id,
+                'payment_id' => $payment->id,
+                'starts_at' => null,
+                'ends_at' => null,
+                'is_active' => false,
+            ]);
+
             $payment->load(['plan', 'gateway', 'proofs', 'user']);
 
             $admins = User::query()->where('role', Role::Admin)->get();

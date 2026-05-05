@@ -2,9 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Subscriptions\Schemas;
 
+use App\Enums\SubscriptionStatus;
 use App\Models\Plan;
-use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
@@ -45,16 +46,19 @@ class SubscriptionForm
 
                     DateTimePicker::make('starts_at')
                         ->label('Starts At')
-                        ->required()
-                        ->default(now()),
+                        ->nullable(),
 
                     DateTimePicker::make('ends_at')
                         ->label('Ends At')
-                        ->required(),
+                        ->nullable(),
+
+                    Placeholder::make('status_display')
+                        ->label('Status')
+                        ->content(fn ($record): string => $record?->status instanceof SubscriptionStatus ? $record->status->label() : 'N/A'),
 
                     Toggle::make('is_active')
                         ->label('Active')
-                        ->default(true)
+                        ->default(false)
                         ->columnSpanFull(),
                 ])
                 ->columns(2)

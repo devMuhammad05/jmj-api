@@ -33,6 +33,19 @@ class SubscriptionController extends ApiController
             );
         }
 
+        $hasPending = $user->subscriptions()
+            ->whereNull('starts_at')
+            ->where('is_active', false)
+            ->whereHas('plan', fn ($q) => $q->where('type', $plan->type))
+            ->exists();
+
+        if ($hasPending) {
+            return $this->errorResponse(
+                "You already have a pending {$plan->type->label()} subscription awaiting approval.",
+                \Symfony\Component\HttpFoundation\Response::HTTP_CONFLICT,
+            );
+        }
+
         $payment = $this->subscribeAction->execute($user, $request);
 
         return $this->createdResponse(

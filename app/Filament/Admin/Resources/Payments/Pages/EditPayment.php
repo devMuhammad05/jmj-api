@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Payments\Pages;
 
 use App\Actions\ApprovePaymentAction;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Filament\Admin\Resources\Payments\PaymentResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -24,9 +25,8 @@ class EditPayment extends EditRecord
                 ->requiresConfirmation()
                 ->modalHeading('Approve Payment')
                 ->modalDescription('This will approve the payment and create an active subscription for the user. Are you sure?')
-                ->visible(fn (): bool => in_array($this->record->status, [
-                    PaymentStatus::Pending,
-                ]))
+                ->visible(fn (): bool => in_array($this->record->status, [PaymentStatus::Pending])
+                    && $this->record->type !== PaymentType::ClassSubscription)
                 ->action(function (): void {
                     try {
                         app(ApprovePaymentAction::class)->execute($this->record);
@@ -54,9 +54,8 @@ class EditPayment extends EditRecord
                 ->requiresConfirmation()
                 ->modalHeading('Reject Payment')
                 ->modalDescription('This will reject the payment. No subscription will be created. Are you sure?')
-                ->visible(fn (): bool => in_array($this->record->status, [
-                    PaymentStatus::Pending,
-                ]))
+                ->visible(fn (): bool => in_array($this->record->status, [PaymentStatus::Pending])
+                    && $this->record->type !== PaymentType::ClassSubscription)
                 ->action(function (): void {
                     try {
                         $this->record->update(['status' => PaymentStatus::Rejected]);
