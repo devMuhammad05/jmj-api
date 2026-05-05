@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\PaymentType;
+use App\Enums\GatewayType;
 use App\Models\PaymentGateway;
 use Illuminate\Database\Seeder;
 
@@ -17,7 +17,7 @@ class PaymentGatewaySeeder extends Seeder
                 'wallet_address' => 'TRthwAMM8oaWzHnbUw1zaXgVeXaonhmQq9',
                 'network' => 'TRC20',
                 'bar_code_path' => 'img/payment-gateway/usdt_qr_code.jpg',
-                'payment_type' => PaymentType::CRYPTO,
+                'payment_type' => GatewayType::CRYPTO,
                 'is_active' => true,
             ],
         );
@@ -28,7 +28,7 @@ class PaymentGatewaySeeder extends Seeder
                 'name' => 'USDT ERC20',
                 'wallet_address' => '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
                 'network' => 'ERC20',
-                'payment_type' => PaymentType::CRYPTO,
+                'payment_type' => GatewayType::CRYPTO,
                 'is_active' => true,
             ],
         );
@@ -40,7 +40,7 @@ class PaymentGatewaySeeder extends Seeder
                 'wallet_address' => 'bc1qup697nu0r7y5rgh3qqd08k96xyjfjslvusk5qf',
                 'network' => 'BTC',
                 'bar_code_path' => 'img/payment-gateway/btc_qr_code.jpg',
-                  'payment_type' => PaymentType::CRYPTO,
+                'payment_type' => GatewayType::CRYPTO,
                 'is_active' => true,
             ],
         );
@@ -52,7 +52,7 @@ class PaymentGatewaySeeder extends Seeder
                 'wallet_address' => 'j64gBCpMHsTuDhVc8SKvWUk4jgABuo11DLCRzggK8cv',
                 'network' => 'SOL',
                 'bar_code_path' => 'img/payment-gateway/sol_qr_code.jpg',
-                  'payment_type' => PaymentType::CRYPTO,
+                'payment_type' => GatewayType::CRYPTO,
                 'is_active' => true,
             ],
         );
@@ -64,7 +64,7 @@ class PaymentGatewaySeeder extends Seeder
                 'account_name' => 'JMJ Trading Academy',
                 'account_number' => '1234567890',
                 'bank_name' => 'First Bank Nigeria',
-                'payment_type' => PaymentType::BANK_TRANSFER,
+                'payment_type' => GatewayType::BANK_TRANSFER,
                 'is_active' => true,
             ],
         );

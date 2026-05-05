@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Observers\PaymentObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,7 @@ class Payment extends Model
 
     protected $casts = [
         'status' => PaymentStatus::class,
+        'type' => PaymentType::class,
         'amount' => 'decimal:2',
     ];
 

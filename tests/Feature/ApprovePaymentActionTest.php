@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Actions\ApprovePaymentAction;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Models\Payment;
 use App\Models\Plan;
 use App\Models\Subscription;
@@ -33,6 +34,7 @@ class ApprovePaymentActionTest extends TestCase
             'user_id' => $user->id,
             'plan_id' => $plan->id,
             'amount' => $plan->price,
+            'type' => PaymentType::ClassSubscription,
             'status' => PaymentStatus::Approved,
             'reference' => 'REF-001',
         ]);

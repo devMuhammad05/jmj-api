@@ -6,6 +6,7 @@ namespace App\Actions;
 
 use App\DTOs\PoolInvestmentData;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Enums\PoolInvestmentStatus;
 use App\Models\MetaTraderCredential;
 use App\Models\Payment;
@@ -39,8 +40,8 @@ class CreatePoolInvestmentAction
                 'pool_investment_id' => $investment->id,
                 'payment_gateway_id' => $data->payment_gateway_id,
                 'amount' => $data->amount_paid,
+                'type' => PaymentType::PoolInvestment,
                 'status' => PaymentStatus::Pending,
-                'type' => 'pool_investment',
             ]);
 
             // Create the proof for the payment

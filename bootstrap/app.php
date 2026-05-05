@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'pin' => \App\Http\Middleware\RequirePin::class,
             'verified.email' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'verified.kyc' => \App\Http\Middleware\EnsureKycVerified::class,
             'subscribed' => \App\Http\Middleware\EnsureActiveSubscription::class,
         ]);
     })

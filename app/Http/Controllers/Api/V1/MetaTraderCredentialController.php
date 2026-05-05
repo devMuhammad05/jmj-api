@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\DTOs\MetaTraderData;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreMetaTraderCredentialRequest;
 use App\Jobs\ConnectMetaTraderAccount;
@@ -29,8 +30,8 @@ class MetaTraderCredentialController extends ApiController
                 'user_id' => $request->user()->id,
                 'payment_gateway_id' => $request->input('payment_gateway_id'),
                 'amount' => $request->input('amount_paid'),
+                'type' => PaymentType::MetaCredential,
                 'status' => PaymentStatus::Pending,
-                'type' => 'meta_trader_submission',
             ]);
 
             // Create the proof for the payment

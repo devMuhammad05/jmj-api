@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources\Payments;
 
 use App\Enums\PaymentStatus;
-use App\Filament\Admin\Resources\Payments\Pages\EditPayment;
 use App\Filament\Admin\Resources\Payments\Pages\ListPayments;
 use App\Filament\Admin\Resources\Payments\Schemas\PaymentForm;
 use App\Filament\Admin\Resources\Payments\Tables\PaymentsTable;
@@ -71,7 +70,6 @@ class PaymentResource extends Resource
     {
         return [
             'index' => ListPayments::route('/'),
-            'edit' => EditPayment::route('/{record}/edit'),
         ];
     }
 }

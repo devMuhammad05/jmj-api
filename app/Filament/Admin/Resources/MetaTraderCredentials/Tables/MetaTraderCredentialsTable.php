@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\MetaTraderCredentials\Tables;
 
+use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\MetaTraderPlatformType;
 use App\Enums\RiskLevel;
 use App\Models\MetaTraderCredential;
@@ -80,10 +81,16 @@ class MetaTraderCredentialsTable
                 //         'failed' => 'danger',
                 //         default => 'gray',
                 //     }),
-                
-                TextColumn::make('created_at')
-                    ->label('Connected')
-                    ->dateTime()
+
+                TextColumn::make('status')
+                    ->label('Account Status')
+                    ->badge()
+                    ->color(
+                        fn (MetaTraderCredentialConnectionStatus $state): string => match ($state) {
+                            MetaTraderCredentialConnectionStatus::Pending => 'warning',
+                            MetaTraderCredentialConnectionStatus::Connected => 'success',
+                        },
+                    )
                     ->sortable(),
                 TextColumn::make('updated_at')
                     ->dateTime()
@@ -121,6 +128,25 @@ class MetaTraderCredentialsTable
                     ->preload(),
             ])
             ->recordActions([
+                Action::make('connect_account')
+                    ->label('Connect Account')
+                    ->icon('heroicon-o-signal')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Connect MetaTrader Account')
+                    ->modalDescription('Connecting this account means you have confirmed their service charge fee. The account will be connected to the MetaAPI Cloud server (https://metaapi.cloud/).')
+                    ->modalSubmitActionLabel('Yes, Connect Account')
+                    ->hidden(fn (MetaTraderCredential $record): bool => $record->status === MetaTraderCredentialConnectionStatus::Connected)
+                    ->action(function (MetaTraderCredential $record) {
+                        $record->status = MetaTraderCredentialConnectionStatus::Connected;
+                        $record->save();
+
+                        Notification::make()
+                            ->title('Account Connected')
+                            ->body('The MetaTrader account has been successfully connected.')
+                            ->success()
+                            ->send();
+                    }),
                 Action::make('view_credentials')
                     ->label('View Credentials')
                     ->icon('heroicon-o-key')
@@ -139,19 +165,6 @@ class MetaTraderCredentialsTable
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close')
                     ->action(function (MetaTraderCredential $record) {
-                        // Log credential access for audit trail
-                        activity()
-                            ->performedOn($record)
-                            ->causedBy(auth()->user())
-                            ->withProperties([
-                                'log_type' => \App\Enums\LogType::MT->value,
-                                'action' => 'view_credentials',
-                                'mt_account_number' => $record->mt_account_number,
-                                'user_email' => $record->user->email,
-                                'accessed_at' => now()->toDateTimeString(),
-                            ])
-                            ->log('MetaTrader credentials accessed');
-
                         Notification::make()
                             ->title('Credentials Accessed')
                             ->body(

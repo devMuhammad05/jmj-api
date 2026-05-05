@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Enums\Role;
 use App\Http\Requests\Api\V1\SubscribeRequest;
 use App\Models\Payment;
@@ -30,6 +31,7 @@ class SubscribeAction
                 'plan_id' => $plan->id,
                 'payment_gateway_id' => $gateway->id,
                 'amount' => $plan->price,
+                'type' => PaymentType::ClassSubscription,
                 'status' => PaymentStatus::Pending,
                 'reference' => 'SUB-'.strtoupper((string) Str::ulid()),
                 'transaction_id' => 'TXN-'.strtoupper((string) Str::ulid()),
@@ -38,8 +40,6 @@ class SubscribeAction
             $payment->proofs()->create([
                 'payment_proof_url' => $request->string('payment_proof')->value(),
             ]);
-
-            $payment->update(['status' => PaymentStatus::Approved]);
 
             $payment->load(['plan', 'gateway', 'proofs', 'user']);
 

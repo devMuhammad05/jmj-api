@@ -25,7 +25,7 @@ class EditPayment extends EditRecord
                 ->modalHeading('Approve Payment')
                 ->modalDescription('This will approve the payment and create an active subscription for the user. Are you sure?')
                 ->visible(fn (): bool => in_array($this->record->status, [
-                    PaymentStatus::Approved,
+                    PaymentStatus::Pending,
                 ]))
                 ->action(function (): void {
                     try {

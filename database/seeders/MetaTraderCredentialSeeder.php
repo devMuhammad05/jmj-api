@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\MetaTraderPlatformType;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Enums\RiskLevel;
 use App\Models\MetaTraderCredential;
 use App\Models\Payment;
@@ -31,6 +33,7 @@ class MetaTraderCredentialSeeder extends Seeder
                 'platform_type' => MetaTraderPlatformType::MT5,
                 'initial_deposit' => 5000.00,
                 'risk_level' => RiskLevel::MODERATE->value,
+                'status' => MetaTraderCredentialConnectionStatus::Pending,
             ]);
 
             // Get first payment gateway
@@ -42,8 +45,8 @@ class MetaTraderCredentialSeeder extends Seeder
                     'meta_trader_credential_id' => $credential->id,
                     'payment_gateway_id' => $gateway->id,
                     'amount' => 5000.00,
+                    'type' => PaymentType::MetaCredential,
                     'status' => PaymentStatus::Approved,
-                    'type' => 'meta_trader_credential',
                 ]);
 
                 PaymentProof::create([

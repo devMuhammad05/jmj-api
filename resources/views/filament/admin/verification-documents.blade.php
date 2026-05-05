@@ -388,7 +388,19 @@
     }
 </style>
 
-<div class="kyc-viewer">
+@php
+    $statusVal = $record->status->value ?? strtolower($record->status->name ?? '');
+    $statusLabel = ucfirst($statusVal);
+@endphp
+
+<div
+    class="kyc-viewer"
+    x-data="{
+        tab: 'front',
+        lightbox: null,
+    }"
+    @keydown.escape.window="lightbox = null"
+>
 
     {{-- ── Info Bar ── --}}
     <div class="kyc-info-bar">
@@ -404,10 +416,6 @@
         <div class="kyc-info-item">
             <div class="label">Status</div>
             <div class="value">
-                @php
-                    $statusVal = $record->status->value ?? strtolower($record->status->name ?? '');
-                    $statusLabel = ucfirst($statusVal);
-                @endphp
                 <span class="kyc-status-badge {{ $statusVal }}">
                     <span class="dot"></span>
                     {{ $statusLabel }}
@@ -418,7 +426,7 @@
 
     {{-- ── Tab Strip ── --}}
     <div class="kyc-tabs">
-        <button type="button" class="kyc-tab-btn active" onclick="kycSwitchTab(this, 'front')">
+        <button type="button" class="kyc-tab-btn" :class="{ active: tab === 'front' }" @click="tab = 'front'">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="M7 9h5M7 13h3" />
@@ -426,7 +434,7 @@
             ID Front
         </button>
         @if ($record->id_card_back_img_url)
-            <button type="button" class="kyc-tab-btn" onclick="kycSwitchTab(this, 'back')">
+            <button type="button" class="kyc-tab-btn" :class="{ active: tab === 'back' }" @click="tab = 'back'">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="5" width="18" height="14" rx="2" />
                     <path d="M12 9h5M12 13h3" />
@@ -434,7 +442,7 @@
                 ID Back
             </button>
         @endif
-        <button type="button" class="kyc-tab-btn" onclick="kycSwitchTab(this, 'selfie')">
+        <button type="button" class="kyc-tab-btn" :class="{ active: tab === 'selfie' }" @click="tab = 'selfie'">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
@@ -444,7 +452,7 @@
     </div>
 
     {{-- ── Front Panel ── --}}
-    <div class="kyc-panel active" data-tab="front" id="kyc-tab-front">
+    <div class="kyc-panel" :class="{ active: tab === 'front' }">
         <div class="kyc-doc-card">
             <div class="kyc-doc-header">
                 <div class="kyc-doc-header-left">
@@ -468,7 +476,7 @@
                     Open full
                 </a>
             </div>
-            <div class="kyc-img-wrapper" onclick="kycOpenLightbox('{{ $record->id_card_front_img_url }}')">
+            <div class="kyc-img-wrapper" @click="lightbox = '{{ $record->id_card_front_img_url }}'">
                 <img src="{{ $record->id_card_front_img_url }}" alt="ID Card Front" loading="lazy" />
                 <div class="kyc-img-overlay">
                     <span class="kyc-img-zoom-hint">
@@ -485,7 +493,7 @@
 
     {{-- ── Back Panel ── --}}
     @if ($record->id_card_back_img_url)
-        <div class="kyc-panel" data-tab="back" id="kyc-tab-back">
+        <div class="kyc-panel" :class="{ active: tab === 'back' }">
             <div class="kyc-doc-card">
                 <div class="kyc-doc-header">
                     <div class="kyc-doc-header-left">
@@ -509,7 +517,7 @@
                         Open full
                     </a>
                 </div>
-                <div class="kyc-img-wrapper" onclick="kycOpenLightbox('{{ $record->id_card_back_img_url }}')">
+                <div class="kyc-img-wrapper" @click="lightbox = '{{ $record->id_card_back_img_url }}'">
                     <img src="{{ $record->id_card_back_img_url }}" alt="ID Card Back" loading="lazy" />
                     <div class="kyc-img-overlay">
                         <span class="kyc-img-zoom-hint">
@@ -526,7 +534,7 @@
     @endif
 
     {{-- ── Selfie Panel ── --}}
-    <div class="kyc-panel" data-tab="selfie" id="kyc-tab-selfie">
+    <div class="kyc-panel" :class="{ active: tab === 'selfie' }">
         <div class="kyc-doc-card">
             <div class="kyc-doc-header">
                 <div class="kyc-doc-header-left">
@@ -550,7 +558,7 @@
                     Open full
                 </a>
             </div>
-            <div class="kyc-img-wrapper" onclick="kycOpenLightbox('{{ $record->selfie_img_url }}')">
+            <div class="kyc-img-wrapper" @click="lightbox = '{{ $record->selfie_img_url }}'">
                 <img src="{{ $record->selfie_img_url }}" alt="Selfie with ID" loading="lazy" />
                 <div class="kyc-img-overlay">
                     <span class="kyc-img-zoom-hint">
@@ -581,44 +589,14 @@
         </div>
     </div>
 
+    {{-- ── Lightbox ── --}}
+    <div class="kyc-lightbox" :class="{ open: lightbox }" @click="lightbox = null">
+        <button type="button" class="kyc-lightbox-close" @click.stop="lightbox = null">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+        <img :src="lightbox ?? ''" alt="Document" @click.stop />
+    </div>
+
 </div>
-
-{{-- ── Lightbox ── --}}
-<div class="kyc-lightbox" id="kyc-lightbox" onclick="kycCloseLightbox()">
-    <button class="kyc-lightbox-close" onclick="kycCloseLightbox()">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path d="M18 6 6 18M6 6l12 12" />
-        </svg>
-    </button>
-    <img id="kyc-lightbox-img" src="" alt="Document" onclick="event.stopPropagation()" />
-</div>
-
-<script>
-    function kycSwitchTab(btn, tab) {
-        document.querySelectorAll('.kyc-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.kyc-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        const panel = document.getElementById('kyc-tab-' + tab);
-        if (panel) {
-            panel.classList.add('active');
-        }
-    }
-
-    function kycOpenLightbox(src) {
-        const lb = document.getElementById('kyc-lightbox');
-        document.getElementById('kyc-lightbox-img').src = src;
-        lb.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function kycCloseLightbox() {
-        document.getElementById('kyc-lightbox').classList.remove('open');
-        document.body.style.overflow = '';
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            kycCloseLightbox();
-        }
-    });
-</script>

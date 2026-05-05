@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\MetaTraderPlatformType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->string('platform_type')->default(MetaTraderPlatformType::MT5->value);
             $table->decimal('initial_deposit', 10, 2);
             $table->string('risk_level');
+            $table->string('status')->default(MetaTraderCredentialConnectionStatus::Pending->value);
             $table->timestamps();
         });
     }

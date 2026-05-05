@@ -83,7 +83,9 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/{tradingClass}', [TradingClassController::class, 'show']);
         });
 
-        Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
+        Route::middleware('verified.kyc')->group(function (): void {
+            Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
+        });
 
         Route::get('/trading-stats', [TradingStatsController::class, 'show']);
 

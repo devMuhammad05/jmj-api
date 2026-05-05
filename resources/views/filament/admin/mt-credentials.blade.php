@@ -49,7 +49,7 @@
                 <code style="flex: 1; display: block; font-size: 14px; font-family: monospace; font-weight: 600; color: #111827; background: #f9fafb; padding: 12px 16px; border-radius: 8px; border: 1px solid #e5e7eb;">
                     {{ $record->mt_account_number }}
                 </code>
-                <button onclick="copyToClipboard('{{ $record->mt_account_number }}', 'Account number')"
+                <button data-copy="{{ $record->mt_account_number }}" onclick="copyToClipboard(this.dataset.copy, 'Account number')"
                     style="flex-shrink: 0; padding: 12px 16px; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -66,7 +66,7 @@
                 <code style="flex: 1; display: block; font-size: 14px; font-family: monospace; font-weight: 600; color: #111827; background: #f9fafb; padding: 12px 16px; border-radius: 8px; border: 1px solid #e5e7eb;">
                     {{ $record->mt_server }}
                 </code>
-                <button onclick="copyToClipboard('{{ $record->mt_server }}', 'Server')"
+                <button data-copy="{{ $record->mt_server }}" onclick="copyToClipboard(this.dataset.copy, 'Server')"
                     style="flex-shrink: 0; padding: 12px 16px; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;">
                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -88,7 +88,7 @@
                 <code style="flex: 1; display: block; font-size: 14px; font-family: monospace; font-weight: 700; color: #111827; background: #fef2f2; padding: 12px 16px; border-radius: 8px; border: 2px solid #fca5a5;">
                     {{ $record->mt_password }}
                 </code>
-                <button onclick="copyToClipboard('{{ $record->mt_password }}', 'Password')"
+                <button data-copy="{{ $record->mt_password }}" onclick="copyToClipboard(this.dataset.copy, 'Password')"
                     style="flex-shrink: 0; padding: 12px 16px; background: #dc2626; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(220,38,38,0.3);">
                     <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -149,26 +149,18 @@
 
 <script>
 function copyToClipboard(text, label) {
-    // Log for debugging
-    console.log('Attempting to copy:', label, 'Value:', text);
-
-    // Try modern clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
-            console.log('Copy successful via Clipboard API');
             showSuccessToast(label + ' copied!');
-        }).catch(err => {
-            console.error('Clipboard API failed:', err);
+        }).catch(() => {
             fallbackCopy(text, label);
         });
     } else {
-        console.log('Using fallback copy method');
         fallbackCopy(text, label);
     }
 }
 
 function fallbackCopy(text, label) {
-    // Create temporary textarea
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
@@ -180,18 +172,14 @@ function fallbackCopy(text, label) {
     try {
         textarea.focus();
         textarea.select();
-        textarea.setSelectionRange(0, 99999); // For mobile devices
+        textarea.setSelectionRange(0, 99999);
 
-        const successful = document.execCommand('copy');
-        console.log('Fallback copy result:', successful);
-
-        if (successful) {
+        if (document.execCommand('copy')) {
             showSuccessToast(label + ' copied!');
         } else {
             showErrorToast('Failed to copy. Please copy manually.');
         }
-    } catch (err) {
-        console.error('Fallback copy failed:', err);
+    } catch {
         showErrorToast('Copy failed. Please copy manually.');
     } finally {
         document.body.removeChild(textarea);
@@ -244,10 +232,6 @@ function showErrorToast(message) {
     }, 3000);
 }
 
-// Log clipboard availability on load
-console.log('Clipboard API available:', !!navigator.clipboard);
-console.log('Secure context:', window.isSecureContext);
-console.log('Protocol:', window.location.protocol);
 </script>
 
 <style>

@@ -27,6 +27,7 @@ class MetaTraderCredential extends Model
         'platform_type',
         'initial_deposit',
         'risk_level',
+        'status',
     ];
 
     /**
@@ -46,6 +47,7 @@ class MetaTraderCredential extends Model
     protected function casts(): array
     {
         return [
+            'status' => \App\Enums\MetaTraderCredentialConnectionStatus::class,
             'risk_level' => \App\Enums\RiskLevel::class,
             'platform_type' => \App\Enums\MetaTraderPlatformType::class,
             'initial_deposit' => 'decimal:2',
