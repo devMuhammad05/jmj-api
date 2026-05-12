@@ -2,9 +2,11 @@
 
 namespace App\Filament\Admin\Resources\MetaTraderCredentials\Tables;
 
+use App\DTOs\MetaTraderData;
 use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\MetaTraderPlatformType;
 use App\Enums\RiskLevel;
+use App\Jobs\ConnectMetaTraderAccount;
 use App\Models\MetaTraderCredential;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -140,12 +142,24 @@ class MetaTraderCredentialsTable
                     ->modalSubmitActionLabel('Yes, Connect Account')
                     ->hidden(fn (MetaTraderCredential $record): bool => $record->status === MetaTraderCredentialConnectionStatus::Connected)
                     ->action(function (MetaTraderCredential $record) {
-                        $record->status = MetaTraderCredentialConnectionStatus::Connected;
-                        $record->save();
+                        ConnectMetaTraderAccount::dispatch(
+                            $record->user,
+                            new MetaTraderData(
+                                mt_account_number: $record->mt_account_number,
+                                mt_password: $record->mt_password,
+                                mt_server: $record->mt_server,
+                                initial_deposit: $record->initial_deposit,
+                                risk_level: $record->risk_level->value,
+                                id: $record->id,
+                                pool_id: $record->pool_id,
+                                payment_id: $record->payment?->id,
+                            ),
+                        );
 
+                        $record->save();
                         Notification::make()
-                            ->title('Account Connected')
-                            ->body('The MetaTrader account has been successfully connected.')
+                            ->title('Connecting Account')
+                            ->body('The MetaTrader account connection has been queued and will be processed shortly.')
                             ->success()
                             ->send();
                     }),

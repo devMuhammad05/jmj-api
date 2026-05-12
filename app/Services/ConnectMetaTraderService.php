@@ -24,15 +24,7 @@ class ConnectMetaTraderService
         return Http::baseUrl($baseUrl)
             ->post('/provision-account', [
                 'user_id' => $user->id,
-                // 'meta_trader_credential_id' => $data->id,
-                // 'name' => $user->full_name,
-                // 'login' => $data->mt_account_number,
-                // 'password' => $data->mt_password,
-                // 'server' => $data->mt_server,
-                // 'risk_level' => $data->risk_level,
-                // 'platform' => 'mt5',
-                // 'magic' => 0,
-                // 'pool_id' => $data->pool_id,
+                'meta_trader_credential_id' => $data->id,
             ]);
     }
 }

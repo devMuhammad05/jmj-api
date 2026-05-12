@@ -51,11 +51,11 @@ class PaymentGatewayForm
                         ->label('')
                         ->options([
                             'crypto' => 'Cryptocurrency Wallet',
-                            'bank' => 'Bank Account',
+                            'bank_transfer' => 'Bank Account',
                         ])
                         ->descriptions([
                             'crypto' => 'Provide a wallet address and optional QR code for crypto payments.',
-                            'bank' => 'Provide bank account details for direct bank transfers.',
+                            'bank_transfer' => 'Provide bank account details for direct bank transfers.',
                         ])
                         ->inline(false)
                         ->required()
@@ -113,27 +113,27 @@ class PaymentGatewayForm
             Section::make('Bank Account Details')
                 ->icon('heroicon-o-building-library')
                 ->description('Bank account information for direct bank transfers.')
-                ->visible(fn ($get) => $get('payment_type') === 'bank')
+                ->visible(fn ($get) => $get('payment_type') === 'bank_transfer')
                 ->schema([
                     TextInput::make('bank_name')
                         ->label('Bank Name')
                         ->maxLength(255)
                         ->placeholder('e.g. Access Bank, Zenith Bank')
-                        ->required(fn ($get) => $get('payment_type') === 'bank')
+                        ->required(fn ($get) => $get('payment_type') === 'bank_transfer')
                         ->columnSpan(1),
 
                     TextInput::make('account_name')
                         ->label('Account Name')
                         ->maxLength(255)
                         ->placeholder('e.g. JMJ Investments Ltd')
-                        ->required(fn ($get) => $get('payment_type') === 'bank')
+                        ->required(fn ($get) => $get('payment_type') === 'bank_transfer')
                         ->columnSpan(1),
 
                     TextInput::make('account_number')
                         ->label('Account Number')
                         ->maxLength(255)
                         ->placeholder('e.g. 0123456789')
-                        ->required(fn ($get) => $get('payment_type') === 'bank')
+                        ->required(fn ($get) => $get('payment_type') === 'bank_transfer')
                         ->columnSpan(1),
                 ])
                 ->columns(2),

@@ -83,11 +83,17 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/{tradingClass}', [TradingClassController::class, 'show']);
         });
 
-        Route::middleware('verified.kyc')->group(function (): void {
-            // Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
-        });
 
+        if(app()->isProduction()){
+            Route::middleware('verified.kyc')->group(function (): void {
+                Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
+            });
+        }
+
+        if(app()->isLocal()){
             Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
+        }
+
 
 
         Route::get('/trading-stats', [TradingStatsController::class, 'show']);

@@ -14,6 +14,7 @@ readonly class MetaTraderData
         public string $mt_server,
         public float $initial_deposit,
         public string $risk_level,
+        public ?string $id = null,
         public ?string $pool_id = null,
         public ?int $payment_id = null,
     ) {}
