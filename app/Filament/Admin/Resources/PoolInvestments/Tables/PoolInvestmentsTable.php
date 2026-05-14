@@ -2,12 +2,12 @@
 
 namespace App\Filament\Admin\Resources\PoolInvestments\Tables;
 
+use App\Enums\PaymentStatus;
 use App\Enums\PoolInvestmentStatus;
 use App\Models\PoolInvestment;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -73,7 +73,7 @@ class PoolInvestmentsTable
                 //     ->toggleable(),
 
                 TextColumn::make('created_at')
-                    ->label('Applied At')
+                    ->label('Submitted At')
                     ->dateTime()
                     ->sortable(),
             ])
@@ -115,7 +115,25 @@ class PoolInvestmentsTable
                         ),
                     ),
 
-                EditAction::make(),
+                Action::make('approve')
+                    ->label('Approve')
+                    ->icon(Heroicon::OutlinedCheckCircle)
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Approve Investment')
+                    ->modalDescription('Are you sure you want to approve this investment? By approving, you are also confirming that the payment has been received and verified.')
+                    ->modalSubmitActionLabel('Yes, approve & verify payment')
+                    ->action(function (PoolInvestment $record): void {
+                        $record->update([
+                            'status' => PoolInvestmentStatus::VERIFIED,
+                            'verified_at' => now(),
+                        ]);
+
+                        $record->payment?->update([
+                            'status' => PaymentStatus::Approved,
+                        ]);
+                    })
+                    ->visible(fn (PoolInvestment $record): bool => $record->status === PoolInvestmentStatus::PENDING),
             ])
             ->bulkActions([
                 BulkActionGroup::make([DeleteBulkAction::make()]),
