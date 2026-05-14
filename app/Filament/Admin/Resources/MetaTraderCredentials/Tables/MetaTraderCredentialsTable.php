@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Resources\MetaTraderCredentials\Tables;
 
-use App\DTOs\MetaTraderData;
 use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\MetaTraderPlatformType;
 use App\Enums\RiskLevel;
@@ -142,19 +141,7 @@ class MetaTraderCredentialsTable
                     ->modalSubmitActionLabel('Yes, Connect Account')
                     ->hidden(fn (MetaTraderCredential $record): bool => $record->status === MetaTraderCredentialConnectionStatus::Connected)
                     ->action(function (MetaTraderCredential $record) {
-                        ConnectMetaTraderAccount::dispatch(
-                            $record->user,
-                            new MetaTraderData(
-                                mt_account_number: $record->mt_account_number,
-                                mt_password: $record->mt_password,
-                                mt_server: $record->mt_server,
-                                initial_deposit: $record->initial_deposit,
-                                risk_level: $record->risk_level->value,
-                                id: $record->id,
-                                pool_id: $record->pool_id,
-                                payment_id: $record->payment?->id,
-                            ),
-                        );
+                        ConnectMetaTraderAccount::dispatch($record->user, $record);
 
                         $record->save();
                         Notification::make()

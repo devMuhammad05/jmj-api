@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\DTOs\MetaTraderData;
+use App\Models\MetaTraderCredential;
 use App\Models\User;
 use App\Services\ConnectMetaTraderService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,27 +19,24 @@ class ConnectMetaTraderAccount implements ShouldQueue
 
     public function __construct(
         public User $user,
-        public MetaTraderData $data,
+        public MetaTraderCredential $credential,
     ) {}
 
     public function handle(ConnectMetaTraderService $connectMetaTrader): void
     {
-        $response = $connectMetaTrader->provision($this->user, $this->data);
+        $response = $connectMetaTrader->provision($this->user, $this->credential);
 
         Log::info('MetaTrader provision response', [
             'status' => $response->status(),
             'body' => $response->json(),
         ]);
 
-        if ($response->successful()) {
-         
-        } else {
+        if (! $response->successful()) {
             Log::error('Failed to connect MetaTrader account', [
                 'user_id' => $this->user->id,
+                'meta_trader_credential_id' => $this->credential->id,
                 'status' => $response->status(),
                 'body' => $response->json() ?? $response->body(),
-                'login' => $this->data->mt_account_number,
-                'server' => $this->data->mt_server,
             ]);
         }
     }
