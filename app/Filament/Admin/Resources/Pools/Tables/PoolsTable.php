@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Pools\Tables;
 
+use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\PoolStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -37,6 +38,26 @@ class PoolsTable
                         },
                     )
                     ->searchable(),
+                TextColumn::make('metaTraderCredential.mt_account_number')
+                    ->label('MT5 Account')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->copyable(),
+                TextColumn::make('metaTraderCredential.mt_server')
+                    ->label('MT5 Server')
+                    ->placeholder('—')
+                    ->searchable(),
+                TextColumn::make('metaTraderCredential.status')
+                    ->label('MT5 Connection Status')
+                    ->badge()
+                    ->placeholder('—')
+                    ->color(
+                        fn (?MetaTraderCredentialConnectionStatus $state): string => match ($state) {
+                            MetaTraderCredentialConnectionStatus::Connected => 'success',
+                            MetaTraderCredentialConnectionStatus::Pending => 'warning',
+                            default => 'gray',
+                        },
+                    ),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

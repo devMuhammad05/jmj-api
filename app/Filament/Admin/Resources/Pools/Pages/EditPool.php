@@ -46,7 +46,8 @@ class EditPool extends EditRecord
         $this->metaTraderData = array_filter([
             'mt_account_number' => $data['mt_account_number'] ?? null,
             'mt_password' => $data['mt_password'] ?? null,
-            'mt_server' => isset($data['mt_server']) ? $this->formatServerName($data['mt_server']) : null,
+            // 'mt_server' => isset($data['mt_server']) ? $this->formatServerName($data['mt_server']) : null,
+            'mt_server' => $data['mt_server'] ?? null,
             'platform_type' => $data['platform_type'] ?? null,
             'risk_level' => $data['risk_level'] ?? null,
         ]);

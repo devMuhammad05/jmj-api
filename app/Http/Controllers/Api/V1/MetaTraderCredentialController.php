@@ -33,7 +33,8 @@ class MetaTraderCredentialController extends ApiController
             $credential = $user->metaTraderCredentials()->create([
                 'mt_account_number' => $request->input('mt_account_number'),
                 'mt_password' => $request->input('mt_password'),
-                'mt_server' => $this->formatServerName((string) $request->input('mt_server')),
+                // 'mt_server' => $this->formatServerName((string) $request->input('mt_server')),
+                'mt_server' => $request->input('mt_server'),
                 'initial_deposit' => $request->input('initial_deposit'),
                 'risk_level' => $request->input('risk_level'),
                 'status' => MetaTraderCredentialConnectionStatus::Pending,
