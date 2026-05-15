@@ -64,22 +64,25 @@ class MetaTraderCredentialForm
                     ->options(RiskLevel::class)
                     ->required()
                     ->helperText('Determines position sizing and risk management'),
-                TextInput::make('payment.amount')
+                TextInput::make('payment_amount')
                     ->label('Amount Paid')
                     ->numeric()
                     ->prefix('$')
                     ->step(0.01)
                     ->disabled()
-                    ->dehydrated(false),
-                TextInput::make('payment.gateway.name')
+                    ->dehydrated(false)
+                    ->afterStateHydrated(fn ($component, $record) => $component->state($record?->payment?->amount)),
+                TextInput::make('payment_gateway_name')
                     ->label('Payment Gateway')
                     ->disabled()
-                    ->dehydrated(false),
-                TextInput::make('payment.proofs.0.payment_proof_url')
+                    ->dehydrated(false)
+                    ->afterStateHydrated(fn ($component, $record) => $component->state($record?->payment?->gateway?->name)),
+                TextInput::make('payment_proof_url')
                     ->label('Payment Proof URL')
                     ->url()
                     ->disabled()
-                    ->dehydrated(false),
+                    ->dehydrated(false)
+                    ->afterStateHydrated(fn ($component, $record) => $component->state($record?->payment?->proofs->first()?->payment_proof_url)),
             ])
             ->columns(2);
     }
