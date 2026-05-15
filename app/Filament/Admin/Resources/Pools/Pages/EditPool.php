@@ -7,11 +7,14 @@ use App\Enums\RiskLevel;
 use App\Filament\Admin\Resources\Pools\PoolResource;
 use App\Jobs\ConnectMetaTraderAccount;
 use App\Models\MetaTraderCredential;
+use App\Traits\FormatsMetaTraderServerName;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPool extends EditRecord
 {
+    use FormatsMetaTraderServerName;
+
     protected static string $resource = PoolResource::class;
 
     private array $metaTraderData = [];
@@ -28,6 +31,7 @@ class EditPool extends EditRecord
         $credential = $this->record->metaTraderCredential;
 
         if ($credential) {
+            $data['add_mt5_account'] = true;
             $data['mt_account_number'] = $credential->mt_account_number;
             $data['mt_server'] = $credential->mt_server;
             $data['platform_type'] = $credential->platform_type?->value;
@@ -42,7 +46,7 @@ class EditPool extends EditRecord
         $this->metaTraderData = array_filter([
             'mt_account_number' => $data['mt_account_number'] ?? null,
             'mt_password' => $data['mt_password'] ?? null,
-            'mt_server' => $data['mt_server'] ?? null,
+            'mt_server' => isset($data['mt_server']) ? $this->formatServerName($data['mt_server']) : null,
             'platform_type' => $data['platform_type'] ?? null,
             'risk_level' => $data['risk_level'] ?? null,
         ]);

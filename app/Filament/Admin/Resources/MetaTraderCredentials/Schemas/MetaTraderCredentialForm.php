@@ -71,7 +71,7 @@ class MetaTraderCredentialForm
                     ->step(0.01)
                     ->disabled()
                     ->dehydrated(false),
-                Select::make('payment.gateway.name')
+                TextInput::make('payment.gateway.name')
                     ->label('Payment Gateway')
                     ->disabled()
                     ->dehydrated(false),

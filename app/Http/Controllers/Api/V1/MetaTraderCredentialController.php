@@ -13,12 +13,15 @@ use App\Http\Requests\Api\V1\StoreMetaTraderCredentialRequest;
 use App\Models\Payment;
 use App\Models\User;
 use App\Notifications\Admin\NewPaymentSubmittedNotification;
+use App\Traits\FormatsMetaTraderServerName;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 
 class MetaTraderCredentialController extends ApiController
 {
+    use FormatsMetaTraderServerName;
+
     /**
      * Store a newly created resource in storage.
      */
@@ -30,7 +33,7 @@ class MetaTraderCredentialController extends ApiController
             $credential = $user->metaTraderCredentials()->create([
                 'mt_account_number' => $request->input('mt_account_number'),
                 'mt_password' => $request->input('mt_password'),
-                'mt_server' => $request->input('mt_server'),
+                'mt_server' => $this->formatServerName((string) $request->input('mt_server')),
                 'initial_deposit' => $request->input('initial_deposit'),
                 'risk_level' => $request->input('risk_level'),
                 'status' => MetaTraderCredentialConnectionStatus::Pending,

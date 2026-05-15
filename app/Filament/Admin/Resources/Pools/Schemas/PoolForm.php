@@ -7,7 +7,9 @@ use App\Enums\PoolStatus;
 use App\Enums\RiskLevel;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class PoolForm
@@ -65,29 +67,46 @@ class PoolForm
                 ->description('Configure the MetaTrader account used for trading this pool.')
                 ->icon('heroicon-o-computer-desktop')
                 ->schema([
+                    Toggle::make('add_mt5_account')
+                        ->label('Attach MT5 Account')
+                        ->helperText('Enable to configure the MetaTrader account for this pool. The connection will be processed in the background.')
+                        ->live()
+                        ->dehydrated(false)
+                        ->inline(false)
+                        ->columnSpanFull(),
+
                     TextInput::make('mt_account_number')
                         ->label('Account Number')
-                        ->required()
-                        ->maxLength(50),
+                        ->maxLength(50)
+                        ->required(fn (Get $get): bool => (bool) $get('add_mt5_account'))
+                        ->visible(fn (Get $get): bool => (bool) $get('add_mt5_account')),
+
                     TextInput::make('mt_server')
                         ->label('Server')
-                        ->required()
                         ->placeholder('e.g., Exness-MT5Real')
-                        ->maxLength(100),
+                        ->maxLength(100)
+                        ->required(fn (Get $get): bool => (bool) $get('add_mt5_account'))
+                        ->visible(fn (Get $get): bool => (bool) $get('add_mt5_account')),
+
                     Select::make('platform_type')
                         ->label('Platform')
-                        ->required()
                         ->options(MetaTraderPlatformType::class)
-                        ->default(MetaTraderPlatformType::MT5),
+                        ->default(MetaTraderPlatformType::MT5)
+                        ->required(fn (Get $get): bool => (bool) $get('add_mt5_account'))
+                        ->visible(fn (Get $get): bool => (bool) $get('add_mt5_account')),
+
                     Select::make('risk_level')
                         ->label('Risk Level')
-                        ->required()
-                        ->options(RiskLevel::class),
+                        ->options(RiskLevel::class)
+                        ->required(fn (Get $get): bool => (bool) $get('add_mt5_account'))
+                        ->visible(fn (Get $get): bool => (bool) $get('add_mt5_account')),
+
                     TextInput::make('mt_password')
                         ->label('Password')
-                        ->required()
                         ->password()
-                        ->revealable(),
+                        ->revealable()
+                        ->required(fn (Get $get): bool => (bool) $get('add_mt5_account'))
+                        ->visible(fn (Get $get): bool => (bool) $get('add_mt5_account')),
                 ])
                 ->columns(3)
                 ->columnSpanFull(),
