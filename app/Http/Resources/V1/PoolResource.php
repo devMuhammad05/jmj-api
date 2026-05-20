@@ -19,7 +19,8 @@ class PoolResource extends JsonResource
             'name' => $this->name,
             'total_amount' => $this->total_amount,
             'investor_count' => $this->investor_count,
-            'minimum_investment' => $this->minimum_investment,
+            'number_of_investors' => $this->number_of_investors,
+            'each_contribution_amount' => $this->each_contribution_amount,
             'status' => $this->status,
             'created_at' => $this->created_at->toDateTimeString(),
         ];

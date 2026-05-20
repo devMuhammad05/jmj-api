@@ -24,6 +24,8 @@ class Pool extends Model
         'name',
         'total_amount',
         'minimum_investment',
+        'number_of_investors',
+        'each_contribution_amount',
         'status',
     ];
 
@@ -37,6 +39,8 @@ class Pool extends Model
         return [
             'total_amount' => 'decimal:2',
             'minimum_investment' => 'decimal:2',
+            'each_contribution_amount' => 'decimal:2',
+            'number_of_investors' => 'integer',
             'status' => PoolStatus::class,
         ];
     }

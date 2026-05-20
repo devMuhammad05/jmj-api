@@ -15,6 +15,10 @@ class PoolsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->withCount([
+                'poolInvestments as approved_investors_count' => fn ($q) => $q->where('status', 'verified'),
+                'poolInvestments as pending_investors_count' => fn ($q) => $q->where('status', 'pending'),
+            ]))
             ->columns([
                 TextColumn::make('name')
                     ->weight('bold')
@@ -24,9 +28,20 @@ class PoolsTable
                     ->label('Total Capital')
                     ->money('USD')
                     ->sortable(),
-                TextColumn::make('minimum_investment')
-                    ->label('Min. Investment')
+                TextColumn::make('each_contribution_amount')
+                    ->label('Contribution Amount')
                     ->money('USD')
+                    ->sortable()
+                    ->placeholder('—'),
+                TextColumn::make('approved_investors_count')
+                    ->label('Approved Investors')
+                    ->badge()
+                    ->color('success')
+                    ->sortable(),
+                TextColumn::make('pending_investors_count')
+                    ->label('Pending Investors')
+                    ->badge()
+                    ->color('warning')
                     ->sortable(),
                 TextColumn::make('status')
                     ->badge()

@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\FetchAllTradingStatsJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -11,3 +12,4 @@ Artisan::command('inspire', function () {
 Schedule::command('subscriptions:expire')->daily();
 Schedule::command('notifications:subscription-expiring')->dailyAt('09:00');
 Schedule::command('notifications:trading-class-reminders')->everyMinute();
+Schedule::job(new FetchAllTradingStatsJob)->everyFifteenMinutes();

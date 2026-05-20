@@ -5,11 +5,13 @@ namespace App\Filament\Admin\Resources\Pools\Schemas;
 use App\Enums\MetaTraderPlatformType;
 use App\Enums\PoolStatus;
 use App\Enums\RiskLevel;
+use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class PoolForm
@@ -33,14 +35,28 @@ class PoolForm
                         ->required()
                         ->native(false),
 
-                    TextInput::make('minimum_investment')
-                        ->label('Minimum Investment ($)')
+                    TextInput::make('number_of_investors')
+                        ->label('Number of Investors')
                         ->required()
                         ->numeric()
-                        ->prefix('$')
-                        ->default(1000.0)
-                        ->minValue(0)
-                        ->placeholder('1000.00'),
+                        ->integer()
+                        ->minValue(1)
+                        ->placeholder('e.g. 10')
+                        ->live()
+                        ->afterStateUpdated(function (Get $get, Set $set, ?string $state): void {
+                            $total = (float) $get('total_amount');
+                            $count = (int) $state;
+                            $set('each_contribution_amount', $count > 0 ? number_format($total / $count, 2, '.', '') : null);
+                        })
+                        ->rules([
+                            fn (Get $get): Closure => function (string $attribute, mixed $value, Closure $fail) use ($get): void {
+                                $total = (float) $get('total_amount');
+                                $count = (int) $value;
+                                if ($count > 0 && fmod($total, $count) !== 0.0) {
+                                    $fail("The contribution amount (\${$total} ÷ {$count}) must be a whole number with no decimals.");
+                                }
+                            },
+                        ]),
                 ])
                 ->columns(2)
                 ->columnSpan(1),
@@ -57,7 +73,29 @@ class PoolForm
                         ->default(0.0)
                         ->minValue(0)
                         ->placeholder('0.00')
-                        ->hint('Cumulative capital in the pool'),
+                        ->hint('Cumulative capital in the pool')
+                        ->live()
+                        ->afterStateUpdated(function (Get $get, Set $set, ?string $state): void {
+                            $total = (float) $state;
+                            $count = (int) $get('number_of_investors');
+                            $set('each_contribution_amount', $count > 0 ? number_format($total / $count, 2, '.', '') : null);
+                        })
+                        ->rules([
+                            fn (Get $get): Closure => function (string $attribute, mixed $value, Closure $fail) use ($get): void {
+                                $total = (float) $value;
+                                $count = (int) $get('number_of_investors');
+                                if ($count > 0 && fmod($total, $count) !== 0.0) {
+                                    $fail("The total amount (\${$total} ÷ {$count} investors) must divide evenly with no decimal remainder.");
+                                }
+                            },
+                        ]),
+
+                    TextInput::make('each_contribution_amount')
+                        ->label('Each Contribution ($)')
+                        ->prefix('$')
+                        ->disabled()
+                        ->placeholder('Auto-calculated')
+                        ->hint('total_amount ÷ number_of_investors'),
 
                 ])
                 ->columns(1)

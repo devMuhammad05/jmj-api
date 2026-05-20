@@ -60,6 +60,12 @@ class EditPool extends EditRecord
             $data['risk_level'],
         );
 
+        $numberOfInvestors = (int) ($data['number_of_investors'] ?? 0);
+        $totalAmount = (float) ($data['total_amount'] ?? 0);
+        $data['each_contribution_amount'] = $numberOfInvestors > 0
+            ? round($totalAmount / $numberOfInvestors, 2)
+            : null;
+
         return $data;
     }
 
