@@ -41,6 +41,12 @@ class UsersTable
                     ->label('KYC Status')
                     ->badge()
                     ->default('Not Submitted')
+                    ->color(fn ($state): string => match ($state) {
+                        'approved' => 'success',
+                        'pending' => 'warning',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
                     ->sortable(),
                 // TextColumn::make('metaTraderCredentials_count')
                 //     ->label('MT Accounts')

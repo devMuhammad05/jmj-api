@@ -115,6 +115,15 @@ class PoolInvestmentsTable
                         ),
                     ),
 
+                Action::make('viewBankDetails')
+                    ->label('Bank Details')
+                    ->icon(Heroicon::OutlinedBuildingLibrary)
+                    ->color('gray')
+                    ->modalHeading('Bank Details')
+                    ->modalContent(fn (PoolInvestment $record) => view('filament.admin.bank-details-modal', ['record' => $record]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close'),
+
                 Action::make('approve')
                     ->label('Approve')
                     ->icon(Heroicon::OutlinedCheckCircle)

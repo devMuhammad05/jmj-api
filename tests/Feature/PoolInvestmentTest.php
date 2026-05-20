@@ -370,6 +370,91 @@ class PoolInvestmentTest extends TestCase
         ]);
     }
 
+    public function test_pool_shows_approved_investors_count(): void
+    {
+        $otherUser = User::factory()->create();
+
+        PoolInvestment::create([
+            'user_id' => $otherUser->id,
+            'pool_id' => $this->pool->id,
+            'full_name' => 'Jane Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'Jane Doe',
+            'contribution' => 1000,
+            'terms_accepted' => true,
+            'status' => PoolInvestmentStatus::VERIFIED,
+        ]);
+
+        PoolInvestment::create([
+            'user_id' => $this->user->id,
+            'pool_id' => $this->pool->id,
+            'full_name' => 'John Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'John Doe',
+            'contribution' => 1000,
+            'terms_accepted' => true,
+            'status' => PoolInvestmentStatus::PENDING,
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson('/api/v1/pools');
+
+        $response->assertStatus(200)->assertJsonPath('data.0.approved_investors_count', 1);
+    }
+
+    public function test_pool_shows_user_investment_when_enrolled(): void
+    {
+        $investment = PoolInvestment::create([
+            'user_id' => $this->user->id,
+            'pool_id' => $this->pool->id,
+            'full_name' => 'John Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'John Doe',
+            'contribution' => 1000,
+            'terms_accepted' => true,
+            'status' => PoolInvestmentStatus::VERIFIED,
+            'verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson("/api/v1/pools/{$this->pool->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.user_investment.id', $investment->id)
+            ->assertJsonPath('data.user_investment.is_approved', true);
+    }
+
+    public function test_pool_shows_pending_user_investment_as_not_approved(): void
+    {
+        PoolInvestment::create([
+            'user_id' => $this->user->id,
+            'pool_id' => $this->pool->id,
+            'full_name' => 'John Doe',
+            'phone_number' => '+234 123 456 7890',
+            'bank_name' => 'GTBank',
+            'account_number' => '0123456789',
+            'account_name' => 'John Doe',
+            'contribution' => 1000,
+            'terms_accepted' => true,
+            'status' => PoolInvestmentStatus::PENDING,
+        ]);
+
+        $response = $this->actingAs($this->user)->getJson("/api/v1/pools/{$this->pool->id}");
+
+        $response->assertStatus(200)->assertJsonPath('data.user_investment.is_approved', false);
+    }
+
+    public function test_pool_shows_null_user_investment_when_not_enrolled(): void
+    {
+        $response = $this->actingAs($this->user)->getJson("/api/v1/pools/{$this->pool->id}");
+
+        $response->assertStatus(200)->assertJsonPath('data.user_investment', null);
+    }
+
     public function test_requires_authentication(): void
     {
         $response = $this->getJson('/api/v1/pools');
