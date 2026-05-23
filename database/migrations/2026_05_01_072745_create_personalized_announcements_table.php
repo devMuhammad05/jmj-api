@@ -19,9 +19,11 @@ return new class extends Migration
         });
 
         Schema::create('personalized_announcement_user', function (Blueprint $table) {
-            $table->foreignId('personalized_announcement_id')->constrained('personalized_announcements')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('personalized_announcement_id');
+            $table->unsignedBigInteger('user_id');
             $table->primary(['personalized_announcement_id', 'user_id']);
+            $table->foreign('personalized_announcement_id', 'pa_user_pa_id_foreign')->references('id')->on('personalized_announcements')->cascadeOnDelete();
+            $table->foreign('user_id', 'pa_user_user_id_foreign')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 

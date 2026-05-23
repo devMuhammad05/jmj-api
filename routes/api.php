@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AppSettingController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\GetOtpController;
 use App\Http\Controllers\Api\V1\Auth\Pin\ChangePinController;
@@ -58,6 +59,9 @@ Route::prefix('v1')->group(function (): void {
                 Route::post('/reset', ResetPinController::class);
             });
     });
+
+    // App Settings (public)
+    Route::get('/app-settings', [AppSettingController::class, 'show']);
 
     // Plans (public)
     Route::get('/plans', [PlanController::class, 'index']);

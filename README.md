@@ -27,6 +27,7 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | Method | Endpoint                      | Auth | Description                        |
 | ------ | ----------------------------- | ---- | ---------------------------------- |
 | GET    | `/`                           | No   | Health check                       |
+| GET    | `/app-settings`               | No   | Get app configuration & contact info |
 | POST   | `/auth/register`              | No   | Register new user (sends OTP)      |
 | POST   | `/auth/verify-registration-otp` | No | Verify OTP to complete registration |
 | POST   | `/auth/send-otp`              | No   | Resend OTP to email                |
@@ -90,6 +91,39 @@ Returns a simple message confirming the API is running.
 ```json
 "API is active"
 ```
+
+---
+
+### 0. App Settings — `/app-settings`
+
+#### Get App Settings
+
+`GET /app-settings`
+
+Returns the application's public configuration — identity, contact details, and external URLs. No authentication required.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "App settings retrieved successfully",
+    "data": {
+        "app_name": "JMJ Investment",
+        "support_email": "support@jmj.finance.com",
+        "support_phone": "+2348012345678",
+        "support_whatsapp": "+2348012345678",
+        "address": "123 Finance Street, Lagos, Nigeria",
+        "facebook_url": "https://facebook.com/jmjfinance",
+        "twitter_url": "https://twitter.com/jmjfinance",
+        "instagram_url": "https://instagram.com/jmjfinance",
+        "deriv_referral_url": "https://track.deriv.com/_REF_ID/...",
+        "youtube_tutorials_url": "https://youtube.com/playlist?list=..."
+    }
+}
+```
+
+> Fields that have not been configured by the admin are returned as `null`.
 
 ---
 
@@ -1837,6 +1871,14 @@ All API responses follow a consistent JSON structure.
 ## Testing the API
 
 ### Using cURL
+
+**Get app settings:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/app-settings
+```
+
+---
 
 **Register a new user:**
 
