@@ -31,11 +31,13 @@ class PoolInvestmentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTicket;
 
-    protected static ?string $navigationLabel = 'Pool investments';
+    protected static ?string $navigationLabel = 'Pool Investments';
 
     protected static ?string $modelLabel = 'Investment Application';
 
-    protected static ?int $navigationSort = 6;
+    protected static string|\UnitEnum|null $navigationGroup = 'Trading & Investments';
+
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'full_name';
 

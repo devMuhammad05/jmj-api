@@ -2,11 +2,17 @@
 
 namespace App\Filament\Admin\Widgets;
 
+use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
+use App\Enums\PoolStatus;
 use App\Enums\Role;
 use App\Enums\SignalStatus;
 use App\Enums\VerificationStatus;
 use App\Models\MetaTraderCredential;
+use App\Models\Payment;
+use App\Models\Pool;
 use App\Models\Signal;
+use App\Models\Subscription;
 use App\Models\User;
 use App\Models\Verification;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -31,6 +37,15 @@ class StatsOverviewWidget extends BaseWidget
 
         $activeSignals = Signal::where('status', SignalStatus::ACTIVE)->count();
         $signalsThisMonth = Signal::whereMonth('created_at', now()->month)->count();
+
+        $activePools = Pool::where('status', PoolStatus::ACTIVE)->count();
+        $totalPoolCapital = Pool::where('status', PoolStatus::ACTIVE)->sum('total_amount');
+
+        $activeSubscriptions = Subscription::where('is_active', true)->count();
+        $revenueThisMonth = Payment::where('status', PaymentStatus::Approved)
+            ->whereIn('type', [PaymentType::Signals->value, PaymentType::ClassSubscription->value])
+            ->whereMonth('created_at', now()->month)
+            ->sum('amount');
 
         return [
             Stat::make('Total Users', $totalUsers)
@@ -60,6 +75,18 @@ class StatsOverviewWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-bolt')
                 ->color('primary')
                 ->url(route('filament.admin.resources.signals.index')),
+
+            Stat::make('Active Pools', $activePools)
+                ->description('$'.number_format($totalPoolCapital, 2).' total capital')
+                ->descriptionIcon('heroicon-m-circle-stack')
+                ->color('success')
+                ->url(route('filament.admin.resources.pools.index')),
+
+            Stat::make('Active Subscriptions', $activeSubscriptions)
+                ->description('$'.number_format($revenueThisMonth, 2).' revenue this month')
+                ->descriptionIcon('heroicon-m-credit-card')
+                ->color('info')
+                ->url(route('filament.admin.resources.subscriptions.index')),
         ];
     }
 }

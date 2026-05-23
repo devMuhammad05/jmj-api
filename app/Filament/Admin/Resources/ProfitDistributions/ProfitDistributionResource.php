@@ -24,7 +24,9 @@ class ProfitDistributionResource extends Resource
 
     protected static ?string $modelLabel = 'Profit Distribution';
 
-    protected static ?int $navigationSort = 7;
+    protected static string|\UnitEnum|null $navigationGroup = 'Trading & Investments';
+
+    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {

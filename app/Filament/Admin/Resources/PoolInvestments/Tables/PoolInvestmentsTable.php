@@ -19,6 +19,7 @@ class PoolInvestmentsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['user.payoutAccounts']))
             ->columns([
                 TextColumn::make('user.full_name')
                     ->label('User')
@@ -115,11 +116,11 @@ class PoolInvestmentsTable
                         ),
                     ),
 
-                Action::make('viewBankDetails')
-                    ->label('Bank Details')
+                Action::make('viewPayoutDetails')
+                    ->label('Payout Details')
                     ->icon(Heroicon::OutlinedBuildingLibrary)
                     ->color('gray')
-                    ->modalHeading('Bank Details')
+                    ->modalHeading('Payout Details')
                     ->modalContent(fn (PoolInvestment $record) => view('filament.admin.bank-details-modal', ['record' => $record]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close'),

@@ -22,6 +22,8 @@ class VerificationResource extends Resource
 
     protected static ?string $navigationLabel = 'KYC Verifications';
 
+    protected static string|\UnitEnum|null $navigationGroup = 'User Management';
+
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationBadge(): ?string

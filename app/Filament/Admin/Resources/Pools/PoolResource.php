@@ -24,7 +24,9 @@ class PoolResource extends Resource
 
     protected static ?string $modelLabel = 'Pool';
 
-    protected static ?int $navigationSort = 5;
+    protected static string|\UnitEnum|null $navigationGroup = 'Trading & Investments';
+
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'name';
 

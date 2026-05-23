@@ -22,7 +22,9 @@ class MetaTraderCredentialResource extends Resource
 
     protected static ?string $navigationLabel = 'MT Accounts';
 
-    protected static ?int $navigationSort = 3;
+    protected static string|\UnitEnum|null $navigationGroup = 'Trading & Investments';
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'mt_account_number';
 

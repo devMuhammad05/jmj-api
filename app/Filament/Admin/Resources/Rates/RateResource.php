@@ -19,6 +19,11 @@ class RateResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-dollar';
 
+    protected static ?string $navigationLabel = 'Rates';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Trading & Investments';
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
