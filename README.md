@@ -54,6 +54,8 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/pool-investments`           | 🔒   | Get user's pool investments        |
 | POST   | `/pool-investments`           | 🔒   | Submit pool investment application |
 | GET    | `/pool-investments/{id}`      | 🔒   | Get specific investment details    |
+| GET    | `/payout-accounts`            | 🔒   | List user's payout accounts        |
+| POST   | `/payout-accounts`            | 🔒   | Add a payout account (bank/crypto) |
 | GET    | `/profit-distributions`       | 🔒   | Get user's profit distributions    |
 | GET    | `/profit-distributions/{id}`  | 🔒   | Get specific distribution details  |
 | GET    | `/trading-classes`            | 🔒   | Get trading classes (filtered by subscription tier) |
@@ -1074,9 +1076,6 @@ Submit an application to join an investment pool. Payment verification takes 24-
 | `pool_id`              | UUID    | ✓        | Must be a valid active pool              |
 | `full_name`            | string  | ✓        | Investor's full legal name               |
 | `phone_number`         | string  | ✓        | Contact number                           |
-| `bank_name`            | string  | ✓        | Bank for profit disbursement             |
-| `account_number`       | string  | ✓        | 10-digit bank account number             |
-| `account_name`         | string  | ✓        | Name on bank account                     |
 | `contribution`         | numeric | ✓        | Investment amount (minimum $1,000)       |
 | `amount_paid`          | numeric | ✓        | Total amount paid (including fees)        |
 | `payment_gateway_id`   | integer | ✓        | ID of the payment gateway used            |
@@ -1227,7 +1226,98 @@ Retrieve detailed information about a specific pool investment. Users can only v
 
 ---
 
-#### 5.6 Get User's Profit Distributions
+#### 5.6 Payout Accounts — `/payout-accounts`
+
+Manage the bank or crypto accounts used to receive payouts. Bank details are no longer collected on the pool investment form — store them here instead.
+
+##### 5.6.1 List Payout Accounts
+
+`GET /payout-accounts` 🔒
+
+Returns all payout accounts for the authenticated user.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "Payout accounts retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "type": "bank",
+            "label": "My GTB Account",
+            "is_default": true,
+            "bank_name": "GTBank",
+            "account_name": "John Doe",
+            "account_number": "0123456789",
+            "created_at": "2026-05-23 10:00:00"
+        },
+        {
+            "id": 2,
+            "type": "crypto",
+            "label": "My USDT Wallet",
+            "is_default": false,
+            "wallet_address": "TRx123456789abcdefghij",
+            "network": "TRC20",
+            "coin": "USDT",
+            "created_at": "2026-05-23 10:05:00"
+        }
+    ]
+}
+```
+
+> Bank-specific fields (`bank_name`, `account_name`, `account_number`) are omitted for crypto accounts and vice versa.
+
+---
+
+##### 5.6.2 Add Payout Account
+
+`POST /payout-accounts` 🔒
+
+Add a new bank or crypto payout account. Setting `is_default: true` automatically clears the default flag from any existing account.
+
+**Request Body:**
+
+| Field            | Type    | Required        | Notes                                      |
+| ---------------- | ------- | --------------- | ------------------------------------------ |
+| `type`           | string  | ✓               | `bank` or `crypto`                         |
+| `label`          | string  | —               | Optional friendly name, max 100 characters |
+| `is_default`     | boolean | —               | Defaults to `false`                        |
+| `bank_name`      | string  | if `type=bank`  | Name of the bank                           |
+| `account_name`   | string  | if `type=bank`  | Name on the account                        |
+| `account_number` | string  | if `type=bank`  | Account number, max 20 characters          |
+| `wallet_address` | string  | if `type=crypto`| Wallet address, max 255 characters         |
+| `network`        | string  | if `type=crypto`| Network (e.g. `TRC20`, `ERC20`, `BEP20`)  |
+| `coin`           | string  | if `type=crypto`| Coin ticker (e.g. `USDT`, `BTC`, `ETH`)   |
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "Payout account added successfully",
+    "data": {
+        "id": 3,
+        "type": "bank",
+        "label": "My Access Account",
+        "is_default": true,
+        "bank_name": "Access Bank",
+        "account_name": "John Doe",
+        "account_number": "9876543210",
+        "created_at": "2026-05-23 11:00:00"
+    }
+}
+```
+
+**Error Responses:**
+
+- `401`: Unauthenticated
+- `422`: Validation error — missing required fields for the chosen type
+
+---
+
+#### 5.7 Get User's Profit Distributions
 
 `GET /profit-distributions` 🔒
 
@@ -1872,9 +1962,6 @@ curl -X POST http://localhost:8000/api/v1/pool-investments \
     "pool_id": "9d3e4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
     "full_name": "John Doe",
     "phone_number": "+234 123 456 7890",
-    "bank_name": "GTBank",
-    "account_number": "0123456789",
-    "account_name": "John Doe",
     "contribution": 1000,
     "amount_paid": 1035,
     "payment_gateway_id": 1,
@@ -1888,6 +1975,37 @@ curl -X POST http://localhost:8000/api/v1/pool-investments \
 ```bash
 curl -X GET http://localhost:8000/api/v1/pool-investments \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Add a bank payout account:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/payout-accounts \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "bank",
+    "label": "My GTB Account",
+    "bank_name": "GTBank",
+    "account_name": "John Doe",
+    "account_number": "0123456789",
+    "is_default": true
+  }'
+```
+
+**Add a crypto payout account:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/payout-accounts \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "crypto",
+    "label": "My USDT Wallet",
+    "wallet_address": "TRx123456789abcdefghij",
+    "network": "TRC20",
+    "coin": "USDT"
+  }'
 ```
 
 **Get my profit distributions:**

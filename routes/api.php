@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\PaymentGatewayController;
+use App\Http\Controllers\Api\V1\PayoutAccountController;
 use App\Http\Controllers\Api\V1\PlanController;
 use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\PoolInvestmentController;
@@ -83,18 +84,15 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/{tradingClass}', [TradingClassController::class, 'show']);
         });
 
-
-        if(app()->isProduction()){
+        if (app()->isProduction()) {
             Route::middleware('verified.kyc')->group(function (): void {
                 Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
             });
         }
 
-        if(app()->isLocal()){
+        if (app()->isLocal()) {
             Route::post('/metatrader-credentials', [MetaTraderCredentialController::class, 'store']);
         }
-
-
 
         Route::get('/trading-stats', [TradingStatsController::class, 'show']);
 
@@ -113,6 +111,10 @@ Route::prefix('v1')->group(function (): void {
         // Profit Distribution Routes
         Route::get('/profit-distributions', [ProfitDistributionController::class, 'index']);
         Route::get('/profit-distributions/{profitDistribution}', [ProfitDistributionController::class, 'show']);
+
+        // Payout Account Routes
+        Route::get('/payout-accounts', [PayoutAccountController::class, 'index']);
+        Route::post('/payout-accounts', [PayoutAccountController::class, 'store']);
 
         // Payment Gateway Routes
         Route::get('/payment-gateways', [PaymentGatewayController::class, 'index']);

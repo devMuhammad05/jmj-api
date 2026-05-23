@@ -4,8 +4,10 @@ namespace App\Http\Requests\Api\V1;
 
 use App\Enums\MetaTraderPlatformType;
 use App\Enums\RiskLevel;
+use App\Models\Pool;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StorePoolInvestmentRequest extends FormRequest
 {
@@ -28,9 +30,6 @@ class StorePoolInvestmentRequest extends FormRequest
             'pool_id' => ['required', 'uuid', 'exists:pools,id'],
             'full_name' => ['required', 'string', 'max:255'],
             'phone_number' => ['required', 'string', 'max:20'],
-            'bank_name' => ['required', 'string', 'max:255'],
-            'account_number' => ['required', 'string', 'max:20'],
-            'account_name' => ['required', 'string', 'max:255'],
             'contribution' => ['required', 'numeric', 'min:1000'],
             'amount_paid' => ['required', 'numeric', 'min:0'],
             'payment_gateway_id' => ['required', 'integer', 'exists:payment_gateways,id'],
@@ -58,5 +57,30 @@ class StorePoolInvestmentRequest extends FormRequest
             'contribution.min' => 'The minimum investment amount is $1,000.',
             'terms_accepted.accepted' => 'You must accept the terms and conditions.',
         ];
+    }
+
+    /**
+     * Add post-validation checks that require database lookups.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $pool = Pool::find($this->input('pool_id'));
+
+            if (! $pool) {
+                return;
+            }
+
+            $activeApplications = $pool->poolInvestments()
+                ->whereIn('status', [PoolInvestmentStatus::PENDING, PoolInvestmentStatus::VERIFIED])
+                ->count();
+
+            if ($activeApplications >= $pool->number_of_investors) {
+                $validator->errors()->add(
+                    'pool_id',
+                    'This pool has reached its maximum capacity and is no longer accepting applications.'
+                );
+            }
+        });
     }
 }

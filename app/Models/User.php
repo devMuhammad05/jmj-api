@@ -173,6 +173,16 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     }
 
     /**
+     * Get the payout accounts associated with the user.
+     *
+     * @return HasMany<PayoutAccount, $this>
+     */
+    public function payoutAccounts(): HasMany
+    {
+        return $this->hasMany(PayoutAccount::class);
+    }
+
+    /**
      * Get the active subscription for the user (any type).
      */
     public function activeSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne

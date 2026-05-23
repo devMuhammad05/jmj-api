@@ -6,8 +6,6 @@ use App\Enums\MetaTraderPlatformType;
 use App\Enums\PoolInvestmentStatus;
 use App\Enums\PoolStatus;
 use App\Enums\RiskLevel;
-use App\Models\MetaAccountMetric;
-use App\Models\MetaTraderCredential;
 use App\Models\Pool;
 use App\Models\PoolInvestment;
 use App\Models\User;
@@ -30,7 +28,8 @@ class PoolInvestmentTest extends TestCase
         $this->pool = Pool::create([
             'name' => 'Test Pool',
             'total_amount' => 45000,
-            'investor_count' => 23,
+            'number_of_investors' => 23,
+            'each_contribution_amount' => 1000,
             'minimum_investment' => 1000,
             'status' => PoolStatus::ACTIVE,
         ]);
@@ -48,7 +47,6 @@ class PoolInvestmentTest extends TestCase
                     'id',
                     'name',
                     'total_amount',
-                    'investor_count',
                     'minimum_investment',
                     'status',
                 ],
@@ -77,11 +75,10 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'amount_paid' => 1000,
+            'payment_gateway_id' => 1,
+            'payment_proof_url' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
         ];
 
@@ -113,11 +110,10 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
-            'contribution' => 500, // Below minimum
-            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'contribution' => 500,
+            'amount_paid' => 500,
+            'payment_gateway_id' => 1,
+            'payment_proof_url' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
         ];
 
@@ -137,11 +133,10 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'amount_paid' => 1000,
+            'payment_gateway_id' => 1,
+            'payment_proof_url' => 'https://example.com/proof.jpg',
             'terms_accepted' => false,
         ];
 
@@ -162,11 +157,7 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::PENDING,
         ]);
@@ -193,16 +184,11 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'Other User',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'Other User',
             'contribution' => 1000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::PENDING,
         ]);
 
-        // User should not be able to view another user's investment
         $response = $this->actingAs($this->user)->getJson(
             "/api/v1/pool-investments/{$investment->id}",
         );
@@ -217,16 +203,11 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::PENDING,
         ]);
 
-        // User should be able to view their own investment
         $response = $this->actingAs($this->user)->getJson(
             "/api/v1/pool-investments/{$investment->id}",
         );
@@ -246,11 +227,10 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'Jane Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'Jane Doe',
             'contribution' => 5000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'amount_paid' => 5000,
+            'payment_gateway_id' => 1,
+            'payment_proof_url' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
             'mt_account_number' => '123456',
             'mt_password' => 'secret123',
@@ -277,11 +257,10 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'amount_paid' => 1000,
+            'payment_gateway_id' => 1,
+            'payment_proof_url' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
         ];
 
@@ -299,13 +278,12 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'Jane Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'Jane Doe',
             'contribution' => 1000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
+            'amount_paid' => 1000,
+            'payment_gateway_id' => 1,
+            'payment_proof_url' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
-            'mt_account_number' => '123456', // Provided without the other MT fields
+            'mt_account_number' => '123456',
         ];
 
         $response = $this->actingAs($this->user)->postJson('/api/v1/pool-investments', $data);
@@ -319,39 +297,14 @@ class PoolInvestmentTest extends TestCase
         ]);
     }
 
-    public function test_verified_investment_includes_metric_data(): void
+    public function test_verified_investment_does_not_include_meta_trader_data(): void
     {
-        $accountId = fake()->uuid();
-
-        $credential = MetaTraderCredential::create([
-            'user_id' => $this->user->id,
-            'pool_id' => $this->pool->id,
-            'account_id' => $accountId,
-            'mt_account_number' => '1234567',
-            'mt_password' => 'secret',
-            'mt_server' => 'Exness-MT5Real',
-            'platform_type' => MetaTraderPlatformType::MT5->value,
-            'initial_deposit' => 5000,
-            'risk_level' => RiskLevel::MODERATE->value,
-        ]);
-
-        MetaAccountMetric::create([
-            'account_id' => $accountId,
-            'balance' => 5250.00,
-            'equity' => 5300.00,
-            'margin' => 150.00,
-        ]);
-
         $investment = PoolInvestment::create([
             'user_id' => $this->user->id,
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 5000,
-            'payment_proof_path' => 'https://example.com/proof.jpg',
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::VERIFIED,
             'verified_at' => now(),
@@ -359,15 +312,8 @@ class PoolInvestmentTest extends TestCase
 
         $response = $this->actingAs($this->user)->getJson("/api/v1/pool-investments/{$investment->id}");
 
-        $response->assertStatus(200)->assertJson([
-            'data' => [
-                'pool_meta_trader_account' => [
-                    'balance' => '5250.00',
-                    'equity' => '5300.00',
-                    'margin' => '150.00',
-                ],
-            ],
-        ]);
+        $response->assertStatus(200);
+        $this->assertArrayNotHasKey('pool_meta_trader_account', $response->json('data'));
     }
 
     public function test_pool_shows_approved_investors_count(): void
@@ -379,9 +325,6 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'Jane Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'Jane Doe',
             'contribution' => 1000,
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::VERIFIED,
@@ -392,9 +335,6 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::PENDING,
@@ -412,9 +352,6 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::VERIFIED,
@@ -435,9 +372,6 @@ class PoolInvestmentTest extends TestCase
             'pool_id' => $this->pool->id,
             'full_name' => 'John Doe',
             'phone_number' => '+234 123 456 7890',
-            'bank_name' => 'GTBank',
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
             'contribution' => 1000,
             'terms_accepted' => true,
             'status' => PoolInvestmentStatus::PENDING,

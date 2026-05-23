@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\V1;
 
-use App\Enums\PoolInvestmentStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,34 +22,10 @@ class PoolInvestmentResource extends JsonResource
             'contribution' => $this->contribution,
             'amount_paid' => $this->amount_paid,
             'share_percentage' => $this->share_percentage,
-            'payment_proof_url' => $this->whenLoaded('payment', function () {
-                return $this->payment->proofs->first()?->payment_proof_url;
-            }),
             'status' => $this->status,
             'terms_accepted' => $this->terms_accepted,
             'verified_at' => $this->verified_at?->toDateTimeString(),
             'rejection_reason' => $this->when($this->status->value === 'rejected', $this->rejection_reason),
-            'pool_meta_trader_account' => $this->when(
-                $this->status === PoolInvestmentStatus::VERIFIED
-                    && $this->relationLoaded('pool')
-                    && $this->pool->relationLoaded('metaTraderCredential')
-                    && $this->pool->metaTraderCredential !== null,
-                function () {
-                    $credential = $this->pool->metaTraderCredential;
-                    $metric = $credential->relationLoaded('metric') ? $credential->metric : null;
-
-                    return [
-                        'mt_account_number' => $credential->mt_account_number,
-                        'mt_server' => $credential->mt_server,
-                        'platform_type' => $credential->platform_type,
-                        'risk_level' => $credential->risk_level,
-                        'initial_deposit' => $credential->initial_deposit,
-                        'balance' => $metric?->balance,
-                        'equity' => $metric?->equity,
-                        'margin' => $metric?->margin,
-                    ];
-                }
-            ),
             'submitted_at' => $this->created_at->toDateTimeString(),
         ];
     }

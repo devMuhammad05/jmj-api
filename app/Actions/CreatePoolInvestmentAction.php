@@ -24,14 +24,11 @@ class CreatePoolInvestmentAction
                 'pool_id' => $data->pool_id,
                 'full_name' => $data->full_name,
                 'phone_number' => $data->phone_number,
-                'bank_name' => $data->bank_name,
-                'account_number' => $data->account_number,
-                'account_name' => $data->account_name,
                 'contribution' => $data->contribution,
                 'amount_paid' => $data->amount_paid,
                 'terms_accepted' => $data->terms_accepted,
                 'status' => PoolInvestmentStatus::PENDING,
-                'share_percentage' => 0, // Will be calculated after verification
+                'share_percentage' => 0,
             ]);
 
             // Create a Payment record for this investment
