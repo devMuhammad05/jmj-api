@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1;
 
 use App\Enums\MetaTraderPlatformType;
+use App\Enums\PoolInvestmentStatus;
 use App\Enums\RiskLevel;
 use App\Models\Pool;
 use Illuminate\Foundation\Http\FormRequest;
