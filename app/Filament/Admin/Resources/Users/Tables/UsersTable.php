@@ -37,6 +37,11 @@ class UsersTable
                 TextColumn::make('country')
                     ->searchable()
                     ->toggleable(),
+                TextColumn::make('referral_source')
+                    ->label('Referral Source')
+                    ->formatStateUsing(fn ($state): string => $state?->name ?? '-')
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('verification.status')
                     ->label('KYC Status')
                     ->badge()
