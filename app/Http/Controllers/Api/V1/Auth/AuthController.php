@@ -32,6 +32,7 @@ final class AuthController extends ApiController
             'full_name' => $request->full_name,
             'email' => $request->email,
             'country' => $request->country,
+            'referral_source' => $request->referral_source,
             'password' => $this->hasher->make($request->password),
         ]);
 

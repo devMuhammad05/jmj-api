@@ -28,6 +28,7 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | ------ | ----------------------------- | ---- | ---------------------------------- |
 | GET    | `/`                           | No   | Health check                       |
 | GET    | `/app-settings`               | No   | Get app configuration & contact info |
+| GET    | `/referral-sources`           | No   | List referral source options       |
 | POST   | `/auth/register`              | No   | Register new user (sends OTP)      |
 | POST   | `/auth/verify-registration-otp` | No | Verify OTP to complete registration |
 | POST   | `/auth/send-otp`              | No   | Resend OTP to email                |
@@ -43,10 +44,10 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/plans`                      | No   | List all active plans grouped by type      |
 | GET    | `/rates`                      | No   | List all exchange rates            |
 | GET    | `/rates/{key}`                | No   | Get specific rate by key           |
-| GET    | `/signals`                    | No   | Get signals (filtered by subscription tier) |
-| GET    | `/signals/active`             | No   | Get active signals (filtered by subscription tier) |
-| GET    | `/signals/statistics`         | No   | Get signal performance statistics  |
-| GET    | `/signals/{id}`               | No   | Get specific signal details        |
+| GET    | `/signals`                    | 🔒   | Get signals (filtered by subscription tier) |
+| GET    | `/signals/active`             | 🔒   | Get active signals (filtered by subscription tier) |
+| GET    | `/signals/statistics`         | 🔒   | Get signal performance statistics  |
+| GET    | `/signals/{id}`               | 🔒   | Get specific signal details        |
 | GET    | `/verifications`              | 🔒   | Get KYC verification status        |
 | POST   | `/verifications`              | 🔒   | Submit KYC documents               |
 | POST   | `/metatrader-credentials`     | 🔒   | Store MetaTrader credentials       |
@@ -94,13 +95,16 @@ Returns a simple message confirming the API is running.
 
 ---
 
-### 0. App Settings — `/app-settings`
+### 0. App Settings & Public Lookups
+
+#### Get App Settings
 
 #### Get App Settings
 
 `GET /app-settings`
 
 Returns the application's public configuration — identity, contact details, and external URLs. No authentication required.
+
 
 **Response:**
 
@@ -127,6 +131,36 @@ Returns the application's public configuration — identity, contact details, an
 
 ---
 
+#### Get Referral Sources
+
+`GET /referral-sources`
+
+Returns the list of referral source options for the "How did you hear about us?" registration field. No authentication required.
+
+**Response:**
+
+```json
+{
+    "status": "success",
+    "message": "Referral sources retrieved successfully",
+    "data": [
+        { "value": "facebook", "label": "Facebook" },
+        { "value": "instagram", "label": "Instagram" },
+        { "value": "twitter", "label": "Twitter" },
+        { "value": "tiktok", "label": "Tiktok" },
+        { "value": "youtube", "label": "Youtube" },
+        { "value": "whatsapp", "label": "Whatsapp" },
+        { "value": "telegram", "label": "Telegram" },
+        { "value": "linkedin", "label": "Linkedin" },
+        { "value": "google", "label": "Google" },
+        { "value": "friend", "label": "Friend" },
+        { "value": "other", "label": "Other" }
+    ]
+}
+```
+
+---
+
 ### 1. Authentication — `/auth`
 
 #### 1.1 Register
@@ -137,32 +171,23 @@ Create a new user account.
 
 **Request Body:**
 
-| Field                   | Type   | Required | Notes                 |
-| ----------------------- | ------ | -------- | --------------------- |
-| `full_name`             | string | ✓        |                       |
-| `email`                 | string | ✓        | Must be unique        |
-| `password`              | string | ✓        | Min 8 characters      |
-| `password_confirmation` | string | ✓        | Must match `password` |
-| `country`               | string | —        | Optional              |
+| Field                   | Type   | Required | Notes                                                      |
+| ----------------------- | ------ | -------- | ---------------------------------------------------------- |
+| `full_name`             | string | ✓        |                                                            |
+| `email`                 | string | ✓        | Must be unique                                             |
+| `password`              | string | ✓        | Min 8 characters                                           |
+| `password_confirmation` | string | ✓        | Must match `password`                                      |
+| `country`               | string | —        | Optional                                                   |
+| `referral_source`       | string | —        | One of the values from `GET /referral-sources` (optional)  |
 
 **Response:**
 
 ```json
 {
     "status": "success",
-    "message": "User registered successfully",
+    "message": "Registration successful. Please check your email for OTP verification.",
     "data": {
-        "user": {
-            "id": 1,
-            "full_name": "John Doe",
-            "email": "john@example.com",
-            "country": "Nigeria",
-            "created_at": "2026-03-08T10:00:00.000000Z",
-            "updated_at": "2026-03-08T10:00:00.000000Z"
-        },
-        "access_token": "1|abc123...",
-        "token_type": "Bearer",
-        "pin_configured": false
+        "email": "john@example.com"
     }
 }
 ```
@@ -832,9 +857,9 @@ Retrieve a specific rate by its key identifier.
 
 ### 8. Trading Signals — `/signals`
 
-> ℹ️ Signal routes are **public** — no authentication required.
+> 🔒 All signal routes require authentication.
 > Content is filtered by subscription tier:
-> - **No subscription / unauthenticated** — only signals marked `is_free = true` are returned.
+> - **No active Signals subscription** — only signals marked `is_free = true` are returned.
 > - **Active Signals subscription** — free signals + all signals assigned to the user's plan.
 
 #### 4.1 Get All Signals
@@ -1878,6 +1903,12 @@ All API responses follow a consistent JSON structure.
 curl -X GET http://localhost:8000/api/v1/app-settings
 ```
 
+**Get referral sources:**
+
+```bash
+curl -X GET http://localhost:8000/api/v1/referral-sources
+```
+
 ---
 
 **Register a new user:**
@@ -1890,7 +1921,8 @@ curl -X POST http://localhost:8000/api/v1/auth/register \
     "email": "john@example.com",
     "password": "password123",
     "password_confirmation": "password123",
-    "country": "Nigeria"
+    "country": "Nigeria",
+    "referral_source": "instagram"
   }'
 ```
 
@@ -1960,31 +1992,36 @@ curl -X GET http://localhost:8000/api/v1/client-portfolio \
 **Get all signals:**
 
 ```bash
-curl -X GET http://localhost:8000/api/v1/signals
+curl -X GET http://localhost:8000/api/v1/signals \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Get active signals only:**
 
 ```bash
-curl -X GET http://localhost:8000/api/v1/signals/active
+curl -X GET http://localhost:8000/api/v1/signals/active \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Get signals with filters:**
 
 ```bash
-curl -X GET "http://localhost:8000/api/v1/signals?symbol=EURUSD&status=active&per_page=10"
+curl -X GET "http://localhost:8000/api/v1/signals?symbol=EURUSD&status=active&per_page=10" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Get signal statistics:**
 
 ```bash
-curl -X GET http://localhost:8000/api/v1/signals/statistics
+curl -X GET http://localhost:8000/api/v1/signals/statistics \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Get specific signal:**
 
 ```bash
-curl -X GET http://localhost:8000/api/v1/signals/1
+curl -X GET http://localhost:8000/api/v1/signals/1 \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Get active pools:**

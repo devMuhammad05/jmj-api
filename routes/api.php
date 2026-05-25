@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\PoolController;
 use App\Http\Controllers\Api\V1\PoolInvestmentController;
 use App\Http\Controllers\Api\V1\ProfitDistributionController;
 use App\Http\Controllers\Api\V1\RateController;
+use App\Http\Controllers\Api\V1\ReferralSourceController;
 use App\Http\Controllers\Api\V1\SignalController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\TradingClassController;
@@ -63,6 +64,9 @@ Route::prefix('v1')->group(function (): void {
     // App Settings (public)
     Route::get('/app-settings', [AppSettingController::class, 'show']);
 
+    // Referral Sources (public)
+    Route::get('/referral-sources', [ReferralSourceController::class, 'index']);
+
     // Plans (public)
     Route::get('/plans', [PlanController::class, 'index']);
 
@@ -70,15 +74,15 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/rates', [RateController::class, 'index']);
     Route::get('/rates/{key}', [RateController::class, 'show']);
 
-    // Public Signal Routes (no authentication required)
-    Route::prefix('signals')->group(function (): void {
-        Route::get('/', [SignalController::class, 'index']);
-        Route::get('/active', [SignalController::class, 'active']);
-        Route::get('/statistics', [SignalController::class, 'statistics']);
-        Route::get('/{signal}', [SignalController::class, 'show']);
-    });
-
     Route::middleware(['auth:sanctum', 'verified.email'])->group(function (): void {
+        // Signal Routes
+        Route::prefix('signals')->group(function (): void {
+            Route::get('/', [SignalController::class, 'index']);
+            Route::get('/active', [SignalController::class, 'active']);
+            Route::get('/statistics', [SignalController::class, 'statistics']);
+            Route::get('/{signal}', [SignalController::class, 'show']);
+        });
+
         // Client Portfolio Route
         Route::get('/client-portfolio', [ClientPortfolioController::class, 'index']);
 

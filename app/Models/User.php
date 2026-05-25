@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\PlanType;
+use App\Enums\ReferralSource;
 use App\Enums\Role;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
@@ -36,6 +37,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
         'email',
         'phone_number',
         'country',
+        'referral_source',
         'password',
         'role',
         'pin',
@@ -90,6 +92,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'referral_source' => ReferralSource::class,
             'pin_set_at' => 'datetime',
             'pin_locked_until' => 'datetime',
             'pin_attempts' => 'integer',
