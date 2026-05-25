@@ -23,8 +23,8 @@ class UserRegistrationsChart extends ChartWidget
 
         $registrations = User::where('role', Role::User)
             ->where('created_at', '>=', $months->first())
-            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, count(*) as count')
-            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+            ->selectRaw('EXTRACT(YEAR FROM created_at) as year, EXTRACT(MONTH FROM created_at) as month, count(*) as count')
+            ->groupByRaw('EXTRACT(YEAR FROM created_at), EXTRACT(MONTH FROM created_at)')
             ->get()
             ->keyBy(fn ($r): string => $r->year.'-'.$r->month);
 

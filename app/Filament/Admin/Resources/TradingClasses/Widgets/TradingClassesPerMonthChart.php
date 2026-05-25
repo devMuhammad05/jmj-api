@@ -21,8 +21,8 @@ class TradingClassesPerMonthChart extends ChartWidget
         $months = collect(range(5, 0))->map(fn (int $ago): CarbonInterface => now()->subMonths($ago)->startOfMonth());
 
         $classes = TradingClass::where('scheduled_at', '>=', $months->first())
-            ->selectRaw('YEAR(scheduled_at) as year, MONTH(scheduled_at) as month, count(*) as count')
-            ->groupByRaw('YEAR(scheduled_at), MONTH(scheduled_at)')
+            ->selectRaw('EXTRACT(YEAR FROM scheduled_at) as year, EXTRACT(MONTH FROM scheduled_at) as month, count(*) as count')
+            ->groupByRaw('EXTRACT(YEAR FROM scheduled_at), EXTRACT(MONTH FROM scheduled_at)')
             ->get()
             ->keyBy(fn ($r): string => $r->year.'-'.$r->month);
 
