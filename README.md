@@ -179,6 +179,7 @@ Create a new user account.
 | `password_confirmation` | string | ✓        | Must match `password`                                      |
 | `country`               | string | —        | Optional                                                   |
 | `referral_source`       | string | —        | One of the values from `GET /referral-sources` (optional)  |
+| `referral_code`         | string | —        | 8-character referral code of an existing user (optional)   |
 
 **Response:**
 
@@ -1922,7 +1923,8 @@ curl -X POST http://localhost:8000/api/v1/auth/register \
     "password": "password123",
     "password_confirmation": "password123",
     "country": "Nigeria",
-    "referral_source": "instagram"
+    "referral_source": "instagram",
+    "referral_code": "ABCD1234"
   }'
 ```
 

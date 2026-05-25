@@ -28,11 +28,16 @@ final class AuthController extends ApiController
      */
     public function register(RegisterUserRequest $request): JsonResponse
     {
+        $referrer = $request->filled('referral_code')
+            ? User::where('referral_code', $request->referral_code)->first()
+            : null;
+
         $user = User::create([
             'full_name' => $request->full_name,
             'email' => $request->email,
             'country' => $request->country,
             'referral_source' => $request->referral_source,
+            'referred_by' => $referrer?->id,
             'password' => $this->hasher->make($request->password),
         ]);
 

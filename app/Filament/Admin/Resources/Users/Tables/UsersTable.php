@@ -19,7 +19,7 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('role', Role::User)->with('verification'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('role', Role::User)->with(['verification', 'referredBy']))
             ->columns([
                 TextColumn::make('full_name')
                     ->label('Name')
@@ -37,6 +37,15 @@ class UsersTable
                 TextColumn::make('country')
                     ->searchable()
                     ->toggleable(),
+                TextColumn::make('referral_code')
+                    ->label('Referral Code')
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('referredBy.full_name')
+                    ->label('Referred By')
+                    ->default('-')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('referral_source')
                     ->label('Referral Source')
                     ->formatStateUsing(fn ($state): string => $state?->name ?? '-')

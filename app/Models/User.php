@@ -6,10 +6,13 @@ namespace App\Models;
 use App\Enums\PlanType;
 use App\Enums\ReferralSource;
 use App\Enums\Role;
+use App\Observers\UserObserver;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +21,7 @@ use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
 use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
 use Stephenjude\FilamentTwoFactorAuthentication\TwoFactorAuthenticatable;
 
+#[ObservedBy(UserObserver::class)]
 class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -38,6 +42,8 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
         'phone_number',
         'country',
         'referral_source',
+        'referral_code',
+        'referred_by',
         'password',
         'role',
         'pin',
@@ -225,5 +231,25 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
     public function hasActiveTradingSubscription(): bool
     {
         return $this->activeSubscriptionFor(PlanType::TradingClasses) !== null;
+    }
+
+    /**
+     * Get the user who referred this user.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function referredBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    /**
+     * Get the users referred by this user.
+     *
+     * @return HasMany<User, $this>
+     */
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by');
     }
 }

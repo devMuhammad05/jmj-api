@@ -30,6 +30,7 @@ final class RegisterUserRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'country' => ['nullable', 'string', 'max:255'],
             'referral_source' => ['nullable', new Enum(ReferralSource::class)],
+            'referral_code' => ['nullable', 'string', 'size:8', 'exists:users,referral_code'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
