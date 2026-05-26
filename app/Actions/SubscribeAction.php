@@ -6,12 +6,14 @@ namespace App\Actions;
 
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
+use App\Enums\PlanType;
 use App\Http\Requests\Api\V1\SubscribeRequest;
 use App\Models\Payment;
 use App\Models\PaymentGateway;
 use App\Models\Plan;
 use App\Models\User;
-use App\Notifications\Admin\NewPaymentSubmittedNotification;
+use App\Notifications\Admin\NewClassSubscriptionNotification;
+use App\Notifications\Admin\NewSignalSubscriptionNotification;
 use App\Services\AdminService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -53,11 +55,16 @@ class SubscribeAction
 
             $adminService = app(AdminService::class);
 
+            $notification = match ($plan->type) {
+                PlanType::Signals => new NewSignalSubscriptionNotification($payment),
+                PlanType::TradingClasses => new NewClassSubscriptionNotification($payment),
+            };
+
             foreach ($adminService->getAdminEmails() as $email) {
-                Notification::route('mail', $email)->notify(new NewPaymentSubmittedNotification($payment));
+                Notification::route('mail', $email)->notify($notification);
             }
 
-            Notification::send($adminService->getAdmins(), new NewPaymentSubmittedNotification($payment));
+            Notification::send($adminService->getAdmins(), $notification);
 
             return $payment;
         });
