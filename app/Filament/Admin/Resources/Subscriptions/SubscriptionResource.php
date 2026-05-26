@@ -37,7 +37,12 @@ class SubscriptionResource extends Resource
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'warning';
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Pending';
     }
 
     public static function form(Schema $schema): Schema
