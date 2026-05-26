@@ -34,6 +34,8 @@ class CreateVerificationAction
             Notification::route('mail', $email)->notify(new KycSubmittedNotification($verification));
         }
 
+        Notification::send($adminService->getAdmins(), new KycSubmittedNotification($verification));
+
         return $verification;
     }
 }

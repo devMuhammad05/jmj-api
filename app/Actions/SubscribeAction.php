@@ -57,6 +57,8 @@ class SubscribeAction
                 Notification::route('mail', $email)->notify(new NewPaymentSubmittedNotification($payment));
             }
 
+            Notification::send($adminService->getAdmins(), new NewPaymentSubmittedNotification($payment));
+
             return $payment;
         });
     }
