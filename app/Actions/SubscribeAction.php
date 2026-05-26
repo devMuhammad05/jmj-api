@@ -51,7 +51,9 @@ class SubscribeAction
 
             $payment->load(['plan', 'gateway', 'proofs', 'user']);
 
-            foreach (app(AdminService::class)->getAdminEmails() as $email) {
+            $adminService = app(AdminService::class);
+
+            foreach ($adminService->getAdminEmails() as $email) {
                 Notification::route('mail', $email)->notify(new NewPaymentSubmittedNotification($payment));
             }
 

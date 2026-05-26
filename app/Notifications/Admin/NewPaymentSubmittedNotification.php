@@ -25,7 +25,7 @@ class NewPaymentSubmittedNotification extends Notification implements ShouldQueu
             return ['mail'];
         }
 
-        return ['mail', 'database', 'broadcast'];
+        return ['database', 'broadcast'];
     }
 
     public function toMail(object $notifiable): MailMessage

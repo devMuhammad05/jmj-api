@@ -27,7 +27,7 @@ class KycSubmittedNotification extends Notification implements ShouldQueue
             return ['mail'];
         }
 
-        return ['mail', 'database', 'broadcast'];
+        return ['database', 'broadcast'];
     }
 
     public function toMail(object $notifiable): MailMessage

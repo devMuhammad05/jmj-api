@@ -28,7 +28,9 @@ class CreateVerificationAction
             ]
         );
 
-        foreach (app(AdminService::class)->getAdminEmails() as $email) {
+        $adminService = app(AdminService::class);
+
+        foreach ($adminService->getAdminEmails() as $email) {
             Notification::route('mail', $email)->notify(new KycSubmittedNotification($verification));
         }
 
