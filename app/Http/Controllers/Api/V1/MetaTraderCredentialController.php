@@ -7,12 +7,11 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\MetaTraderCredentialConnectionStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
-use App\Enums\Role;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreMetaTraderCredentialRequest;
 use App\Models\Payment;
-use App\Models\User;
 use App\Notifications\Admin\NewPaymentSubmittedNotification;
+use App\Services\AdminService;
 use App\Traits\FormatsMetaTraderServerName;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -55,8 +54,9 @@ class MetaTraderCredentialController extends ApiController
 
             $payment->load(['user', 'gateway', 'proofs']);
 
-            $admins = User::query()->where('role', Role::Admin)->get();
-            Notification::send($admins, new NewPaymentSubmittedNotification($payment));
+            foreach (app(AdminService::class)->getAdminEmails() as $email) {
+                Notification::route('mail', $email)->notify(new NewPaymentSubmittedNotification($payment));
+            }
         });
 
         return $this->createdResponse(

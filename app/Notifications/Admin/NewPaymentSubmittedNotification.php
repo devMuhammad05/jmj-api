@@ -5,6 +5,7 @@ namespace App\Notifications\Admin;
 use App\Models\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -20,6 +21,10 @@ class NewPaymentSubmittedNotification extends Notification implements ShouldQueu
      */
     public function via(object $notifiable): array
     {
+        if ($notifiable instanceof AnonymousNotifiable) {
+            return ['mail'];
+        }
+
         return ['mail', 'database', 'broadcast'];
     }
 

@@ -7,6 +7,7 @@ namespace App\Notifications\Admin;
 use App\Models\Verification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -22,6 +23,10 @@ class KycSubmittedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
+        if ($notifiable instanceof AnonymousNotifiable) {
+            return ['mail'];
+        }
+
         return ['mail', 'database', 'broadcast'];
     }
 

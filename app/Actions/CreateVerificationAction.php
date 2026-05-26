@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\DTOs\VerificationData;
-use App\Enums\Role;
 use App\Enums\VerificationStatus;
 use App\Models\User;
 use App\Models\Verification;
 use App\Notifications\Admin\KycSubmittedNotification;
+use App\Services\AdminService;
 use Illuminate\Support\Facades\Notification;
 
 class CreateVerificationAction
@@ -28,9 +28,9 @@ class CreateVerificationAction
             ]
         );
 
-        $admins = User::query()->where('role', Role::Admin)->get();
-
-        Notification::send($admins, new KycSubmittedNotification($verification));
+        foreach (app(AdminService::class)->getAdminEmails() as $email) {
+            Notification::route('mail', $email)->notify(new KycSubmittedNotification($verification));
+        }
 
         return $verification;
     }
