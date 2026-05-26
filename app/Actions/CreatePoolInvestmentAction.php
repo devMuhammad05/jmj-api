@@ -13,7 +13,10 @@ use App\Models\Payment;
 use App\Models\PaymentProof;
 use App\Models\PoolInvestment;
 use App\Models\User;
+use App\Notifications\Admin\NewPoolInvestmentSubmittedNotification;
+use App\Services\AdminService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class CreatePoolInvestmentAction
 {
@@ -59,6 +62,16 @@ class CreatePoolInvestmentAction
                     'risk_level' => $data->risk_level,
                 ]);
             }
+
+            $investment->load(['user', 'pool']);
+
+            $adminService = app(AdminService::class);
+
+            foreach ($adminService->getAdminEmails() as $email) {
+                Notification::route('mail', $email)->notify(new NewPoolInvestmentSubmittedNotification($investment));
+            }
+
+            Notification::send($adminService->getAdmins(), new NewPoolInvestmentSubmittedNotification($investment));
 
             return $investment;
         });
