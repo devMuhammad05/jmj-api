@@ -40,6 +40,11 @@ class SignalResource extends Resource
         return 'info';
     }
 
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Active trading signals';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return SignalForm::configure($schema);

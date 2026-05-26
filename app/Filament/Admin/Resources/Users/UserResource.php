@@ -58,4 +58,14 @@ class UserResource extends Resource
     {
         return static::getModel()::count();
     }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Total registered users';
+    }
 }

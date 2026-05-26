@@ -33,6 +33,16 @@ class MetaTraderCredentialResource extends Resource
         return static::getModel()::count();
     }
 
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Total MT accounts';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return MetaTraderCredentialForm::configure($schema);

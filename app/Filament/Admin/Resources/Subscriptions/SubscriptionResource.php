@@ -42,7 +42,7 @@ class SubscriptionResource extends Resource
 
     public static function getNavigationBadgeTooltip(): ?string
     {
-        return 'Pending';
+        return 'Pending Subscriptions';
     }
 
     public static function form(Schema $schema): Schema
