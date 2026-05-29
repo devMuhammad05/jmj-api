@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use NotificationChannels\Expo\ExpoPushToken;
 use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
 use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
 use Stephenjude\FilamentTwoFactorAuthentication\TwoFactorAuthenticatable;
@@ -50,6 +51,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
         'pin_set_at',
         'pin_attempts',
         'pin_locked_until',
+        'expo_push_token',
     ];
 
     /**
@@ -57,7 +59,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
      *
      * @var list<string>
      */
-    protected $hidden = ['password', 'remember_token', 'pin', 'role'];
+    protected $hidden = ['password', 'remember_token', 'pin', 'role', 'expo_push_token'];
 
     public function getFilamentName(): string
     {
@@ -102,7 +104,16 @@ class User extends Authenticatable implements FilamentUser, HasName, HasPasskeys
             'pin_set_at' => 'datetime',
             'pin_locked_until' => 'datetime',
             'pin_attempts' => 'integer',
+            'expo_push_token' => ExpoPushToken::class,
         ];
+    }
+
+    /**
+     * Route notifications to the Expo channel.
+     */
+    public function routeNotificationForExpo(): ?ExpoPushToken
+    {
+        return $this->expo_push_token;
     }
 
     /**

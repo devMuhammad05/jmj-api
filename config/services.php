@@ -39,4 +39,7 @@ return [
         'base_url' => env('FAST_BACKEND_BASE_URL'),
     ],
 
+    'expo' => [
+        'access_token' => env('EXPO_ACCESS_TOKEN'),
+    ],
 ];

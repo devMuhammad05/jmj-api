@@ -74,6 +74,8 @@ You receive a token on successful `/auth/register` or `/auth/login`.
 | GET    | `/notifications/unread-count` | 🔒   | Get unread notification count      |
 | POST   | `/notifications/{id}/read`    | 🔒   | Mark a notification as read        |
 | POST   | `/notifications/read-all`     | 🔒   | Mark all notifications as read     |
+| PUT    | `/expo-push-token`            | 🔒   | Register or update Expo push token |
+| DELETE | `/expo-push-token`            | 🔒   | Remove Expo push token             |
 
 ---
 
@@ -1831,6 +1833,197 @@ Marks all unread notifications as read for the authenticated user.
 
 ---
 
+### 13. Push Notifications (Expo) — `/expo-push-token`
+
+> 🔒 Both routes require authentication.
+
+The API delivers native push notifications to mobile devices via **Expo Push Notifications**. To receive them, the app must obtain an Expo push token from the device and register it with the API. Once registered, the server will send a push notification whenever a relevant event occurs (e.g. KYC approved or rejected).
+
+#### Events that trigger a push notification
+
+| Event | Title | Body |
+|-------|-------|------|
+| KYC approved | `Account Verified` | `Your identity has been verified. You now have full access.` |
+| KYC rejected | `KYC Verification Rejected` | Rejection reason if provided, otherwise a generic message |
+
+Push notifications are **in addition to** the existing `mail`, `database`, and `broadcast` channels — they only fire when the user has a registered token.
+
+---
+
+#### 13.1 Register / Update Push Token
+
+`PUT /api/v1/expo-push-token` 🔒
+
+Save or replace the authenticated user's Expo push token. Call this on app launch after the user has granted notification permissions and every time `getExpoPushTokenAsync()` returns a new value.
+
+**Request Body:**
+
+| Field             | Type   | Required | Notes                                                   |
+|-------------------|--------|----------|---------------------------------------------------------|
+| `expo_push_token` | string | ✓        | Must start with `ExponentPushToken[` or `ExpoPushToken[` |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Push token updated.",
+  "data": []
+}
+```
+
+**Error Responses:**
+
+- `401`: Unauthenticated
+- `422`: Token is missing or has an invalid format
+
+---
+
+#### 13.2 Remove Push Token
+
+`DELETE /api/v1/expo-push-token` 🔒
+
+Clear the stored push token for the authenticated user. Call this on logout so the user no longer receives push notifications on the device.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "message": "Push token removed.",
+  "data": []
+}
+```
+
+---
+
+#### 13.3 React Native Integration Guide
+
+##### Step 1 — Install the package
+
+```bash
+npx expo install expo-notifications expo-device
+```
+
+##### Step 2 — Request permission and get the token
+
+```js
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
+
+export async function registerForPushNotifications() {
+  if (!Device.isDevice) {
+    // Push notifications only work on a real device
+    return null;
+  }
+
+  // Android 13+ requires an explicit permission request
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+    });
+  }
+
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    return null; // User denied permission
+  }
+
+  const tokenData = await Notifications.getExpoPushTokenAsync({
+    projectId: 'your-expo-project-id', // from app.json / EAS
+  });
+
+  return tokenData.data; // e.g. "ExponentPushToken[xxxxxxxxxxxxxxxxxxxx]"
+}
+```
+
+##### Step 3 — Register the token with the API
+
+Call this after login, once you have both the access token and the push token:
+
+```js
+import api from './api'; // your axios instance with Authorization header set
+
+async function syncPushToken() {
+  const token = await registerForPushNotifications();
+
+  if (!token) return; // no permission or simulator
+
+  await api.put('/expo-push-token', { expo_push_token: token });
+}
+```
+
+A good place to call `syncPushToken()` is inside `useEffect` right after the user is authenticated:
+
+```js
+useEffect(() => {
+  if (user) {
+    syncPushToken();
+  }
+}, [user]);
+```
+
+##### Step 4 — Handle foreground notifications
+
+```js
+import * as Notifications from 'expo-notifications';
+
+// Show notifications even when the app is in the foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+```
+
+##### Step 5 — Navigate on notification tap
+
+```js
+import { useNavigationContainerRef } from '@react-navigation/native';
+
+const navigationRef = useNavigationContainerRef();
+
+// Handle taps on notifications that open the app from background/killed state
+Notifications.addNotificationResponseReceivedListener((response) => {
+  const data = response.notification.request.content.data;
+  // data mirrors the `toArray()` payload:
+  // { type: 'account_verified', title: '...', message: '...' }
+  // { type: 'kyc_rejected', title: '...', message: '...', reason: '...' }
+
+  if (data.type === 'account_verified') {
+    navigationRef.navigate('Dashboard');
+  } else if (data.type === 'kyc_rejected') {
+    navigationRef.navigate('KYCSubmission');
+  }
+});
+```
+
+##### Step 6 — Remove token on logout
+
+```js
+async function handleLogout() {
+  await api.delete('/expo-push-token');   // stop push notifications
+  await api.post('/auth/logout');         // revoke Sanctum token
+  echo.disconnect();                      // close WebSocket
+  await SecureStore.deleteItemAsync('auth_token');
+  navigation.replace('Login');
+}
+```
+
+---
+
 ## Response Format
 
 All API responses follow a consistent JSON structure.
@@ -2148,6 +2341,22 @@ curl -X POST http://localhost:8000/api/v1/notifications/9d4e5f6a-7b8c-9d0e-1f2a-
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/notifications/read-all \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Register Expo push token:**
+
+```bash
+curl -X PUT http://localhost:8000/api/v1/expo-push-token \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -d '{"expo_push_token": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"}'
+```
+
+**Remove Expo push token (on logout):**
+
+```bash
+curl -X DELETE http://localhost:8000/api/v1/expo-push-token \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 

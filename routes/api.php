@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Auth\Pin\VerifyPinController;
 use App\Http\Controllers\Api\V1\Auth\SendOtpController;
 use App\Http\Controllers\Api\V1\Auth\VerifyRegistrationOtpController;
 use App\Http\Controllers\Api\V1\ClientPortfolioController;
+use App\Http\Controllers\Api\V1\ExpoPushTokenController;
 use App\Http\Controllers\Api\V1\MetaTraderCredentialController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PaymentController;
@@ -135,6 +136,10 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
         Route::get('/subscriptions/current', [SubscriptionController::class, 'current']);
         Route::get('/subscriptions', [SubscriptionController::class, 'index']);
+
+        // Expo Push Token Routes
+        Route::put('/expo-push-token', [ExpoPushTokenController::class, 'update']);
+        Route::delete('/expo-push-token', [ExpoPushTokenController::class, 'destroy']);
 
         // Notification Routes
         Route::prefix('notifications')->group(function (): void {

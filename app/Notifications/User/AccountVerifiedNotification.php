@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Expo\ExpoMessage;
 
 class AccountVerifiedNotification extends Notification implements ShouldQueue
 {
@@ -17,7 +18,13 @@ class AccountVerifiedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        $channels = ['mail', 'database', 'broadcast'];
+
+        if ($notifiable->expo_push_token !== null) {
+            $channels[] = 'expo';
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -46,5 +53,12 @@ class AccountVerifiedNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toArray($notifiable));
+    }
+
+    public function toExpo(object $notifiable): ExpoMessage
+    {
+        return ExpoMessage::create('Account Verified')
+            ->body('Your identity has been verified. You now have full access.')
+            ->playSound();
     }
 }

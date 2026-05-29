@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Expo\ExpoMessage;
 
 class KycRejectedNotification extends Notification implements ShouldQueue
 {
@@ -20,7 +21,13 @@ class KycRejectedNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        $channels = ['mail', 'database', 'broadcast'];
+
+        if ($notifiable->expo_push_token !== null) {
+            $channels[] = 'expo';
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -53,5 +60,18 @@ class KycRejectedNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toArray($notifiable));
+    }
+
+    public function toExpo(object $notifiable): ExpoMessage
+    {
+        $body = 'Your identity verification was rejected. Please re-submit your documents.';
+
+        if (filled($this->verification->rejection_reason)) {
+            $body = 'KYC rejected: '.$this->verification->rejection_reason;
+        }
+
+        return ExpoMessage::create('KYC Verification Rejected')
+            ->body($body)
+            ->playSound();
     }
 }
