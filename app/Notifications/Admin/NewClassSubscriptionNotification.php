@@ -48,11 +48,16 @@ class NewClassSubscriptionNotification extends Notification implements ShouldQue
      */
     public function toArray(object $notifiable): array
     {
-        return \Filament\Notifications\Notification::make()
-            ->title('New Trading Class Subscription')
-            ->body(($this->payment->user->full_name ?? $this->payment->user->email).' submitted $'.$this->payment->amount.' for '.$this->payment->plan->name.'.')
-            ->icon('heroicon-o-banknotes')
-            ->getDatabaseMessage();
+        return [
+            'type' => 'new_class_subscription',
+            'title' => 'New Trading Class Subscription',
+            'message' => ($this->payment->user->full_name ?? $this->payment->user->email).' submitted a payment of $'.$this->payment->amount.' for the '.$this->payment->plan->name.' plan.',
+            'payment_id' => $this->payment->id,
+            'reference' => $this->payment->reference,
+            'amount' => $this->payment->amount,
+            'user_id' => $this->payment->user_id,
+            'plan_name' => $this->payment->plan->name,
+        ];
     }
 
     public function toBroadcast(object $notifiable): BroadcastMessage
