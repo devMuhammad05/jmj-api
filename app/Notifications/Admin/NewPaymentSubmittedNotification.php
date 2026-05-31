@@ -3,6 +3,7 @@
 namespace App\Notifications\Admin;
 
 use App\Models\Payment;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -47,17 +48,15 @@ class NewPaymentSubmittedNotification extends Notification implements ShouldQueu
     /**
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
-        return [
-            'type' => 'new_payment_submitted',
-            'title' => 'New Payment Submitted',
-            'message' => ($this->payment->user->full_name ?? $this->payment->user->email).' submitted a payment of $'.$this->payment->amount.' for the '.($this->payment->plan?->name ?? format_status_text($this->payment->type->value)).' plan.',
-            'payment_id' => $this->payment->id,
-            'reference' => $this->payment->reference,
-            'amount' => $this->payment->amount,
-            'user_id' => $this->payment->user_id,
-            'plan_name' => $this->payment->plan?->name ?? format_status_text($this->payment->type->value),
-        ];
+        $userName = $this->payment->user->full_name ?? $this->payment->user->email;
+        $planLabel = $this->payment->plan?->name ?? format_status_text($this->payment->type->value);
+
+        return FilamentNotification::make()
+            ->title('New Payment Submitted')
+            ->body($userName.' submitted a payment of $'.$this->payment->amount.' for the '.$planLabel.' plan.')
+            ->warning()
+            ->getDatabaseMessage();
     }
 }

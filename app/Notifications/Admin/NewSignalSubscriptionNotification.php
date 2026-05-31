@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications\Admin;
 
 use App\Models\Payment;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -48,17 +49,14 @@ class NewSignalSubscriptionNotification extends Notification implements ShouldQu
     /**
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
-        return [
-            'type' => 'new_signal_subscription',
-            'title' => 'New Signal Subscription',
-            'message' => ($this->payment->user->full_name ?? $this->payment->user->email).' submitted a payment of $'.$this->payment->amount.' for the '.$this->payment->plan->name.' plan.',
-            'payment_id' => $this->payment->id,
-            'reference' => $this->payment->reference,
-            'amount' => $this->payment->amount,
-            'user_id' => $this->payment->user_id,
-            'plan_name' => $this->payment->plan->name,
-        ];
+        $userName = $this->payment->user->full_name ?? $this->payment->user->email;
+
+        return FilamentNotification::make()
+            ->title('New Signal Subscription')
+            ->body($userName.' submitted a payment of $'.$this->payment->amount.' for the '.$this->payment->plan->name.' plan.')
+            ->warning()
+            ->getDatabaseMessage();
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications\Admin;
 
 use App\Models\PoolInvestment;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -48,17 +49,14 @@ class NewPoolInvestmentSubmittedNotification extends Notification implements Sho
     /**
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
-        return [
-            'type' => 'new_pool_investment_submitted',
-            'title' => 'New Pool Investment Submitted',
-            'message' => ($this->investment->user->full_name ?? $this->investment->user->email).' submitted a pool investment of $'.$this->investment->amount_paid.' for the '.$this->investment->pool->name.' pool.',
-            'investment_id' => $this->investment->id,
-            'pool_id' => $this->investment->pool_id,
-            'pool_name' => $this->investment->pool->name,
-            'amount_paid' => $this->investment->amount_paid,
-            'user_id' => $this->investment->user_id,
-        ];
+        $userName = $this->investment->user->full_name ?? $this->investment->user->email;
+
+        return FilamentNotification::make()
+            ->title('New Pool Investment Submitted')
+            ->body($userName.' submitted a pool investment of $'.$this->investment->amount_paid.' for the '.$this->investment->pool->name.' pool.')
+            ->warning()
+            ->getDatabaseMessage();
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Notifications\Admin;
 
 use App\Models\Verification;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -48,14 +49,14 @@ class KycSubmittedNotification extends Notification implements ShouldQueue
     /**
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
-        return [
-            'type' => 'kyc_submitted',
-            'title' => 'New KYC Submission',
-            'message' => ($this->verification->user->full_name ?? $this->verification->user->email).' submitted a KYC verification request.',
-            'verification_id' => $this->verification->id,
-            'user_id' => $this->verification->user_id,
-        ];
+        $userName = $this->verification->user->full_name ?? $this->verification->user->email;
+
+        return FilamentNotification::make()
+            ->title('New KYC Submission')
+            ->body($userName.' submitted a KYC verification request.')
+            ->warning()
+            ->getDatabaseMessage();
     }
 }
