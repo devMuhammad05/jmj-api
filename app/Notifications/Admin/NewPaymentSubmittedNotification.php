@@ -14,6 +14,8 @@ class NewPaymentSubmittedNotification extends Notification implements ShouldQueu
 {
     use Queueable;
 
+    public bool $afterCommit = true;
+
     public function __construct(public Payment $payment) {}
 
     /**
@@ -50,12 +52,12 @@ class NewPaymentSubmittedNotification extends Notification implements ShouldQueu
         return [
             'type' => 'new_payment_submitted',
             'title' => 'New Payment Submitted',
-            'message' => ($this->payment->user->full_name ?? $this->payment->user->email).' submitted a payment of $'.$this->payment->amount.' for the '.$this->payment->plan->name.' plan.',
+            'message' => ($this->payment->user->full_name ?? $this->payment->user->email).' submitted a payment of $'.$this->payment->amount.' for the '.($this->payment->plan?->name ?? format_status_text($this->payment->type->value)).' plan.',
             'payment_id' => $this->payment->id,
             'reference' => $this->payment->reference,
             'amount' => $this->payment->amount,
             'user_id' => $this->payment->user_id,
-            'plan_name' => $this->payment->plan->name,
+            'plan_name' => $this->payment->plan?->name ?? format_status_text($this->payment->type->value),
         ];
     }
 

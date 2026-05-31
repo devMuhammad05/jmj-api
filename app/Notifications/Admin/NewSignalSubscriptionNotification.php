@@ -16,6 +16,8 @@ class NewSignalSubscriptionNotification extends Notification implements ShouldQu
 {
     use Queueable;
 
+    public bool $afterCommit = true;
+
     public function __construct(public Payment $payment) {}
 
     /**

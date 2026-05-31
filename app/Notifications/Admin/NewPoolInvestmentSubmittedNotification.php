@@ -16,6 +16,8 @@ class NewPoolInvestmentSubmittedNotification extends Notification implements Sho
 {
     use Queueable;
 
+    public bool $afterCommit = true;
+
     public function __construct(public PoolInvestment $investment) {}
 
     /**
