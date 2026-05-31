@@ -16,9 +16,10 @@ class KycSubmittedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public bool $afterCommit = true;
-
-    public function __construct(public Verification $verification) {}
+    public function __construct(public Verification $verification)
+    {
+        $this->afterCommit();
+    }
 
     /**
      * @return array<int, string>
