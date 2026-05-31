@@ -33,7 +33,7 @@ class NewSignalSubscriptionNotification extends Notification implements ShouldQu
     public function toMail(object $notifiable): MailMessage
     {
         $userName = $this->payment->user->full_name ?? $this->payment->user->email;
-        $reviewUrl = route('filament.admin.resources.payments.edit', $this->payment);
+        $reviewUrl = route('filament.admin.resources.subscriptions.index');
 
         return (new MailMessage)
             ->subject('New Signal Subscription')

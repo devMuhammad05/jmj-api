@@ -29,7 +29,7 @@ class PaymentForm
                         ->label('Payment Type')
                         ->disabled()
                         ->dehydrated(false)
-                        ->afterStateHydrated(fn ($component, $record) => $component->state($record?->type ? format_status_text($record->type) : null)),
+                        ->afterStateHydrated(fn ($component, $record) => $component->state($record?->type ? format_status_text($record->type->value) : null)),
 
                     TextInput::make('gateway_name')
                         ->label('Gateway')
@@ -81,7 +81,7 @@ class PaymentForm
                         ->required()
                         ->native(false),
                 ])
-                ->columnSpanFull()
+                ->columnSpanFull(),
         ]);
     }
 }

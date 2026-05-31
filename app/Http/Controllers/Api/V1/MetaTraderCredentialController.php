@@ -54,9 +54,13 @@ class MetaTraderCredentialController extends ApiController
 
             $payment->load(['user', 'gateway', 'proofs']);
 
-            foreach (app(AdminService::class)->getAdminEmails() as $email) {
+            $adminService = app(AdminService::class);
+
+            foreach ($adminService->getAdminEmails() as $email) {
                 Notification::route('mail', $email)->notify(new NewPaymentSubmittedNotification($payment));
             }
+
+            Notification::send($adminService->getAdmins(), new NewPaymentSubmittedNotification($payment));
         });
 
         return $this->createdResponse(
