@@ -1138,7 +1138,7 @@ Submit an application to join an investment pool. Payment verification takes 24-
 | `pool_id`              | UUID    | ✓        | Must be a valid active pool              |
 | `full_name`            | string  | ✓        | Investor's full legal name               |
 | `phone_number`         | string  | ✓        | Contact number                           |
-| `contribution`         | numeric | ✓        | Investment amount (minimum $1,000)       |
+| `contribution`         | numeric | ✓        | Investment amount (minimum = pool's `each_contribution_amount`) |
 | `amount_paid`          | numeric | ✓        | Total amount paid (including fees)        |
 | `payment_gateway_id`   | integer | ✓        | ID of the payment gateway used            |
 | `payment_proof_url`    | URL     | ✓        | URL to payment screenshot                |
