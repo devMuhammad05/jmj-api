@@ -31,11 +31,12 @@ class StorePoolInvestmentRequest extends FormRequest
             'pool_id' => ['required', 'uuid', 'exists:pools,id'],
             'full_name' => ['required', 'string', 'max:255'],
             'phone_number' => ['required', 'string', 'max:20'],
-            'contribution' => ['required', 'numeric', 'min:1000'],
+            'contribution' => ['required', 'numeric', 'min:0'],
             'amount_paid' => ['required', 'numeric', 'min:0'],
             'payment_gateway_id' => ['required', 'integer', 'exists:payment_gateways,id'],
             'payment_proof_url' => ['required', 'url'],
             'terms_accepted' => ['required', 'boolean', 'accepted'],
+
             // MetaTrader account — all optional, but if account number is given the rest become required
             'mt_account_number' => ['nullable', 'string', 'max:50'],
             'mt_password' => ['nullable', 'required_with:mt_account_number', 'string'],
@@ -55,7 +56,7 @@ class StorePoolInvestmentRequest extends FormRequest
     {
         return [
             'pool_id.exists' => 'The selected pool does not exist.',
-            'contribution.min' => 'The minimum investment amount is $1,000.',
+            'contribution.min' => 'The contribution amount must be at least 0.',
             'terms_accepted.accepted' => 'You must accept the terms and conditions.',
         ];
     }
@@ -70,6 +71,15 @@ class StorePoolInvestmentRequest extends FormRequest
 
             if (! $pool) {
                 return;
+            }
+
+            $contribution = (float) $this->input('contribution', 0);
+
+            if ($contribution < (float) $pool->each_contribution_amount) {
+                $validator->errors()->add(
+                    'contribution',
+                    "The minimum contribution for this pool is \${$pool->each_contribution_amount}."
+                );
             }
 
             $activeApplications = $pool->poolInvestments()
