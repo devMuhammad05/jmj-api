@@ -8,7 +8,6 @@ use App\Models\Verification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -30,7 +29,7 @@ class KycSubmittedNotification extends Notification implements ShouldQueue
             return ['mail'];
         }
 
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -58,10 +57,5 @@ class KycSubmittedNotification extends Notification implements ShouldQueue
             'verification_id' => $this->verification->id,
             'user_id' => $this->verification->user_id,
         ];
-    }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage($this->toArray($notifiable));
     }
 }

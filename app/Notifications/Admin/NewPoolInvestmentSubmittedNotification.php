@@ -8,7 +8,6 @@ use App\Models\PoolInvestment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -30,7 +29,7 @@ class NewPoolInvestmentSubmittedNotification extends Notification implements Sho
             return ['mail'];
         }
 
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -61,10 +60,5 @@ class NewPoolInvestmentSubmittedNotification extends Notification implements Sho
             'amount_paid' => $this->investment->amount_paid,
             'user_id' => $this->investment->user_id,
         ];
-    }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage($this->toArray($notifiable));
     }
 }

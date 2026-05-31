@@ -8,7 +8,6 @@ use App\Models\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -30,7 +29,7 @@ class NewClassSubscriptionNotification extends Notification implements ShouldQue
             return ['mail'];
         }
 
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -61,10 +60,5 @@ class NewClassSubscriptionNotification extends Notification implements ShouldQue
             'user_id' => $this->payment->user_id,
             'plan_name' => $this->payment->plan->name,
         ];
-    }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage($this->toArray($notifiable));
     }
 }

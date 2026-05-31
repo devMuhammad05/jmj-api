@@ -6,7 +6,6 @@ use App\Models\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -28,7 +27,7 @@ class NewPaymentSubmittedNotification extends Notification implements ShouldQueu
             return ['mail'];
         }
 
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -60,10 +59,5 @@ class NewPaymentSubmittedNotification extends Notification implements ShouldQueu
             'user_id' => $this->payment->user_id,
             'plan_name' => $this->payment->plan?->name ?? format_status_text($this->payment->type->value),
         ];
-    }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage($this->toArray($notifiable));
     }
 }
