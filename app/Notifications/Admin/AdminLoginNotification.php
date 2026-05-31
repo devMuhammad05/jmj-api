@@ -7,6 +7,7 @@ namespace App\Notifications\Admin;
 use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -41,6 +42,18 @@ class AdminLoginNotification extends Notification implements ShouldQueue
             ->line('**Device / Browser:** '.$this->userAgent)
             ->action('Review Admin Panel', route('filament.admin.pages.dashboard'))
             ->line('If this was not you, please change your password immediately and contact support.');
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'type' => 'admin_login',
+            'title' => 'Admin Login Detected',
+            'message' => 'A login was detected from IP '.$this->ipAddress.' at '.$this->loginAt.'.',
+            'ip_address' => $this->ipAddress,
+            'user_agent' => $this->userAgent,
+            'login_at' => $this->loginAt,
+        ]);
     }
 
     /**
